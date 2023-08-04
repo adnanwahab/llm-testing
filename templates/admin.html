@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://cdn.tailwindcss.com"></script> 
+</head>
+<body>
+  <h1 class="text-3xl font-bold underline">
+    LLM benchmark
+  </h1>
+
+
+  <div>
+    <h1>how many posts will we have today ??? ?</h1>
+  
+
+
+    <fieldset class="mt-4">
+      <div class="space-y-4">
+        {% for post in posts %}
+        hello world {{post[0]}}, {{post[1]}}, {{post[2]}}, {{post[3]}}, 
+        {% endfor %}
+      </div>
+    </fieldset>
+  </div>
+
+
+
+</body>
+</html> 

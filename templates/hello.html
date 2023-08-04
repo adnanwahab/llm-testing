@@ -1,0 +1,138 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+    </head>
+    <body>
+      
+    </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://cdn.tailwindcss.com"></script> 
+ <style>
+.calendar-day *:hover{
+    cursor:pointer !important;
+    background: grey;
+}
+
+ </style>
+</head>
+<body>
+  
+<template name="radio">
+    <div class="flex items-center">
+        <input id="{{item}}" name="notification-method" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+        <label for="{{item}}" class="ml-3 block text-sm font-medium leading-6 text-gray-900">{{item}}</label>
+      </div>
+</template>
+
+  <div class="p-5">
+    <h1 class="text-3xl font-bold underline">
+        LLM benchmark
+      </h1>
+    <h1>What are we voting on todays date {{ date }}?</h1>
+  
+
+
+    <label class="text-base font-semibold text-gray-900">Voting</label>
+    <p class="text-sm text-gray-500">What should the stream or congress vote about today?</p>
+    <fieldset class="mt-4">
+      <div class="space-y-4">
+        {% for item in answer %}
+        {% if item %}
+        <div class="flex items-center">
+            <input id="{{item[0]}}" name="notification-method" type="radio" checked class="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600">
+            <label for="{{item}}" class="ml-3 block text-sm font-medium leading-6 text-gray-900">{{item[0]}} {{item[1]}}</label>
+          </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+
+      <textarea for="whatever" class="border-gray-300 border"></textarea>
+    </fieldset>
+    <button type="button" class=" vote rounded-full bg-white px-2.5 py-1 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">Vote</button>
+  </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="float-right w-48 absolute top-0 right-0">
+<div class="flex flex-1 flex-col space-y-5 overflow-auto bg-coolgray-50 capacitor:pt-5 dark:bg-gray-800/30">
+
+        <div class="group min-w-36"><header class="flex items-center justify-between px-4 py-4"><div class="cursor-default text-sm font-semibold text-coolgray-900 dark:text-near-white">August 2023</div><nav class="flex items-center justify-center space-x-1 text-coolgray-400"><button class="cursor-default rounded-md transition-colors duration-100 hover:bg-gray-200/50 hover:text-coolgray-900 dark:hover:bg-white/5 dark:hover:text-white"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M14.7996 8.23966C15.0814 8.5432 15.0639 9.01775 14.7603 9.2996L11.8522 12L14.7603 14.7004C15.0639 14.9823 15.0814 15.4568 14.7996 15.7603C14.5177 16.0639 14.0432 16.0815 13.7397 15.7996L10.2397 12.5496C10.0868 12.4077 10 12.2086 10 12C10 11.7915 10.0868 11.5923 10.2397 11.4504L13.7397 8.20041C14.0432 7.91856 14.5177 7.93613 14.7996 8.23966Z" fill="currentColor"></path></svg></button><div class="inline-flex"><button class="cursor-default rounded-md transition-colors duration-100 hover:bg-gray-200/50 hover:text-coolgray-900 dark:hover:bg-white/5 dark:hover:text-white"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.75 6.5C7.50736 6.5 6.5 7.50736 6.5 8.75V15.25C6.5 16.4926 7.50736 17.5 8.75 17.5H15.25C16.4926 17.5 17.5 16.4926 17.5 15.25V8.75C17.5 7.50736 16.4926 6.5 15.25 6.5H8.75ZM5 8.75C5 6.67893 6.67893 5 8.75 5H15.25C17.3211 5 19 6.67893 19 8.75V15.25C19 17.3211 17.3211 19 15.25 19H8.75C6.67893 19 5 17.3211 5 15.25V8.75Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M9 12.246C9.00002 11.8318 9.33581 11.4961 9.75003 11.4961L10.25 11.4961C10.6642 11.4961 11 11.8319 11 12.2461C11 12.6603 10.6642 12.9961 10.25 12.9961L9.74997 12.9961C9.33576 12.9961 8.99998 12.6603 9 12.246Z" fill="currentColor"></path><path fill-rule="evenodd" clip-rule="evenodd" d="M5 8.75C5 6.67893 6.67893 5 8.75 5H15.25C17.3211 5 19 6.67893 19 8.75V9.25C19 9.66421 18.6642 10 18.25 10H5.75C5.33579 10 5 9.66421 5 9.25V8.75Z" fill="currentColor"></path></svg></button></div><button class="cursor-default rounded-md transition-colors duration-100 hover:bg-gray-200/50 hover:text-coolgray-900 dark:hover:bg-white/5 dark:hover:text-white"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M10.2004 8.23966C9.91855 8.5432 9.93613 9.01775 10.2397 9.2996L13.1478 12L10.2397 14.7004C9.93613 14.9823 9.91855 15.4568 10.2004 15.7603C10.4823 16.0639 10.9568 16.0815 11.2603 15.7996L14.7603 12.5496C14.9132 12.4077 15 12.2086 15 12C15 11.7915 14.9132 11.5923 14.7603 11.4504L11.2603 8.20041C10.9568 7.91856 10.4823 7.93613 10.2004 8.23966Z" fill="currentColor"></path></svg></button></nav></header><div><div class="calendar-weekdays grid grid-cols-7 border-b border-coolgray-900/5 px-4 text-center dark:border-white/10"><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Mo</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Tu</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">We</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Th</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Fr</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Sa</div><div class="py-2 text-2xs font-medium text-coolgray-900 dark:text-near-white">Su</div></div><div class="px-4 py-2"><div class="grid grid-cols-7 text-center"><div class="calendar-day relative py-1.5 text-2xs opacity-20"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">31</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="absolute left-[50%] top-[50%] ml-[-16px] mt-[-16px] h-[32px] w-[32px] rounded-md bg-accent"></div><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500  font-bold text-white">1</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">2</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">3</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">4</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">5</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">6</div></div></div><div class="grid grid-cols-7 text-center"><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">7</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">8</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">9</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">10</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">11</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">12</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">13</div></div></div><div class="grid grid-cols-7 text-center"><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">14</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">15</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">16</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">17</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">18</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">19</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">20</div></div></div><div class="grid grid-cols-7 text-center"><div class="calendar-day relative py-1.5 text-2xs"><div class="pointer-events-none absolute bottom-1 left-1/2 -ml-0.5 h-1 w-1 rounded-full bg-accent/50 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-white/50"></div><div class="relative cursor-default rounded-full duration-500 ">21</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">22</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">23</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">24</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">25</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">26</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">27</div></div></div><div class="grid grid-cols-7 text-center"><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">28</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">29</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">30</div></div><div class="calendar-day relative py-1.5 text-2xs"><div class="relative cursor-default rounded-full duration-500 ">31</div></div><div class="calendar-day relative py-1.5 text-2xs opacity-20"><div class="relative cursor-default rounded-full duration-500 ">1</div></div><div class="calendar-day relative py-1.5 text-2xs opacity-20"><div class="relative cursor-default rounded-full duration-500 ">2</div></div><div class="calendar-day relative py-1.5 text-2xs opacity-20"><div class="relative cursor-default rounded-full duration-500 ">3</div></div></div></div></div></div>
+</div>
+</div>
+
+<script>
+
+    document.querySelector('.vote').addEventListener('click', handleClick)
+    
+    
+    function handleClick(event) {
+    const url = '/vote'; // Replace with your server URL
+    let vote = document.querySelector(':checked').id;
+    let writeInBallot = document.querySelector('textarea').value
+    let date = window.location.pathname.slice(1)
+    const data = {
+      vote,
+      writeInBallot,
+      date
+    }; // Replace with the data you want to send to the server
+    
+    fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json', // Specify the data format as JSON
+      },
+      body: JSON.stringify(data), // Convert data to JSON format
+    })
+      .then(response => response.json()) // Parse the response JSON data
+      .then(data => {
+        // Process the response data here
+        //renderPoll(data)
+        window.location.reload()
+      })
+      .catch(error => {
+        // Handle errors here
+        console.error('Error:', error);
+      });
+    }
+    
+    function renderPoll (data) {
+        console.log(data)
+        document.body.innerHTML = ` <iframe width="100%" height="802" frameborder="0"
+      src="https://observablehq.com/embed/92b22ed54b156fae?cells=barchart"></iframe>`
+    }
+    
+    
+    document.querySelectorAll('.calendar-day').forEach((element)=> {
+        console.log(element)
+        let day = element.textContent.length == 1 ? 
+        '0' + element.textContent :
+         element.textContent
+        element.addEventListener('click', function (element) {
+            window.location.href = `2023-08-${day}`
+         })
+    
+    })
+    </script>
+
+<!-- make 5 polls per day -->
+</body>
+</html> 

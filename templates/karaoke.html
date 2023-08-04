@@ -1,0 +1,90 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+    </head>
+    <body>
+      
+    </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://cdn.tailwindcss.com"></script> 
+ <style>
+ </style>
+</head>
+<body>
+  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js
+  "></script>
+
+  <h3 class="lyrics"></h3>
+  <label>Youtube Downloader</label><input class="yt">
+  <button>click here to play music</button>
+  <audio controls autoplay>
+    <source src="/static/dance.mp3" type="audio/mpeg">
+    Your browser does not support the audio tag.
+</audio>
+  <script type="module">
+import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
+    document.querySelector('button').addEventListener('click', async (e) => {
+      document.querySelector('audio').play()
+      let req = await fetch('/lyrics.json', {headers: {'Content-Type': 'application/json'}});
+      console.log(req);
+      let json = await req.json();
+      let lyrics = Object.values(json)
+      let timestamps = Object.keys(json).map(str => str.split('-->')[0].trim().slice(1))
+      console.log(timestamps)
+      let now = Date.now()
+      let i = 0
+      //00:03.980
+  
+        requestAnimationFrame(function recur() {
+          let elapsed = (Date.now() - now) / 1000
+          //console.log(elapsed)
+          let ts = timestamps.find(ts => getSeconds(ts) > elapsed)
+          let i = timestamps.indexOf(ts) - 1
+          changeLyrics(i, lyrics)
+          requestAnimationFrame(recur)
+        })
+      })
+
+    function changeLyrics(i, lyrics) {
+      document.querySelector('.lyrics').textContent = lyrics[i]
+    }
+
+    function getSeconds (timeStr) {
+      let parts = timeStr.split(":");
+      let minutes = parseInt(parts[0]);
+      let seconds = parseFloat(parts[1]);
+      let totalSeconds = minutes * 60 + seconds;
+      return totalSeconds
+    }
+
+
+    function getYT2(val) {
+        let req =  fetch('/yt', {
+          headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({val}),
+        method: 'POST',
+      }).then(req => req.json()).then(json => console.log(json))
+      console.log('hello')
+
+    }
+
+    let getYT = _.debounce(getYT2, 1000)
+    document.querySelector('.yt').addEventListener('input',  (e) => {
+      let val = e.target.value
+
+  
+      getYT(val)
+
+    })
+
+  </script>
+</body>
+</html> 
