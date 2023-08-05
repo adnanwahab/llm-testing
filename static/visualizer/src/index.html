@@ -15,7 +15,51 @@
 </head>
 <body>
 
- 
+    <div id="content">
+    
+        <label for="thefile" class="file"> Choose an audio file
+          <input type="file" id="thefile" accept="audio/*" />
+        </label>
+    
+        <!-- <audio id="audio" controls></audio> -->
+        <div id="out"></div>
+      </div>
+    <!-- partial -->
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js'></script>
+    <script src='https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.3/dat.gui.min.js'></script> -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js'></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     <h3 class="lyrics"></h3>
 
@@ -67,7 +111,7 @@
 
         let lyrics = []
         let speech = []
-
+        ///https://github.com/github/auto-complete-element
 
 
     import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
@@ -202,5 +246,24 @@ completer.addEventListener('auto-complete-change', function(event) {
     };
     
       </script>
+
+
+      <!-- two visual indicators on the transcript -->
+      <!-- one is for the expected tempo?  -->
+      <!-- the other is for the speakers tempo -> tokenized match (noisy bar) -->
+
+      <!-- split audio and send two files (background + speaker) -->
+
+
+
+      <!-- different modes , conventional - transition the mask at a constant rate -->
+
+
+      <!-- tokenized match  -->
+
+      <!-- compare audio streams on server for pitch, and so on -->
+
+      <!-- regular song + split song - lower volume of the original speech -->
+
 </body>
 </html>
