@@ -25,24 +25,25 @@ import json
 
 
 # Save the JSON data to the file
-def saveJSON(file_path, data):
+def saveJSON(file_path, data): 
+    print(file_path)
     with open(file_path, "w") as json_file:
         json.dump(data, json_file)
 
 
 
 
-from openlrc import LRCer
+# from openlrc import LRCer
 
-lrcer = LRCer()
+# lrcer = LRCer()
 
 
-from faster_whisper import WhisperModel
+# from faster_whisper import WhisperModel
 
-model_size = "large-v2"
+# model_size = "large-v2"
 
-# Run on GPU with FP16
-model = WhisperModel(model_size, device="cuda", compute_type="float16")
+# # Run on GPU with FP16
+# model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
 # or run on GPU with INT8
 # model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")

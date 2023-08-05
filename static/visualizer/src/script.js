@@ -15,8 +15,8 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 
 
-
-
+//https://www.youtube.com/watch?v=SZzehktUeko&ab_channel=ChrisJones
+//https://www.youtube.com/watch?v=gxxqdrrpgZc&ab_channel=HDCOLORS-ColorfulKaleidoscopeswithAddedValue
 var noise = new SimplexNoise();
 var vizInit = function (){
 
