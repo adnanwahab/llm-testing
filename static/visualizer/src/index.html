@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.tailwindcss.com"></script> 
 
+    <style>
+        span {
+            color: green;
+        } 
+    </style>
 </head>
 <body>
 
@@ -83,13 +88,16 @@
           let now = Date.now()
           let i = 0
           //00:03.980
-      
+            let lastIdx = -1
             requestAnimationFrame(function recur() {
               let elapsed = (Date.now() - now) / 1000
               //console.log(elapsed)
               let ts = timestamps.find(ts => getSeconds(ts) > elapsed)
               let i = timestamps.indexOf(ts) - 1
-              changeLyrics(i, lyrics)
+                if (lastIdx !== i) {
+                    changeLyrics(i, lyrics)
+                    lastIdx = i
+                }
               requestAnimationFrame(recur)
               lyrics.push(lyrics[i])
             //   document.querySelector('.lyric-match').textContent = 
@@ -98,7 +106,11 @@
           })
     
         function changeLyrics(i, lyrics) {
-          document.querySelector('.lyrics').textContent = lyrics[i]
+          //document.querySelector('.lyrics').textContent = lyrics[i]
+
+          document.querySelector('.lyrics').innerHTML = lyrics[i].split(' ').map(word => {
+            return '<span> ' + word + ' </span>'
+          })
         }
     
         function getSeconds (timeStr) {
@@ -181,6 +193,11 @@ completer.addEventListener('auto-complete-change', function(event) {
         const transcript = event.results[event.results.length - 1][0].transcript;
       recognizedText.textContent = transcript;
       speech.push(transcript)
+      console.log(document.querySelector('.lyrics'))
+      Array.from(document.querySelector('.lyrics').children).forEach((span, i) => {
+        if (i < transcript.length) 
+        span.style.background = 'pink'
+      })
       //console.log(event.results)
     };
     
