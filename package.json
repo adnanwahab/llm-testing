@@ -4,11 +4,14 @@
   "description": "- [ ] Calendar widget on home page - [ ] Mock Voting Data for 1 year before  - [ ] Once user visits page and if its a new day without data, instantiate a vote  - [ ] Users can send in voting requests  - [ ] Users can add a write-in ballot and that will show up for all other users on that page  - [ ] Use LLMs to summarize and group together comments that are similar  - [ ] Use LLMs to generate and mock out comments to be grouped together (iuse a different model ) - [ ] make the audio kareoke speech coach",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "ngrok start --config=ngrok.yml media_server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
     "express": "^4.18.2"
   }
 }

@@ -7,7 +7,6 @@ from flask import Flask, render_template, jsonify, redirect, url_for, request, s
 import openai
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
-import whisper
 import yt_dlp
 
 
@@ -70,36 +69,59 @@ def lyrics():
     return send_from_directory(path, filename, as_attachment=True)
 
 
-model = whisper.load_model("medium")
+from faster_whisper import WhisperModel
+
+model_size = "large-v2"
+
+# Run on GPU with FP16
+model = WhisperModel(model_size, device="cuda", compute_type="float16")
+
+# or run on GPU with INT8
+# model = WhisperModel(model_size, device="cuda", compute_type="int8_float16")
+# or run on CPU with INT8
+# model = WhisperModel(model_size, device="cpu", compute_type="int8")
+# import whisper
+
+# model = whisper.load_model("medium.en")
+
+
+def transcribe2(fp):
+    result = model.transcribe(fp)
+    print(result)
+    return (result["text"])
+def transcribe(fp):
+    print(fp)
+    segments, info = model.transcribe(fp, beam_size=5,
+                             vad_filter=True,
+    vad_parameters=dict(min_silence_duration_ms=500          
+                                      ))
+    print(info)
+    return list(segments)
+    #lrcer.run(fp, target_lang='en') 
+    #print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
+    #return 
+
+import os
+
+current_directory = os.getcwd()
 
 @app.route('/yt', methods=['POST', 'GET'])
 def yt():
     print(request)
     data = request.json
-    print(data)
-    # with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-    #     ydl.download(['https://www.youtube.com/watch?v=zaIsVnmwdqg'])
+    print('wtf',data)
+    fp = data
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        print('wtfaasdfasdfa',ydl.download([fp]))
 
     # load audio and pad/trim it to fit 30 seconds
-    audio = whisper.load_audio("./dance.mp3")
-    audio = whisper.pad_or_trim(audio)
+    import os
 
-    # make log-Mel spectrogram and move to the same device as the model
-    mel = whisper.log_mel_spectrogram(audio).to(model.device)
-# Convert the input data to full precision (Float)
-    #mel = mel.float()
-    # detect the spoken language
-    _, probs = model.detect_language(mel)
-    print(f"Detected language: {max(probs, key=probs.get)}")
-
-    # decode the audio
-    options = whisper.DecodingOptions(
-        fp16 = False
-        )
-    result = whisper.decode(model, mel, options)
-
+    current_directory = os.getcwd()
+    print(current_directory)
+    data = transcribe(current_directory+'/' + 'How to NOT Take Things Too Personally - Jocko Willink & Echo Charles [tOjnzE_gP28].mp3')
     # print the recognized text
-    print(result.text, data)
+    #print(result.text, data)
 
     # data = audioowl.analyze_file(path='hello.mp3', sr=22050)
 
@@ -255,10 +277,9 @@ def asdasdffasdf():
     return redirect(url_for('hello'))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
+    print('hello')
     app.run(debug=True)
-
-
 
 
 #generate votes for the day 

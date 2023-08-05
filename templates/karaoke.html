@@ -19,17 +19,39 @@
  </style>
 </head>
 <body>
-  <script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js
-  "></script>
+ 
 
   <h3 class="lyrics"></h3>
-  <label>Youtube Downloader</label><input class="yt">
+
+
+ 
+
+  <label>Youtube Downloader</label>
+  
+  
+  <input class="yt">
+
+
+
+  <br>
   <button>click here to play music</button>
   <audio controls autoplay>
     <source src="/static/dance.mp3" type="audio/mpeg">
     Your browser does not support the audio tag.
 </audio>
+<script src="https://code.jquery.com/jquery-2.2.3.min.js" type="text/javascript"></script>
+
   <script type="module">
+    /*! fuzzycomplete 2020-09-19 */
+    import jquery from 'https://cdn.jsdelivr.net/npm/jquery@3.7.0/+esm'
+
+!function(r){"undefined"!=typeof jQuery?"undefined"!=typeof Fuse?r.fn.fuzzyComplete=function(a,l){return this.each(function(){void 0===l&&(l={display:Object.keys(a[0])[0],key:Object.keys(a[0])[0],resultsLimit:4,allowFreeInput:!1,fuseOptions:{keys:Object.keys(a[0])}});var s=new Fuse(a,l.fuseOptions),t=r(this),d=r("<div>").addClass("fuzzyResults");t.after(d);var i=r("<select>").hide();function e(){var e=t.position();e.left+=parseInt(t.css("marginLeft"),10),e.top+=parseInt(t.css("marginTop"),10),d.css({left:e.left,top:e.top+t.outerHeight(),width:t.outerWidth()})}function n(){i.val(d.children(".selected").first().data("id")),t.val(d.children(".selected").first().data("displayValue")),i.data("extraData",d.children(".selected").first().data("extraData")),t.data("extraData",d.children(".selected").first().data("extraData"))}!0!==l.allowFreeInput&&(i.attr("name",t.attr("name")),t.removeAttr("name")),t.after(i),e(),window.addEventListener("resize",e),document.fonts.ready.then(e),t.keydown(function(e){switch(e.which){case 13:return e.preventDefault(),d.hide(),void n();case 9:return d.hide(),void n()}}),t.keyup(function(e){switch(e.which){case 38:return(t=d.find(".selected").first()).length?(t.removeClass("selected"),t.prev().length?t.prev().addClass("selected"):d.children().last().addClass("selected")):d.children().last().addClass("selected"),void n();case 40:var t;return(t=d.find(".selected").first()).length?(t.removeClass("selected"),t.next().length?t.next().addClass("selected"):d.children().first().addClass("selected")):d.children().first().addClass("selected"),void n();case 13:return}var a=s.search(r(this).val());d.empty(),0===a.length&&i.val(null),a.forEach(function(e,t){if("item"in e&&"refIndex"in e&&(e=e.item),!(t>=l.resultsLimit)){0===t&&i.val(e[l.key]);var a=r("<div>").addClass("__autoitem").on("mousedown",function(e){e.preventDefault()}).click(function(){d.find(".selected").removeClass("selected"),r(this).addClass("selected"),n(),d.hide()});"function"==typeof l.key?a.data("id",l.key(e,t)):a.data("id",e[l.key]),"function"==typeof l.display?a.html(l.display(e,t)):a.text(e[l.display]),"function"==typeof l.displayValue?a.data("displayValue",l.displayValue(e,t)):"string"==typeof l.displayValue?a.data("displayValue",e[l.displayValue]):a.data("displayValue",a.text()),"function"==typeof l.extraData?a.data("extraData",l.extraData(e,t)):"string"==typeof l.extraData&&a.data("extraData",e[l.extraData]),d.append(a)}}),d.children().length?(d.show(),d.children().first().addClass("selected")):d.hide()}),t.blur(function(){d.hide()}),t.focus(function(){d.children().length&&d.show()}),i.append(r("<option>",{value:"",text:"(None Selected)"})),a.forEach(function(e,t){var a,s;a="function"==typeof l.key?l.key(e,t):e[l.key],s="function"==typeof l.display?l.display(e,t):e[l.display],i.append(r("<option>",{value:a,text:s}))}),t.val()&&(t.keyup(),t.blur())})}:console.warn("fuzzyComplete plugin requires Fuse.js"):console.warn("fuzzyComplete plugin requires jQuery")}(jQuery);
+//# sourceMappingURL=fuzzycomplete.min.js.map
+  import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
+
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
     document.querySelector('button').addEventListener('click', async (e) => {
       document.querySelector('audio').play()
@@ -66,24 +88,57 @@ import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.1
     }
 
 
-    function getYT2(val) {
-        let req =  fetch('/yt', {
+    function getYT2(shit) {
+        let req =  fetch('//localhost:3000/youtube-search', {
           headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({val}),
+        body: JSON.stringify(shit),
         method: 'POST',
-      }).then(req => req.json()).then(json => console.log(json))
-      console.log('hello')
+      }).then(req => req.json()).then(json => 
+      
+      {console.log(json)
+        $("#airportPicker").fuzzyComplete(json.items.map());
+
+
+      })
 
     }
 
     let getYT = _.debounce(getYT2, 1000)
-    document.querySelector('.yt').addEventListener('input',  (e) => {
-      let val = e.target.value
+
+    document.querySelector('.yt').addEventListener('input', function(event) {
+      let shit = event.target.value
 
   
-      getYT(val)
+getYT(shit)
+})
+  
 
-    })
+
+
+    const grammar =
+  "#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige | bisque | black | blue | brown | chocolate | coral | crimson | cyan | fuchsia | ghostwhite | gold | goldenrod | gray | green | indigo | ivory | khaki | lavender | lime | linen | magenta | maroon | moccasin | navy | olive | orange | orchid | peru | pink | plum | purple | red | salmon | sienna | silver | snow | tan | teal | thistle | tomato | turquoise | violet | white | yellow ;";
+const recognition = new SpeechRecognition();
+const speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+recognition.grammars = speechRecognitionList;
+recognition.continuous = false;
+recognition.lang = "en-US";
+recognition.interimResults = false;
+recognition.maxAlternatives = 1;
+
+const diagnostic = document.querySelector(".output");
+const bg = document.querySelector("html");
+
+document.body.onclick = () => {
+  recognition.start();
+  console.log("Ready to receive a color command.");
+};
+
+recognition.onresult = (event) => {
+  const color = event.results[0][0].transcript;
+  diagnostic.textContent = `Result received: ${color}`;
+  bg.style.backgroundColor = color;
+};
 
   </script>
 </body>

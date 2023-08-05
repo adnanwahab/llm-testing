@@ -94,8 +94,8 @@ scene.add(directionalLight)
  * Sizes
  */
 const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
+    width: window.innerWidth * .75,
+    height: window.innerHeight * .75
 }
 
 window.addEventListener('resize', () =>

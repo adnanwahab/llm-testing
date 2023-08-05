@@ -1,0 +1,45 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+    <head>
+    </head>
+    <body>
+      
+    </body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <script src="https://cdn.tailwindcss.com"></script> 
+ <style>
+ </style>
+</head>
+<body>
+ 
+
+  <h3 class="lyrics">huauu</h3>
+
+  <ul class="fs"></ul>
+
+  <script type="module">
+import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+
+import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
+   
+let abc = await d3.json('https://be1b46fea468.ngrok.app/fs', {
+  crossOrigin: "anonymous",
+  headers : { 
+
+}})
+
+d3.select('.fs').data(abc).join('li').append('a').text((d) => d.title).attr('href', (data) => {
+  return data.href
+})
+  </script>
+</body>
+</html> 

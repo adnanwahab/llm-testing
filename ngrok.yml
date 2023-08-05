@@ -1,0 +1,12 @@
+version: "2"
+authtoken: 2TUCQ8cPQuaI0FJDPRhOXrxeEl3_81nTfvqtKfv9TYpCvAzBE
+tunnels:
+  media_server:
+    proto: http
+    addr: 3000
+    hostname: audity.ngrok.io
+    host_header: "localhost:3000"
+    
+  # ssh:
+  #   proto: tcp
+  #   addr: 22

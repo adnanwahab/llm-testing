@@ -13,7 +13,7 @@ body
 .webgl
 {
     position: fixed;
-    top: 0;
+    top: 25%;
     left: 0;
     outline: none;
 }
