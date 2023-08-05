@@ -15,35 +15,66 @@
     <h3 class="lyrics"></h3>
 
 
+    <div class="lyric-match"></div>
  
 
     <label>Youtube Downloader</label>
     
     
     <input class="yt">
-  
-  
+
   
     <br>
-    <button>click here to play music</button>
+   
+
+    <button type="button" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+        click here to play music
+    </button>
+
+
+    <auto-complete src="/users/search" for="users-popup">
+        <input type="text" name="users">
+        <!--
+          Optional clear button:
+          - id must match the id of the input or the name of the input plus "-clear"
+          - recommended to be *before* UL elements to avoid conflicting with their blur logic
+      
+        -->
+        <button id="users-clear">X</button>
+        <ul id="users-popup"></ul>
+        <!--
+          Optional div for screen reader feedback. Note the ID matches the ul, but with -feedback appended.
+          Recommended: Use a "Screen Reader Only" class to position the element off the visual boundary of the page.
+        -->
+        <div id="users-popup-feedback" class="sr-only"></div>
+      </auto-complete>
+
     <audio controls>
       <source src="/dance.mp3" type="audio/mpeg">
       Your browser does not support the audio tag.
   </audio>
 <div class="recognizedText"></div>
 
-    <canvas class="webgl"></canvas>
+    <canvas class="webgl" style="display:none;"></canvas>
     <script type="module" src="./script.js"></script>
     <script type="module">
+
+
+        let lyrics = []
+        let speech = []
+
+
+
     import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
-    
+    import '@github/auto-complete-element'
+
     import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
     
     
     import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
         document.querySelector('button').addEventListener('click', async (e) => {
           document.querySelector('audio').play()
-          let req = await fetch('http://localhost:5000/lyrics.json', {headers: {'Content-Type': 'application/json'}});
+          let req = await fetch('/api/v1', {headers: {'Content-Type': 'application/json'}});
           console.log(req);
           let json = await req.json();
           let lyrics = Object.values(json)
@@ -60,6 +91,9 @@
               let i = timestamps.indexOf(ts) - 1
               changeLyrics(i, lyrics)
               requestAnimationFrame(recur)
+              lyrics.push(lyrics[i])
+            //   document.querySelector('.lyric-match').textContent = 
+            //   _.zip(lyrics, speech)
             })
           })
     
@@ -75,6 +109,24 @@
           return totalSeconds
         }
     
+        //lyric list 
+        //speech List
+        //compare the length and if the length of tokens is similar, highlight words differently
+
+
+        const completer = document.querySelector('auto-complete')
+const container = completer.parentElement
+completer.addEventListener('loadstart', () => container.classList.add('is-loading'))
+completer.addEventListener('loadend', () => container.classList.remove('is-loading'))
+completer.addEventListener('load', () => container.classList.add('is-success'))
+completer.addEventListener('error', () => container.classList.add('is-error'))
+  
+
+completer.addEventListener('auto-complete-change', function(event) {
+  console.log('Auto-completed value chosen or cleared', completer.value)
+  console.log('Related input element', event.relatedTarget)
+})
+
     
         function getYT2(shit) {
             let req =  fetch('//localhost:3000/youtube-search', {
@@ -127,7 +179,8 @@
     recognition.onresult = (event) => {
          
         const transcript = event.results[event.results.length - 1][0].transcript;
-      //recognizedText.textContent = transcript;
+      recognizedText.textContent = transcript;
+      speech.push(transcript)
       //console.log(event.results)
     };
     

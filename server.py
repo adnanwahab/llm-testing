@@ -60,6 +60,15 @@ def get_db_connection():
 
 app = Flask(__name__)
 
+@app.route('/api/v1')
+def viteProxy():
+    path = '/home/awahab/llm-testing/static/'
+    #directory = "static/lyrics.json"
+    filename = "lyrics.json"
+    print('hello world')
+    return send_from_directory(path, filename, as_attachment=True)
+
+
 @app.route('/lyrics.json')
 def lyrics():
     path = '/home/awahab/llm-testing/static/'

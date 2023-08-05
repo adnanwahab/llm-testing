@@ -12,7 +12,9 @@
   },
   "dependencies": {
     "@github/auto-complete-element": "^3.5.1",
+    "http-proxy-middleware": "^2.0.6",
     "lil-gui": "^0.18.1",
-    "three": "^0.153.0"
+    "three": "^0.153.0",
+    "tls": "^0.0.1"
   }
 }
