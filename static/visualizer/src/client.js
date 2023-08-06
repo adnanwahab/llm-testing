@@ -9,75 +9,67 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
+
+const startNewSong = async (e) => {
+    console.log(e)
+    audioTag.children[0].src= e.href 
+    audioTag.play()
+    let lyrics =e.Lyrics || e.lyrics
+
+  let now = Date.now()
+  let i = 0
+    
+    function recur() {
+        let elapsed = audioTag.currentTime
+  //console.log(elapsed)
+        let foundIndex = lyrics.findIndex((sentence, idx) => {
+          let [start, end, words] = sentence; 
+
+          if (idx === 0) return elapsed < end
+          return start < elapsed && elapsed < end
+        })
+
+          if (foundIndex > -1) {
+              changeLyrics(lyrics[foundIndex][2], foundIndex)
+          }
+        requestAnimationFrame(recur)
+      }
+      recur()
+  }
+
+
 //https://www.shadertoy.com/view/4slGz4
 //https://www.shadertoy.com/view/MslGWN
 //https://www.shadertoy.com/view/XdByzy
 //https://www.shadertoy.com/view/ldlXRS
 //make the worrds work good - use d3 and text spans around each word and then - word by word karaoke matching 
-document.querySelector('audio').currentTime = 30;
-document.querySelector('audio').volume = 0.02;
-const startNewSong = async (e) => {
-    let lyrics
-
-    if (e.title) {
-        console.log(e)
-        console.log('/media/youtube/' + e.title + '.mp3')
-        document.querySelector('audio').children[0].src
-         = 'youtube/' + e.title + '.mp3'
-         document.querySelector('audio').load()
-        lyrics = Object.values(e.lyrics)
-     } else {
-
-        let req = await fetch('/api/v1', {headers: {'Content-Type': 'application/json',
-        type: 'post',
-        body: JSON.stringify({search: e.search })
-      }});
-      
-        let json = await req.json();
-        lyrics = Object.values(json)
-
-     } 
-    document.querySelector('audio').play()
-
-  
+let audioTag = document.querySelector('audio')
+//audioTag.currentTime = 30;
+audioTag.volume = 0.02;
 
 
 
+const startApp = () => {
+    getTranscript(mockData.title, mockData.href)
+    audioTag.children[0].src = mockData.href
+    audioTag.load()
+    audioTag.currentTime = 12
+    audioTag.muted = false
+    // let test = {lyrics:[[0,21.2," Somebody hand me a cigarette I know I ain't had one in over a week"],[21.2,27.240000000000002," Somebody pour me a double shot Been getting bitter by the day, but tonight"],[27.240000000000002,28.240000000000002," I drink"],[28.240000000000002,35.24," I say I gotta get over you and get sober too I got a lot of habits I gotta kick"],[35.24,41.24," Weigh out all your options and take your pick"],[41.24,48.24," I can either burn the bar down Or I can take your number out my phone"],[48.24,55.24," I can give you up right now Never want you back long as I'm half stoned"],[55.24,60.24," If you want me to quit, you want me to get you out of my heart"],[60.24,63.24," And baby, out my mind I hate to tell you, girl"],[63.24,68.24000000000001," But I'm only quitting one thing at a time"],[68.24000000000001,75.24000000000001," I know I got me some problems About a thousand memories I gotta forget"],[75.24000000000001,82.24000000000001," But if I'm gonna solve them Baby, I'll take all the help I can get"],[82.24,86.24," If you ain't gonna kiss me Then I'll take some whiskey, some grizzly"],[86.24,91.24," Nicotine, amphetamines too You want me to stop some of that"],[91.24,95.24," Or you want me to stop loving you And what you want me to do"],[95.24,102.24," I can either burn the bar down Or I can take your number out my phone"],[102.24,109.24," I can give you up right now Never want you back long as I'm half stoned"],[109.24000000000001,114.24000000000001," If you want me to quit, you want me to get you out of my heart"],[114.24000000000001,117.24000000000001," And baby, out my mind I hate to tell you, girl"],[117.24000000000001,122.24000000000001," But I'm only quitting one thing at a time"],[122.24000000000001,124.24000000000001," Oh yeah, I hate to tell you"],[129.24,131.24," Oh yeah, I hate to tell you"],[131.24,140.24," I ain't no superman, I'm just the way I am"],[140.24,143.24," If I'm gonna move on Then I need me something in my hand"],[143.24,149.24," Ain't nothing wrong with that And if you ain't coming back"],[149.24,156.24," I can either burn the bar down Or I can take your number out my phone"],[156.24,163.24," I can give you up right now Never want you back long as I'm half stoned"],[163.24,168.24," If you want me to quit, you want me to get you out of my heart"],[168.24,171.24," And baby, out my mind I hate to tell you, girl"],[171.24,176.24," But I'm only quitting one thing at a time"],[176.24,178.24," Oh yeah, I hate to tell you"],[183.24,185.24," Oh yeah, I hate to tell you"],[186.24,191.24," Oh yeah, I hate to tell you"]],"title":"035. Morgan Wallen - One Thing At A Time.mp3","href":"/media/Billboard%20Hot%20100%20Singles%20Chart%20(24-June-2023)%20Mp3%20320kbps%20[PMEDIA]%20%E2%AD%90%EF%B8%8F/035.%20Morgan%20Wallen%20-%20One%20Thing%20At%20A%20Time.mp3"}
+    // startNewSong(test)
+}
+get('.play-button').addEventListener('click', startApp)
 
+let speechRecognition
+function changeLyrics(lyrics, index) {
+  let lyricContainer = document.querySelector('.lyrics')
+  if (lyricContainer.__index__ == index) return;
+  lyricContainer.__index__ = index
 
-    let timestamps = lyrics
-    //Object.keys(json).map(str => str.split('-->')[0].trim().slice(1))
-
-  console.log(timestamps)
-  let now = Date.now()
-  let i = 0
-  //00:03.980
-    let lastIdx = -1
-    requestAnimationFrame(function recur() {
-      let elapsed = (Date.now() - now) / 1000
-      //console.log(elapsed)
-      let ts = timestamps.find(ts => ts[0] > elapsed)
-      let i = timestamps.indexOf(ts) - 1
-        if (lastIdx !== i) {
-            changeLyrics(timestamps[i][2])
-            lastIdx = i
-        }
-      requestAnimationFrame(recur)
-      //lyrics.push(lyrics[i][2])
-    //   document.querySelector('.lyric-match').textContent = 
-    //   _.zip(lyrics, speech)
-    })
-  }
-
-
-document.querySelector('button').addEventListener('click', startNewSong)
-
-function changeLyrics(lyrics) {
-  //document.querySelector('.lyrics').textContent = lyrics[i]
-
-  document.querySelector('.lyrics').innerHTML = lyrics.split(' ').map(word => {
+  speechRecognition = createSpeechGrammar(lyrics)
+  lyricContainer.innerHTML = lyrics.split(' ').map(word => {
     return '<span> ' + word + ' </span>'
-  })
+  }).join('')
 }
 
 
@@ -113,53 +105,57 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
         get('.search-results').innerHTML = shit.join('')
      })
 })
+let mockData = {title: "03. Jamiroquai - Cosmic Girl (Remastered).mp3", href: "./media/Various Artists - 90's Smash hits (2022) Mp3 320kbps [PMEDIA] \u2b50\ufe0f/03. Jamiroquai - Cosmic Girl (Remastered).mp3"}
 
 
-document.querySelector('.search-results').addEventListener('click', function (e) {
-let shit = e.target.children[0].href
-console.log(shit)
-fetch('http://localhost:3000/play-song', {
-mode: "cors",
-method: "POST",
-headers: {'Content-Type': 'application/json'},
-body: JSON.stringify({title: e.target.textContent, href: shit})
-}).then(req => req.json()).then( json => startNewSong(json))
+document.querySelector('.search-results').addEventListener('click', clickSearchResults)
 
-document.querySelector('.search-results').innerHTML = ''
-})
+
+
+function getTranscript (title, href) {
+    fetch('http://localhost:3000/play-song', {
+    mode: "cors",
+    method: "POST",
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({title, href})
+    }).then(req => req.json()).then( json => startNewSong(json))
+} 
+
+function clickSearchResults(e) {
+    getTranscript(e.target.textContent, e.target.children[0].href)
+    document.querySelector('.search-results').innerHTML = ''
+}
 
 function get (q) { return document.querySelector(q) }
-const recognizedText = document.querySelector('.recognizedText');
 
 
-const grammar =
-"#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige | bisque | black | blue | brown | chocolate | coral | crimson | cyan | fuchsia | ghostwhite | gold | goldenrod | gray | green | indigo | ivory | khaki | lavender | lime | linen | magenta | maroon | moccasin | navy | olive | orange | orchid | peru | pink | plum | purple | red | salmon | sienna | silver | snow | tan | teal | thistle | tomato | turquoise | violet | white | yellow ;";
-const recognition = new webkitSpeechRecognition();
-const speechRecognitionList = new webkitSpeechGrammarList();
-speechRecognitionList.addFromString(grammar, 1);
-recognition.grammars = speechRecognitionList;
-recognition.continuous = true;
-recognition.lang = "en-US";
-recognition.interimResults = true;
-recognition.maxAlternatives = 1;
+function createSpeechGrammar(grammarList) {
+    const recognition = new webkitSpeechRecognition();
+    const speechRecognitionList = new webkitSpeechGrammarList();
+    grammarList = '#JSGF V1.0; grammar colors; public <color> =' + grammarList.split(' ').join(' | ')
+    console.log(grammarList)
+    speechRecognitionList.addFromString(grammarList, 1);
+    recognition.grammars = speechRecognitionList;
+    recognition.continuous = true;
+    recognition.lang = "en-US";
+    recognition.interimResults = true;
+    recognition.maxAlternatives = 1;
+    recognition.start();
+    const recognizedText = document.querySelector('.recognizedText');
+    speech.length = 0;
+    recognition.onresult = (event) => {
+        const transcript = event.results[event.results.length - 1][0].transcript;
+        let results = []
+        for (let key of event.results) {
+            //console.log(key)
+            results.push(key[0].transcript)
+        }
 
-const diagnostic = document.querySelector(".output");
-const bg = document.querySelector("html");
-
-
-recognition.start();
-console.log("Ready to receive a color command.");
-
-
-let count = 0
-recognition.onresult = (event) => {
- 
-const transcript = event.results[event.results.length - 1][0].transcript;
-recognizedText.textContent = transcript;
-speech.push(transcript)
-Array.from(document.querySelector('.lyrics').children).forEach((span, i) => {
-if (i < transcript.length) 
-span.style.background = 'pink'
-})
-//console.log(event.results)
+        results = results.join('').split(' ')
+        console.log(results)
+        //speech.push(transcript)
+        // console.log(speech)
+        Array.from(document.querySelector('.lyrics').children).forEach((span, i) => { if (i <= results.length) span.style.background = 'pink' })
+    } 
+    return recognition
 };

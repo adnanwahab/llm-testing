@@ -32,8 +32,10 @@ app.listen(port, () => {
 
 app.post('/play-song', (req, res) => {
   let data = {}
-  data['lyrics'] = fs.readFileSync(music_directory[req.body.title].replace('.mp3', '.json'))
+  data['lyrics'] = JSON.parse(fs.readFileSync(music_directory[req.body.title].replace('.mp3', '.json')))
   data['title'] = req.body.title
+  data['href'] = req.body.href.replace('http://localhost:5173', '')
+  console.log(data)
   res.send(data)
 })
 

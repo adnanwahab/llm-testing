@@ -16,10 +16,10 @@ from faster_whisper import WhisperModel
 model_size = "large-v2"
 
 # Run on GPU with FP16
+model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
 def transcribe(fp):
     print(fp)
-    model = WhisperModel(model_size, device="cuda", compute_type="float16")
     _, file_extension = os.path.splitext(fp)
 
     if file_extension:
@@ -105,6 +105,8 @@ def is_mp3(fp):
 all_files = filter(is_mp3, get_all_files_in_directory( directory_path))
 
 # Printing all the file paths found in the directory and its subdirectories
+import time
+
 
 if __name__ == '__main__': 
     print('indexing directory of length', (len(list(all_files))))
@@ -112,12 +114,18 @@ if __name__ == '__main__':
     cache = {}
     with open('music_directory.json', 'r') as file:
             data_dict = json.load(file)
-            for key in data_dict: cache[key] = data_dict[key]
+            for key in data_dict: 
+                 cache[key] = data_dict[key]
+    print(f'music_directory is {len(cache)} items long.')
     for file_path in filter(is_mp3, get_all_files_in_directory( directory_path)):
-        print('transcribing ', file_path)
         file_name = os.path.basename(file_path)
         if file_name in cache: continue
+        print('transcribing ', file_path)
+        t0= time.perf_counter()
+
         transcribe(file_path)
+        t1 = time.perf_counter() - t0
+        print("Time elapsed: ", t1 - t0) # CPU seconds elapsed (floating point)
         cache[file_name] = file_path
         with open('music_directory.json', 'w') as json_file:
             json.dump(cache, json_file)

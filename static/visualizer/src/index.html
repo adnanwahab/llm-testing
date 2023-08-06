@@ -20,10 +20,14 @@
         }
 
 
+        li:hover {
+            background: purple;
+            cursor:pointer;
+        }
     </style>
 </head>
 <body>
-
+<!-- //https://codepen.io/serversideup/pen/Vwrgoea -->
     <div id="content">
     
         <!-- <label for="thefile" class="file"> Choose an audio file
@@ -36,20 +40,16 @@
 
     <script src='https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js'></script>
 
+<div class="absolute top-0 left-0 bg-pink-100 border-indigo-500 border border-5 ">
 
-
-    <h3 class="lyrics"></h3>
-
+    <h3 class="lyrics lyrics mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"></h3>
 
     <div class="lyric-match"></div>
- 
-
-    <label>Youtube Downloader</label>
     
     
     <div class="w-32 ml-4">
-        <label for="yt" class="block text-sm font-medium leading-6 text-gray-900">Youtube Search</label>
-        <div class="mt-2">
+        <label for="yt" class="block text-sm font-medium leading-6 text-gray-900">Song Search</label>
+        <div class="">
           <input type="yt" name="yt" id="yt" class="yt block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="you@example.com">
         </div>
       </div>
@@ -58,16 +58,18 @@
     <br>
    
 
-    <button type="button" class="rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+    <button type="button" class=" play-button rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
         click here to play random song
     </button>
 
-    <audio controls>
-      <source src="dance.mp3" type="audio/mpeg">
+    <audio controls autoplay muted>
+      <!-- <source src="/media/youtubeRobot Doctor ｜ D Billions Kids Songs.mp3" type="audio/mpeg"> -->
       Your browser does not support the audio tag.
+      <source src="/media/[nextorrent.com] 7Os8Os9Os/79. Status Quo  - Living On An Island.mp3" type="audio/mpeg">
+      
   </audio>
 <div class="recognizedText"></div>
-
+</div>
     <canvas class="webgl"></canvas>
     <script type="module" src="./script.js"></script>
     <script type="module" src="client.js">
