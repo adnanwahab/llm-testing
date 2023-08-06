@@ -14,6 +14,8 @@ import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
+import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
+
 const sizes = {
     width: window.innerWidth,
     height: window.innerHeight
@@ -95,7 +97,8 @@ const controls = new OrbitControls(camera, canvas)
     
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     //var renderer = new WebGPURenderer();
-
+renderer.toneMapping = THREE.ReinhardToneMapping
+renderer.toneMappingExposure = 1.5
     renderer.setSize(sizes.width, sizes.height);
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
@@ -195,6 +198,7 @@ const controls = new OrbitControls(camera, canvas)
     normalTexture.repeat.x = 10;
     normalTexture.repeat.y = 6;
     normalTexture.anisotropy = 16;
+    const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 
    
     let material = new THREE.MeshPhysicalMaterial( {
@@ -231,20 +235,23 @@ const controls = new OrbitControls(camera, canvas)
 
 		// clearcoatMap:aoTexture,
 	    // clearcoatRoughness:0.0,
-		// clearcoatRoughnessMap: roughnessTexture,
+		 clearcoatRoughness: 0,
 		// clearcoatNormalScale :new THREE.Vector2( 1, 1 ),
 		// clearcoatNormalMap:null,
 
 		// ior:1.5,
-        clearcoat: 1.0,
-        clearcoatRoughness: 0.1,
-        metalness: 0.0,
-        roughness: 0.5,
+
+        // clearcoat: 1.0,
+        // clearcoatRoughness: 0.1,
+        reflectivity: 1,
+        metalness: 1.0,
+        roughness:0.0,
         color: 0x0000ff,
         normalMap: normalTexture,
-        clearcoatNormalMap: roughnessTexture,
+        flatShading: false,
+        // clearcoatNormalMap: roughnessTexture,
 
-        normalScale: new THREE.Vector2( 0.15, 0.15 )
+        // normalScale: new THREE.Vector2( 0.15, 0.15 )
     } );
     
     var ball = new THREE.Mesh(icosahedronGeometry, material);
@@ -657,8 +664,7 @@ effectComposer.addPass(displacementPass)
 // // renderer.shadowMap.enabled = true
 // // renderer.shadowMap.type = THREE.PCFShadowMap
 // // renderer.useLegacyLights = false
-// // renderer.toneMapping = THREE.ReinhardToneMapping
-// // renderer.toneMappingExposure = 1.5
+
 // // renderer.setSize(sizes.width, sizes.height)
 // // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 
