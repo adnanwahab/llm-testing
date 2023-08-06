@@ -13,11 +13,15 @@ import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
+//import { loadConfigFromFile } from 'vite'
 
-
+//  import  {HDRCubeTextureLoader } from 'three/examples/jsm/loaders/HDRCubeTextureLoader.js'
 //https://www.youtube.com/watch?v=SZzehktUeko&ab_channel=ChrisJones
 //https://www.youtube.com/watch?v=gxxqdrrpgZc&ab_channel=HDCOLORS-ColorfulKaleidoscopeswithAddedValue
-var noise = new SimplexNoise();
+//var noise = new SimplexNoise();
+
+
+let particleLight 
 var vizInit = function (){
 
   var file = document.getElementById("thefile");
@@ -37,7 +41,7 @@ var vizInit = function (){
 //     audio.play();
 //     play();
 //   }
-  
+
 function play() {
     var context = new AudioContext();
     var src = context.createMediaElementSource(audio);
@@ -57,11 +61,14 @@ function play() {
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
+    //particleLight= new THREE.Mesh(new THREE.SphereGeometry( .05, 8, 8),
+    //new THREE.MeshBasicMaterial({color: red}))
+
     var planeGeometry = new THREE.PlaneGeometry(800, 800, 20, 20);
     var planeMaterial = new THREE.MeshLambertMaterial({
         color: 0x6904ce,
         side: THREE.DoubleSide,
-        wireframe: true
+        wireframe: false
     });
     
     var plane = new THREE.Mesh(planeGeometry, planeMaterial);
@@ -75,11 +82,19 @@ function play() {
     group.add(plane2);
 
     var icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
-    var lambertMaterial = new THREE.MeshLambertMaterial({
-        color: 0xff00ee,
-        wireframe: true
-    });
+    // var lambertMaterial = new THREE.MeshLambertMaterial({
+    //     color: 0xff00ee,
+    //     wireframe: false
+    // });
+    // new HDRCubeTextureLoader().setPath('./static/pbr')
+    // .load([])
 
+    var lambertMaterial = new THREE.MeshPhysicalMaterial({
+        color: 'blue',
+        wireframe: false,
+       // normalMap: true
+    });
+    console.log(lambertMaterial)
     var ball = new THREE.Mesh(icosahedronGeometry, lambertMaterial);
     ball.position.set(0, 0, 0);
     group.add(ball);
@@ -137,15 +152,20 @@ function play() {
 
     function makeRoughBall(mesh, bassFr, treFr) {
         //console.log(mesh)
-        // mesh.geometry.vertices.forEach(function (vertex, i) {
-        //     var offset = mesh.geometry.parameters.radius;
-        //     var amp = 7;
-        //     var time = window.performance.now();
-        //     vertex.normalize();
-        //     var rf = 0.00001;
-        //     var distance = (offset + bassFr ) + noise.noise3D(vertex.x + time *rf*7, vertex.y +  time*rf*8, vertex.z + time*rf*9) * amp * treFr;
-        //     vertex.multiplyScalar(distance);
-        // });
+        //console.log(mesh)
+        mesh.geometry.attributes.position.array.forEach(function (vertex, i) {
+            var offset = mesh.geometry.parameters.radius;
+            //console.log(offset)
+            var amp = 7;
+            var time = window.performance.now();
+            //vertex.normalize();
+            var rf = 0.00001;
+            //let val = mesh.geometry.attributes.position.array[i]
+            //var distance = (offset + bassFr ) + noise.noise3D(val + time *rf*7, val +  time*rf*8, val + time*rf*9) * amp * treFr;
+            // vertex.multiplyScalar(distance);
+            // console.log(mesh.geometry.attributes.position.array)
+            //mesh.geometry.attributes.position.array[i] *= distance * .1
+        });
         mesh.geometry.verticesNeedUpdate = true;
         mesh.geometry.normalsNeedUpdate = true;
         // mesh.geometry.computeVertexNormals();
