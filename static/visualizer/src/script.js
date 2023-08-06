@@ -13,6 +13,11 @@ import { RGBShiftShader } from 'three/examples/jsm/shaders/RGBShiftShader.js'
 import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectionShader.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
+
+
+// import WebGPU from 'three/addons/capabilities/WebGPU.js';
+// 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
+import {EXRLoader} from 'three/examples/jsm/loaders/EXRLoader'
 //import { loadConfigFromFile } from 'vite'
 
 //  import  {HDRCubeTextureLoader } from 'three/examples/jsm/loaders/HDRCubeTextureLoader.js'
@@ -20,7 +25,7 @@ import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 //https://www.youtube.com/watch?v=gxxqdrrpgZc&ab_channel=HDCOLORS-ColorfulKaleidoscopeswithAddedValue
 //var noise = new SimplexNoise();
 
-
+const cubeTextureLoader = new THREE.CubeTextureLoader()
 let particleLight 
 var vizInit = function (){
 
@@ -41,8 +46,24 @@ var vizInit = function (){
 //     audio.play();
 //     play();
 //   }
+const environmentMap = cubeTextureLoader.load([
+    '/textures/environmentMaps/0/px.jpg',
+    '/textures/environmentMaps/0/nx.jpg',
+    '/textures/environmentMaps/0/py.jpg',
+    '/textures/environmentMaps/0/ny.jpg',
+    '/textures/environmentMaps/0/pz.jpg',
+    '/textures/environmentMaps/0/nz.jpg'
+])
+environmentMap.colorSpace = THREE.SRGBColorSpace
+
+
+
 
 function play() {
+
+
+
+
     var context = new AudioContext();
     var src = context.createMediaElementSource(audio);
     var analyser = context.createAnalyser();
@@ -57,12 +78,18 @@ function play() {
     camera.position.set(0,0,100);
     camera.lookAt(scene.position);
     scene.add(camera);
-
+    scene.background = environmentMap
+    scene.environment = environmentMap
+    
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    //var renderer = new WebGPURenderer();
 
-    //particleLight= new THREE.Mesh(new THREE.SphereGeometry( .05, 8, 8),
-    //new THREE.MeshBasicMaterial({color: red}))
+    renderer.setSize(window.innerWidth * .5, window.innerHeight * .5);
+
+    particleLight= new THREE.Mesh(new THREE.SphereGeometry( .05, 8, 8),
+    new THREE.MeshBasicMaterial({color: 'red'}))
+
+    particleLight.add(new THREE.PointLight(0xffffff, 30))
 
     var planeGeometry = new THREE.PlaneGeometry(800, 800, 20, 20);
     var planeMaterial = new THREE.MeshLambertMaterial({
@@ -88,6 +115,49 @@ function play() {
     // });
     // new HDRCubeTextureLoader().setPath('./static/pbr')
     // .load([])
+    const geometry = new THREE.BufferGeometry();
+    let particleList = new Float32Array(1e5)
+    for (let i = 0; i < 1e5; i+=3 ) {
+        particleList[i] = Math.random() * 10
+        particleList[i+1] = Math.random() * 100
+        particleList[i+2] = Math.random() * 100000
+    }
+    
+    geometry.setAttribute( 'position',  new THREE.BufferAttribute( particleList, 3 ));
+    //geometry.setAttribute( 'initialPosition', positions.clone() );
+
+    //geometry.attributes.position.setUsage( THREE.DynamicDrawUsage );
+
+    let mesh = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 20, color: 'red' } ) );
+
+    scene.add(mesh)
+
+    new EXRLoader()
+    .load( 'pbr/color_map.exr', function ( texture, textureData ) {
+
+        // memorial.exr is NPOT
+
+        //console.log( textureData );
+        //console.log( texture );
+
+        // EXRLoader sets these default settings
+        //texture.generateMipmaps = false;
+        //texture.minFilter = LinearFilter;
+        //texture.magFilter = LinearFilter;
+        console.log(textureData, texture)
+        const material = new THREE.MeshBasicMaterial( { map: texture } );
+
+        const quad = new THREE.PlaneGeometry( 10.5 * textureData.width / textureData.height, 1.5 );
+
+        const mesh = new THREE.Mesh( quad, material );
+
+        scene.add( mesh );
+
+        //render();
+
+    } );
+
+
 
     var lambertMaterial = new THREE.MeshPhysicalMaterial({
         color: 'blue',
@@ -109,7 +179,7 @@ function play() {
     spotLight.castShadow = true;
     scene.add(spotLight);
     
-    scene.add(group);
+    //scene.add(group);
 
     document.getElementById('out').appendChild(renderer.domElement);
 
@@ -303,18 +373,7 @@ function max(arr){
 // /**
 //  * Environment map
 //  */
-// const environmentMap = cubeTextureLoader.load([
-//     '/textures/environmentMaps/0/px.jpg',
-//     '/textures/environmentMaps/0/nx.jpg',
-//     '/textures/environmentMaps/0/py.jpg',
-//     '/textures/environmentMaps/0/ny.jpg',
-//     '/textures/environmentMaps/0/pz.jpg',
-//     '/textures/environmentMaps/0/nz.jpg'
-// ])
-// environmentMap.colorSpace = THREE.SRGBColorSpace
 
-// scene.background = environmentMap
-// scene.environment = environmentMap
 
 // /**
 //  * Models
@@ -535,7 +594,7 @@ function max(arr){
 //             float lightness = clamp(dot(normalColor, lightDirection), 0.0, 1.0);
 //             color.rgb += lightness * 2.0;
 
-//             gl_FragColor = color;
+//              gl_FragColor = color;
 //         }
 //     `
 // }

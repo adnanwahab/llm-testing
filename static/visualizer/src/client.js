@@ -9,6 +9,9 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
+
+document.querySelector('audio').currentTime = 30;
+document.querySelector('audio').volume = 0.02;
 const startNewSong = async (e) => {
     let lyrics
 
