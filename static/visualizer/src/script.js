@@ -136,7 +136,7 @@ function play() {
     }
 
     function makeRoughBall(mesh, bassFr, treFr) {
-        console.log(mesh)
+        //console.log(mesh)
         // mesh.geometry.vertices.forEach(function (vertex, i) {
         //     var offset = mesh.geometry.parameters.radius;
         //     var amp = 7;

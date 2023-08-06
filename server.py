@@ -10,6 +10,14 @@ from langchain.prompts import PromptTemplate
 import yt_dlp
 
 
+from flask_cors import CORS
+
+
+
+# Use CORS with default options (Allow all origins)
+
+
+
 
 class MyLogger(object):
     def debug(self, msg):
@@ -26,8 +34,11 @@ def my_hook(d):
     if d['status'] == 'finished':
         print('Done downloading, now converting ...')
 
+output_location = './media/youtube/'
+output_template = output_location + '%(title)s.%(ext)s'
 
 ydl_opts = {
+    'outtmpl': output_template,
     'format': 'bestaudio/best',
     'postprocessors': [{
         'key': 'FFmpegExtractAudio',
@@ -59,7 +70,7 @@ def get_db_connection():
     return conn
 
 app = Flask(__name__)
-
+CORS(app)
 @app.route('/api/v1')
 def viteProxy():
     path = '/home/awahab/llm-testing/static/'
@@ -114,12 +125,11 @@ import os
 
 current_directory = os.getcwd()
 
-@app.route('/yt', methods=['POST', 'GET'])
+@app.route('/play-song', methods=['POST', 'GET'])
 def yt():
-    print(request)
-    data = request.json
-    print('wtf',data)
-    fp = data
+    print(request.json, ' playing a song')
+    fp = request.json['href']
+    fp = 'https://www.youtube.com/watch?v=ZNX0uTBp7_U'
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         print('wtfaasdfasdfa',ydl.download([fp]))
 
@@ -128,7 +138,7 @@ def yt():
 
     current_directory = os.getcwd()
     print(current_directory)
-    data = transcribe(current_directory+'/' + 'How to NOT Take Things Too Personally - Jocko Willink & Echo Charles [tOjnzE_gP28].mp3')
+    data = transcribe(current_directory+'/' + request.json['title'])
     # print the recognized text
     #print(result.text, data)
 

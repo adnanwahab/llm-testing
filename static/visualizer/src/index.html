@@ -24,40 +24,8 @@
         <!-- <audio id="audio" controls></audio> -->
         <div id="out"></div>
       </div>
-    <!-- partial -->
-    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.min.js'></script>
-    <script src='https://cdn.rawgit.com/mrdoob/three.js/master/examples/js/controls/OrbitControls.js'></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.3/dat.gui.min.js'></script> -->
+
     <script src='https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js'></script>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -70,9 +38,14 @@
     <label>Youtube Downloader</label>
     
     
-    <input class="yt">
-
+    <div class="w-32 ml-4">
+        <label for="yt" class="block text-sm font-medium leading-6 text-gray-900">Youtube Search</label>
+        <div class="mt-2">
+          <input type="yt" name="yt" id="yt" class="yt block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="you@example.com">
+        </div>
+      </div>
   
+      <ul class="search-results"></ul>
     <br>
    
 
@@ -80,171 +53,15 @@
         click here to play music
     </button>
 
-
-    <auto-complete src="/users/search" for="users-popup">
-        <input type="text" name="users">
-        <!--
-          Optional clear button:
-          - id must match the id of the input or the name of the input plus "-clear"
-          - recommended to be *before* UL elements to avoid conflicting with their blur logic
-      
-        -->
-        <button id="users-clear">X</button>
-        <ul id="users-popup"></ul>
-        <!--
-          Optional div for screen reader feedback. Note the ID matches the ul, but with -feedback appended.
-          Recommended: Use a "Screen Reader Only" class to position the element off the visual boundary of the page.
-        -->
-        <div id="users-popup-feedback" class="sr-only"></div>
-      </auto-complete>
-
     <audio controls>
-      <source src="/dance.mp3" type="audio/mpeg">
+      <source src="/Robot Doctor ｜ D Billions Kids Songs [ZNX0uTBp7_U].mp3" type="audio/mpeg">
       Your browser does not support the audio tag.
   </audio>
 <div class="recognizedText"></div>
 
-    <canvas class="webgl" style="display:none;"></canvas>
+    <canvas class="webgl pointer-events-none"></canvas>
     <script type="module" src="./script.js"></script>
-    <script type="module">
-
-
-        let lyrics = []
-        let speech = []
-        ///https://github.com/github/auto-complete-element
-
-
-    import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
-    import '@github/auto-complete-element'
-
-    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-    
-    
-    import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
-        document.querySelector('button').addEventListener('click', async (e) => {
-          document.querySelector('audio').play()
-          let req = await fetch('/api/v1', {headers: {'Content-Type': 'application/json'}});
-          console.log(req);
-          let json = await req.json();
-          let lyrics = Object.values(json)
-          let timestamps = Object.keys(json).map(str => str.split('-->')[0].trim().slice(1))
-          console.log(timestamps)
-          let now = Date.now()
-          let i = 0
-          //00:03.980
-            let lastIdx = -1
-            requestAnimationFrame(function recur() {
-              let elapsed = (Date.now() - now) / 1000
-              //console.log(elapsed)
-              let ts = timestamps.find(ts => getSeconds(ts) > elapsed)
-              let i = timestamps.indexOf(ts) - 1
-                if (lastIdx !== i) {
-                    changeLyrics(i, lyrics)
-                    lastIdx = i
-                }
-              requestAnimationFrame(recur)
-              lyrics.push(lyrics[i])
-            //   document.querySelector('.lyric-match').textContent = 
-            //   _.zip(lyrics, speech)
-            })
-          })
-    
-        function changeLyrics(i, lyrics) {
-          //document.querySelector('.lyrics').textContent = lyrics[i]
-
-          document.querySelector('.lyrics').innerHTML = lyrics[i].split(' ').map(word => {
-            return '<span> ' + word + ' </span>'
-          })
-        }
-    
-        function getSeconds (timeStr) {
-          let parts = timeStr.split(":");
-          let minutes = parseInt(parts[0]);
-          let seconds = parseFloat(parts[1]);
-          let totalSeconds = minutes * 60 + seconds;
-          return totalSeconds
-        }
-    
-        //lyric list 
-        //speech List
-        //compare the length and if the length of tokens is similar, highlight words differently
-
-
-        const completer = document.querySelector('auto-complete')
-const container = completer.parentElement
-completer.addEventListener('loadstart', () => container.classList.add('is-loading'))
-completer.addEventListener('loadend', () => container.classList.remove('is-loading'))
-completer.addEventListener('load', () => container.classList.add('is-success'))
-completer.addEventListener('error', () => container.classList.add('is-error'))
-  
-
-completer.addEventListener('auto-complete-change', function(event) {
-  console.log('Auto-completed value chosen or cleared', completer.value)
-  console.log('Related input element', event.relatedTarget)
-})
-
-    
-        function getYT2(shit) {
-            let req =  fetch('//localhost:3000/youtube-search', {
-              headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(shit),
-            method: 'POST',
-          }).then(req => req.json()).then(json => 
-          
-          {console.log(json)
-            //$("#airportPicker").fuzzyComplete(json.items.map());
-    
-    
-          })
-    
-        }
-    
-        let getYT = _.debounce(getYT2, 1000)
-    
-        document.querySelector('.yt').addEventListener('change', function(event) {
-          let shit = event.target.value
-    
-      
-    getYT(shit)
-    })
-      
-    
-    const recognizedText = document.querySelector('.recognizedText');
-
-    
-        const grammar =
-      "#JSGF V1.0; grammar colors; public <color> = aqua | azure | beige | bisque | black | blue | brown | chocolate | coral | crimson | cyan | fuchsia | ghostwhite | gold | goldenrod | gray | green | indigo | ivory | khaki | lavender | lime | linen | magenta | maroon | moccasin | navy | olive | orange | orchid | peru | pink | plum | purple | red | salmon | sienna | silver | snow | tan | teal | thistle | tomato | turquoise | violet | white | yellow ;";
-    const recognition = new webkitSpeechRecognition();
-    const speechRecognitionList = new webkitSpeechGrammarList();
-    speechRecognitionList.addFromString(grammar, 1);
-    recognition.grammars = speechRecognitionList;
-    recognition.continuous = true;
-    recognition.lang = "en-US";
-    recognition.interimResults = true;
-    recognition.maxAlternatives = 1;
-    
-    const diagnostic = document.querySelector(".output");
-    const bg = document.querySelector("html");
-    
-    
-      recognition.start();
-      console.log("Ready to receive a color command.");
-    
-    
-      let count = 0
-    recognition.onresult = (event) => {
-         
-        const transcript = event.results[event.results.length - 1][0].transcript;
-      recognizedText.textContent = transcript;
-      speech.push(transcript)
-      console.log(document.querySelector('.lyrics'))
-      Array.from(document.querySelector('.lyrics').children).forEach((span, i) => {
-        if (i < transcript.length) 
-        span.style.background = 'pink'
-      })
-      //console.log(event.results)
-    };
-    
+    <script type="module" src="client.js">
       </script>
 
 

@@ -7,6 +7,7 @@ const axios = require('axios');
 
 const cors = require('cors')
 app.use(cors({ origin: 'http://localhost:5000' }));
+app.use(express.json());
 
 
 app.get('/', (req, res) => {
@@ -29,9 +30,10 @@ app.listen(port, () => {
 })
 
 app.post('/youtube-search', (req, res) => {
-  console.log('yt search', req.params)
+  console.log('yt search', req.body)
   let data = fs.readdirSync('./media').map(link => { return { href: link, title: link} })
-  hello(req.params.search, function (data) {
+  hello(req.body.search, function (data) {
+    //console.log(data)
     res.send(data)
   })
 })
@@ -45,7 +47,7 @@ app.use(express.static('media'))
 
 
  function hello (query, cb) {
-
+  console.log('searching for ', query)
   const url = 'https://www.googleapis.com/youtube/v3/search';
   const params = {
     part: 'snippet',
