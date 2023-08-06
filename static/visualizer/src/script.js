@@ -80,6 +80,10 @@ function play() {
     scene.add(camera);
     scene.background = environmentMap
     scene.environment = environmentMap
+
+    const canvas = document.querySelector('canvas.webgl')
+const controls = new OrbitControls(camera, canvas)
+controls.enableDamping = true
     
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     //var renderer = new WebGPURenderer();
@@ -179,7 +183,7 @@ function play() {
     spotLight.castShadow = true;
     scene.add(spotLight);
     
-    //scene.add(group);
+    scene.add(group);
 
     document.getElementById('out').appendChild(renderer.domElement);
 
@@ -211,6 +215,7 @@ function play() {
 
       group.rotation.y += 0.005;
       renderer.render(scene, camera);
+      controls.update()
       requestAnimationFrame(render);
     }
 
@@ -341,7 +346,6 @@ function max(arr){
 // const gui = new dat.GUI()
 
 // // Canvas
-// const canvas = document.querySelector('canvas.webgl')
 
 // // Scene
 // const scene = new THREE.Scene()

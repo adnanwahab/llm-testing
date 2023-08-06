@@ -9,11 +9,3 @@ body
 {
     overflow: hidden;
 }
-
-.webgl
-{
-    position: fixed;
-    top: 25%;
-    left: 0;
-    outline: none;
-}
