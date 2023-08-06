@@ -9,7 +9,11 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
-
+//https://www.shadertoy.com/view/4slGz4
+//https://www.shadertoy.com/view/MslGWN
+//https://www.shadertoy.com/view/XdByzy
+//https://www.shadertoy.com/view/ldlXRS
+//make the worrds work good - use d3 and text spans around each word and then - word by word karaoke matching 
 document.querySelector('audio').currentTime = 30;
 document.querySelector('audio').volume = 0.02;
 const startNewSong = async (e) => {
@@ -87,7 +91,8 @@ function changeLyrics(lyrics) {
 
 
 function getYT2(shit, cb) {
-    let req =  fetch('//localhost:3000/youtube-search', {
+    console.log('music library search')
+    let req =  fetch('//localhost:3000/media-library-search', {
       headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({search: shit}),
     method: 'POST',
@@ -102,7 +107,8 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
  console.log('123')
      getYT(shit, (data) => {
         console.log(data)
-        let shit = data.items.map(item => `<li><a href="${base + item.id.videoId}"></a>${item.snippet.title}</li>`)
+        //let shit = data.items.map(item => `<li><a href="${base + item.id.videoId}"></a>${item.snippet.title}</li>`)
+        let shit = Object.keys(data).map(item => `<li><a href="${data[item]}"></a>${item}</li>`)
 
         get('.search-results').innerHTML = shit.join('')
      })
@@ -112,7 +118,7 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
 document.querySelector('.search-results').addEventListener('click', function (e) {
 let shit = e.target.children[0].href
 console.log(shit)
-fetch('http://localhost:5000/play-song', {
+fetch('http://localhost:3000/play-song', {
 mode: "cors",
 method: "POST",
 headers: {'Content-Type': 'application/json'},

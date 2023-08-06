@@ -113,12 +113,12 @@ if __name__ == '__main__':
     with open('music_directory.json', 'r') as file:
             data_dict = json.load(file)
             for key in data_dict: cache[key] = data_dict[key]
-    cache = {}
     for file_path in filter(is_mp3, get_all_files_in_directory( directory_path)):
         print('transcribing ', file_path)
         file_name = os.path.basename(file_path)
-        cache[file_name] = file_path
+        if file_name in cache: continue
         transcribe(file_path)
+        cache[file_name] = file_path
         with open('music_directory.json', 'w') as json_file:
             json.dump(cache, json_file)
 

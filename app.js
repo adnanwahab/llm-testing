@@ -8,6 +8,7 @@ const axios = require('axios');
 const cors = require('cors')
 app.use(cors({ origin: 'http://localhost:5000' }));
 app.use(express.json());
+let music_directory = JSON.parse(fs.readFileSync('./music_directory.json'))
 
 
 app.get('/', (req, res) => {
@@ -29,11 +30,16 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
+app.post('/play-song', (req, res) => {
+  let data = {}
+  data['lyrics'] = fs.readFileSync(music_directory[req.body.title].replace('.mp3', '.json'))
+  data['title'] = req.body.title
+  res.send(data)
+})
 
 app.post('/media-library-search', (req, res) => {
-  console.log('yt search', req.body)
-  let data = JSON.parse(fs.readFileSync('./music-directory'))
-  res.send(data)
+  console.log('media library search search', req.body)
+  res.send(music_directory)
 })
 
 app.post('/youtube-search', (req, res) => {
