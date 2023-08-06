@@ -65,7 +65,7 @@ const startNewSong = async (e) => {
 
 document.querySelector('button').addEventListener('click', startNewSong)
 
-function changeLyrics(i, lyrics) {
+function changeLyrics(lyrics) {
   //document.querySelector('.lyrics').textContent = lyrics[i]
 
   document.querySelector('.lyrics').innerHTML = lyrics.split(' ').map(word => {

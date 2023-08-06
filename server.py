@@ -105,24 +105,31 @@ model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
 # model = whisper.load_model("medium.en")
 
-
+import json 
 def transcribe2(fp):
     result = model.transcribe(fp)
     print(result)
     return (result["text"])
 def transcribe(fp):
     print(fp)
-    segments, info = model.transcribe(fp, beam_size=5,
-                             #vad_filter=True,
-                             #word_timestamps=True,
-    #vad_parameters=dict(min_silence_duration_ms=500)
-    )
-    #print(list(segments))
+    json_fp = fp + '.json'
+
+    if Path(json_fp).is_file():
+        with open(json_fp, 'r') as file:
+             data_dict = json.load(file)
+        return data_dict
+    
+  
+    segments, info = model.transcribe(fp  + '.mp3', beam_size=5)
+
+  
     data = []
     for segment in segments:
             #print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.word))
             data.append([segment.start, segment.end, segment.text])
-    print(data)
+    #print(data)
+    with open(json_fp, 'w') as file:
+        json.dump(data, file)
     return data
     #return list(segments)
     #lrcer.run(fp, target_lang='en') 
@@ -132,6 +139,7 @@ def transcribe(fp):
 import os
 
 current_directory = os.getcwd()
+from pathlib import Path
 
 @app.route('/play-song', methods=['POST', 'GET'])
 def yt():
@@ -146,13 +154,10 @@ def yt():
 
     current_directory = os.getcwd()
     print(current_directory)
-    segments = transcribe(current_directory+'/media/youtube/' + request.json['title'] + '.mp3')
     data = {}
+    segments = transcribe(current_directory+'/media/youtube/' + request.json['title'])
     data['lyrics'] = segments
     data['title'] = request.json['title']
-    # print the recognized text
-    #print(result.text, data)
-
     # data = audioowl.analyze_file(path='hello.mp3', sr=22050)
 
     # print(data)
