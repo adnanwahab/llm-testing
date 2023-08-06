@@ -10,19 +10,37 @@ import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
 const startNewSong = async (e) => {
-console.log(e, 'start new song by clearing search')
-  if (e.audio) {
-    document.querySelector('audio').children[0].srcObject = e.audio
-  }
-  document.querySelector('audio').play()
-  let req = await fetch('/api/v1', {headers: {'Content-Type': 'application/json',
-  type: 'post',
-  body: JSON.stringify({search: e.search })
-}});
-  console.log(req);
-  let json = await req.json();
-  let lyrics = Object.values(json)
-  let timestamps = Object.keys(json).map(str => str.split('-->')[0].trim().slice(1))
+    let lyrics
+
+    if (e.title) {
+        console.log(e)
+        console.log('/media/youtube/' + e.title + '.mp3')
+        document.querySelector('audio').children[0].src
+         = 'youtube/' + e.title + '.mp3'
+         document.querySelector('audio').load()
+        lyrics = Object.values(e.lyrics)
+     } else {
+
+        let req = await fetch('/api/v1', {headers: {'Content-Type': 'application/json',
+        type: 'post',
+        body: JSON.stringify({search: e.search })
+      }});
+      
+        let json = await req.json();
+        lyrics = Object.values(json)
+
+     } 
+    document.querySelector('audio').play()
+
+  
+
+
+
+
+
+    let timestamps = lyrics
+    //Object.keys(json).map(str => str.split('-->')[0].trim().slice(1))
+
   console.log(timestamps)
   let now = Date.now()
   let i = 0
@@ -31,10 +49,10 @@ console.log(e, 'start new song by clearing search')
     requestAnimationFrame(function recur() {
       let elapsed = (Date.now() - now) / 1000
       //console.log(elapsed)
-      let ts = timestamps.find(ts => getSeconds(ts) > elapsed)
+      let ts = timestamps.find(ts => ts[0] > elapsed)
       let i = timestamps.indexOf(ts) - 1
         if (lastIdx !== i) {
-            changeLyrics(i, lyrics)
+            changeLyrics(timestamps[i])
             lastIdx = i
         }
       requestAnimationFrame(recur)
@@ -50,18 +68,12 @@ document.querySelector('button').addEventListener('click', startNewSong)
 function changeLyrics(i, lyrics) {
   //document.querySelector('.lyrics').textContent = lyrics[i]
 
-  document.querySelector('.lyrics').innerHTML = lyrics[i].split(' ').map(word => {
+  document.querySelector('.lyrics').innerHTML = lyrics.split(' ').map(word => {
     return '<span> ' + word + ' </span>'
   })
 }
 
-function getSeconds (timeStr) {
-  let parts = timeStr.split(":");
-  let minutes = parseInt(parts[0]);
-  let seconds = parseFloat(parts[1]);
-  let totalSeconds = minutes * 60 + seconds;
-  return totalSeconds
-}
+
 
 //lyric list 
 //speech List
@@ -81,7 +93,7 @@ function getYT2(shit, cb) {
 
 let getYT = _.debounce(getYT2, 1000)
 
-let base = 'https://www.youtube.com/watch?'
+let base = 'https://www.youtube.com/watch?v='
 document.querySelector('.yt').addEventListener('keyup', function(event) {
  let shit = event.target.value
      getYT(shit, (data) => {
@@ -135,7 +147,6 @@ recognition.onresult = (event) => {
 const transcript = event.results[event.results.length - 1][0].transcript;
 recognizedText.textContent = transcript;
 speech.push(transcript)
-console.log(document.querySelector('.lyrics'))
 Array.from(document.querySelector('.lyrics').children).forEach((span, i) => {
 if (i < transcript.length) 
 span.style.background = 'pink'

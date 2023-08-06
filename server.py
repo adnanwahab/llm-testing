@@ -36,8 +36,9 @@ def my_hook(d):
 
 output_location = './media/youtube/'
 output_template = output_location + '%(title)s.%(ext)s'
-
+download_archive_file = output_template + 'downloaded.txt'
 ydl_opts = {
+    'download_archive': download_archive_file,
     'outtmpl': output_template,
     'format': 'bestaudio/best',
     'postprocessors': [{
@@ -112,11 +113,18 @@ def transcribe2(fp):
 def transcribe(fp):
     print(fp)
     segments, info = model.transcribe(fp, beam_size=5,
-                             vad_filter=True,
-    vad_parameters=dict(min_silence_duration_ms=500          
-                                      ))
-    print(info)
-    return list(segments)
+                             #vad_filter=True,
+                             #word_timestamps=True,
+    #vad_parameters=dict(min_silence_duration_ms=500)
+    )
+    #print(list(segments))
+    data = []
+    for segment in segments:
+            #print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.word))
+            data.append([segment.start, segment.end, segment.text])
+    print(data)
+    return data
+    #return list(segments)
     #lrcer.run(fp, target_lang='en') 
     #print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
     #return 
@@ -129,7 +137,7 @@ current_directory = os.getcwd()
 def yt():
     print(request.json, ' playing a song')
     fp = request.json['href']
-    fp = 'https://www.youtube.com/watch?v=ZNX0uTBp7_U'
+    #fp = 'https://www.youtube.com/watch?v=ZNX0uTBp7_U'
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         print('wtfaasdfasdfa',ydl.download([fp]))
 
@@ -138,7 +146,10 @@ def yt():
 
     current_directory = os.getcwd()
     print(current_directory)
-    data = transcribe(current_directory+'/' + request.json['title'])
+    segments = transcribe(current_directory+'/media/youtube/' + request.json['title'] + '.mp3')
+    data = {}
+    data['lyrics'] = segments
+    data['title'] = request.json['title']
     # print the recognized text
     #print(result.text, data)
 
