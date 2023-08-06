@@ -1,14 +1,9 @@
 
 let lyrics = []
 let speech = []
-
 import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
-
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-
-
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
-
 
 const startNewSong = async (e) => {
     console.log(e)
@@ -47,8 +42,6 @@ let audioTag = document.querySelector('audio')
 //audioTag.currentTime = 30;
 audioTag.volume = 0.02;
 
-
-
 const startApp = () => {
     getTranscript(mockData.title, mockData.href)
     audioTag.children[0].src = mockData.href
@@ -72,16 +65,6 @@ function changeLyrics(lyrics, index) {
   }).join('')
 }
 
-
-
-//lyric list 
-//speech List
-//compare the length and if the length of tokens is similar, highlight words differently
-
-
-
-
-
 function getYT2(shit, cb) {
     console.log('music library search')
     let req =  fetch('//localhost:3000/media-library-search', {
@@ -99,7 +82,6 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
  console.log('123')
      getYT(shit, (data) => {
         console.log(data)
-        //let shit = data.items.map(item => `<li><a href="${base + item.id.videoId}"></a>${item.snippet.title}</li>`)
         let shit = Object.keys(data).map(item => `<li><a href="${data[item]}"></a>${item}</li>`)
 
         get('.search-results').innerHTML = shit.join('')
@@ -107,10 +89,7 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
 })
 let mockData = {title: "03. Jamiroquai - Cosmic Girl (Remastered).mp3", href: "./media/Various Artists - 90's Smash hits (2022) Mp3 320kbps [PMEDIA] \u2b50\ufe0f/03. Jamiroquai - Cosmic Girl (Remastered).mp3"}
 
-
 document.querySelector('.search-results').addEventListener('click', clickSearchResults)
-
-
 
 function getTranscript (title, href) {
     fetch('http://localhost:3000/play-song', {
@@ -133,7 +112,6 @@ function createSpeechGrammar(grammarList) {
     const recognition = new webkitSpeechRecognition();
     const speechRecognitionList = new webkitSpeechGrammarList();
     grammarList = '#JSGF V1.0; grammar colors; public <color> =' + grammarList.split(' ').join(' | ')
-    console.log(grammarList)
     speechRecognitionList.addFromString(grammarList, 1);
     recognition.grammars = speechRecognitionList;
     recognition.continuous = true;
@@ -141,18 +119,13 @@ function createSpeechGrammar(grammarList) {
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
     recognition.start();
-    const recognizedText = document.querySelector('.recognizedText');
     speech.length = 0;
     recognition.onresult = (event) => {
-        const transcript = event.results[event.results.length - 1][0].transcript;
         let results = []
         for (let key of event.results) {
-            //console.log(key)
             results.push(key[0].transcript)
         }
-
         results = results.join('').split(' ')
-        console.log(results)
         //speech.push(transcript)
         // console.log(speech)
         Array.from(document.querySelector('.lyrics').children).forEach((span, i) => { if (i <= results.length) span.style.background = 'pink' })

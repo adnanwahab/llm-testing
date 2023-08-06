@@ -112,7 +112,6 @@ import json
 import os
 
 current_directory = os.getcwd()
-from pathlib import Path
 
 @app.route('/play-song', methods=['POST', 'GET'])
 def yt():
