@@ -8,7 +8,7 @@ import openai
 from langchain.llms import OpenAI
 from langchain.prompts import PromptTemplate
 import yt_dlp
-
+from transcribe import transcribe
 
 from flask_cors import CORS
 
@@ -106,35 +106,8 @@ model = WhisperModel(model_size, device="cuda", compute_type="float16")
 # model = whisper.load_model("medium.en")
 
 import json 
-def transcribe2(fp):
-    result = model.transcribe(fp)
-    print(result)
-    return (result["text"])
-def transcribe(fp):
-    print(fp)
-    json_fp = fp + '.json'
 
-    if Path(json_fp).is_file():
-        with open(json_fp, 'r') as file:
-             data_dict = json.load(file)
-        return data_dict
-    
-  
-    segments, info = model.transcribe(fp  + '.mp3', beam_size=5)
 
-  
-    data = []
-    for segment in segments:
-            #print("[%.2fs -> %.2fs] %s" % (segment.start, segment.end, segment.word))
-            data.append([segment.start, segment.end, segment.text])
-    #print(data)
-    with open(json_fp, 'w') as file:
-        json.dump(data, file)
-    return data
-    #return list(segments)
-    #lrcer.run(fp, target_lang='en') 
-    #print("Detected language '%s' with probability %f" % (info.language, info.language_probability))
-    #return 
 
 import os
 

@@ -29,6 +29,13 @@ app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
 })
 
+
+app.post('/media-library-search', (req, res) => {
+  console.log('yt search', req.body)
+  let data = JSON.parse(fs.readFileSync('./music-directory'))
+  res.send(data)
+})
+
 app.post('/youtube-search', (req, res) => {
   console.log('yt search', req.body)
   let data = fs.readdirSync('./media').map(link => { return { href: link, title: link} })

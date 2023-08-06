@@ -99,6 +99,7 @@ let getYT = _.debounce(getYT2, 1000)
 let base = 'https://www.youtube.com/watch?v='
 document.querySelector('.yt').addEventListener('keyup', function(event) {
  let shit = event.target.value
+ console.log('123')
      getYT(shit, (data) => {
         console.log(data)
         let shit = data.items.map(item => `<li><a href="${base + item.id.videoId}"></a>${item.snippet.title}</li>`)
