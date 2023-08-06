@@ -52,11 +52,11 @@ const startNewSong = async (e) => {
       let ts = timestamps.find(ts => ts[0] > elapsed)
       let i = timestamps.indexOf(ts) - 1
         if (lastIdx !== i) {
-            changeLyrics(timestamps[i])
+            changeLyrics(timestamps[i][2])
             lastIdx = i
         }
       requestAnimationFrame(recur)
-      lyrics.push(lyrics[i])
+      //lyrics.push(lyrics[i][2])
     //   document.querySelector('.lyric-match').textContent = 
     //   _.zip(lyrics, speech)
     })
