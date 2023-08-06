@@ -190,17 +190,55 @@ const controls = new OrbitControls(camera, canvas)
     const normalTexture = textureLoader.load(textures[4])
     const renderTexture = textureLoader.load(textures[5])
     const roughnessTexture = textureLoader.load(textures[6])
+    normalTexture.wrapS = THREE.RepeatWrapping;
+    normalTexture.wrapT = THREE.RepeatWrapping;
+    normalTexture.repeat.x = 10;
+    normalTexture.repeat.y = 6;
+    normalTexture.anisotropy = 16;
 
-    // var lambertMaterial = new THREE.MeshPhysicalMaterial({
-    //     color: 'blue',
-    //     wireframe: false,
-    //    // normalMap: true
-    // });
-    //console.log(lambertMaterial)
+   
     let material = new THREE.MeshPhysicalMaterial( {
+        // iridescenceMap : renderTexture,
+		// iridescenceIOR :0.3,
+		// iridescenceThicknessRange :[ 100, 400 ],
+		// iridescenceThicknessMap: displacementTexture,
+
+		// sheenColor: new THREE.Color( 0xff0000 ),
+		// sheenColorMap:renderTexture,
+		//sheenRoughness: 1.0,
+		//sheenRoughnessMap:colorTexture,
+
+		// transmissionMap:roughnessTexture,
+
+		// thickness:0,
+		// thicknessMap:roughnessTexture,
+	    // attenuationDistance:Infinity,
+		// attenuationColor:new THREE.Color( 1, 1, 1 ),
+
+		// specularIntensity:1.0,
+		// specularIntensityMap:renderTexture,
+		// specularColor:new THREE.Color( 1, 1, 1 ),
+		// specularColorMap:colorTexture,
+
+		// // _anisotropy = 0;
+		// // _clearcoat = 0;
+		// // _iridescence = 0;
+		// // _sheen = 0.0;
+		// // _transmission = 0;
+
+        // anisotropyRotation: 0,
+		// anisotropyMap:null,
+
+		// clearcoatMap:aoTexture,
+	    // clearcoatRoughness:0.0,
+		// clearcoatRoughnessMap: roughnessTexture,
+		// clearcoatNormalScale :new THREE.Vector2( 1, 1 ),
+		// clearcoatNormalMap:null,
+
+		// ior:1.5,
         clearcoat: 1.0,
         clearcoatRoughness: 0.1,
-        metalness: 0.9,
+        metalness: 0.0,
         roughness: 0.5,
         color: 0x0000ff,
         normalMap: normalTexture,
