@@ -429,7 +429,7 @@ function play() {
 
      window.unrealBloomPass.strength = 1
      
-      if (amplitude > 10) drawLines(0x0093fe) //teal
+      //if (amplitude > 10) drawLines(0x0093fe) //teal
       if (getVocals() > 1) drawLines(0xfb4f87) //fuschia
 
    
