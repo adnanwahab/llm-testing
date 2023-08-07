@@ -214,54 +214,36 @@ function makeWaveForm(mesh) {
     mesh.rotation.z = window.lineCount 
     mesh.rotation.x = .5
 }
+function makeArcs(mesh) {
+    mesh.rotation.z = window.lineCount 
+    mesh.rotation.x = .5
+}
+//opacitate out
 
 let lines = []
-function drawLinesCircle(color) {
+
+
+let keyFrames = [
+    function () {},
+    coneTowardsCamera, 
+    leftToRight,
+    makeArcs
+]
+let currentKeyframe = 0;
+
+setInterval(function () {
+    //console.log(currentKeyframe)
+    //currentKeyframe = (currentKeyframe + 1) % keyFrames.length
+}, 5000)
+//animation speech controlled by waveform
+
+function drawLines(color, dataArray) {
+    
     let i = window.lineCount++;
+    if (currentKeyframe == 2) return drawLinesCircle(color)
     const geometry = new MeshLineGeometry()
     const list = []
-    let angleStep = 2 * Math.PI / 100; 
-    let radius = 1//Math.random() * i
-    for (let i = 0; i< 101; i++) {
-        //     list.push(new THREE.Vector3(i , 0, 0))
-         let theta = angleStep * i
-         list.push(new THREE.Vector3(radius * Math.cos(theta), radius * Math.sin(theta), 0))
-    }
-    geometry.setPoints(list)
-    const material = new MeshLineMaterial({
-        color,
-        transparent: true,
-        lineWidth: .1,
-     
-     })
-     let timer = { value: 0 };
-     material.onBeforeCompile = function (shader) {
-        shader.uniforms.time = timer
-        shader.fragmentShader = fs(window.lineCount)
-        material.userData.shader = shader;
-    }
-    const mesh = new THREE.Mesh(geometry, material)
-  
-    setInterval(function () {
-        mesh.scale.addScalar(.1)
-    }, 10)
-
-        lines.push(mesh)
-       
-        
-     setTimeout(function () {
-        scene.remove(mesh)
-        mesh.geometry.dispose()
-        mesh.material.dispose()
-     }, 5000)
-    scene.add(mesh)
-}
-
-function drawLines(color) {
-    let i = window.lineCount++;
-    const geometry = new MeshLineGeometry()
-    const list = []
-    for (let i = 0; i< 101; i++) {
+    for (let i = 0; i< 101; i+=3) {
          list.push(new THREE.Vector3(i, 0, 0))
     }
     geometry.setPoints(list)
@@ -280,7 +262,9 @@ function drawLines(color) {
         material.userData.shader = shader;
     }
     const mesh = new THREE.Mesh(geometry, material)
-    leftToRight(mesh)
+ 
+    mesh.position.y = i
+    keyFrames[currentKeyframe](mesh)
     lines.push(mesh)
      setTimeout(function () {
         scene.remove(mesh)
@@ -347,6 +331,7 @@ function play() {
     renderer.toneMapping = THREE.ReinhardToneMapping
     renderer.toneMappingExposure = 100.5
     renderer.setSize(sizes.width, sizes.height);
+    renderer.setClearColor(0x000000, 1.)
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
     new THREE.MeshBasicMaterial({color: 'red'}))
@@ -390,7 +375,7 @@ function play() {
         teal: 0x0093fe,
         red: 0xfb4f87
       }
-      if (amplitude > 10) drawLines(colors.red) //teal
+      if (amplitude > 10) drawLines(colors.red, dataArray) //teal
       if (getVocals() > 1) drawLines(colors.teal) //fuschia
 
    
@@ -640,3 +625,46 @@ const TintShader = {
 //   `;
   
 //   export { blur5, blur9, blur13 };
+
+
+function drawLinesCircle(color) {
+    let i = window.lineCount++;
+
+    const geometry = new MeshLineGeometry()
+    const list = []
+    let angleStep = 2 * Math.PI / 100; 
+    let radius = 1//Math.random() * i
+    for (let i = 0; i< 101; i++) {
+        //     list.push(new THREE.Vector3(i , 0, 0))
+         let theta = angleStep * i
+         list.push(new THREE.Vector3(radius * Math.cos(theta), radius * Math.sin(theta), 0))
+    }
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color,
+        transparent: true,
+        lineWidth: .1,
+     
+     })
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+    }
+    const mesh = new THREE.Mesh(geometry, material)
+  
+    setInterval(function () {
+        mesh.scale.addScalar(.1)
+    }, 10)
+
+        lines.push(mesh)
+       
+        
+     setTimeout(function () {
+        scene.remove(mesh)
+        mesh.geometry.dispose()
+        mesh.material.dispose()
+     }, 5000)
+    scene.add(mesh)
+}

@@ -66,6 +66,7 @@ let audioTag = document.querySelector('audio')
 audioTag.volume = 0.02;
 
 const startApp = () => {
+  //document.querySelector('.absolute').style.display='none'
   fetch('./dance_mac.json').then(req => req.json()).then(json => startNewSong(json))
 
     //getTranscript(mockData.title, mockData.href)
