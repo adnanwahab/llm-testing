@@ -44,16 +44,19 @@ window.voiceBuffer = []
 
 //fly towards the camera 
 //convert SVG shapes of letters into characters 
-function addLines (scene) {
+function addLines (scene, dataArray) {
     const geometry = new MeshLineGeometry()
-    const list = Array.from(Array(1e5).keys().map(d => Math.random() * 100))
-    console.log(list)
+    let bool = Math.random() > .5
+    const list = Array.from(Array(10000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000), bool ? dataArray[i] : 0]))
+    //console.log(list)
     geometry.setPoints(list)
     const material = new MeshLineMaterial({
-        color: 0xff0000
+        color: 0xff0000 * Math.random() | 0 
      })
     const mesh = new THREE.Mesh(geometry, material)
-    //mesh.raycast = raycast
+    setInterval(function () {
+        mesh.scale.addScalar(.1)
+    }, 100)
     scene.add(mesh)
 }
 
@@ -112,7 +115,7 @@ var vizInit = function (){
   
 
     audio.addEventListener('play', play)
-
+// make lines look treesa -> edit the shader so it has - > use a high res wood texture
 //     file.onchange = function(){
 //     fileLabel.classList.add('normal');
 //     audio.classList.add('active');
@@ -151,8 +154,8 @@ function play() {
     camera.position.set(0,0,100);
     camera.lookAt(scene.position);
     scene.add(camera);
-    // scene.background = environmentMap
-    // scene.environment = environmentMap
+    scene.background = environmentMap
+    scene.environment = environmentMap
 
     const canvas = document.querySelector('canvas.webgl')
 const controls = new OrbitControls(camera, canvas)
@@ -170,7 +173,7 @@ renderer.toneMappingExposure = 1.5
 var bulbLight;
     particleLight.add(
         bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 )
-        //new THREE.PointLight(0xffffff, 300)
+
         )
         bulbLight.castShadow = true;
         
@@ -211,7 +214,9 @@ let shit = {
     plane.position.set(0, 30, 0);
     //group.add(plane);
     
-    addLines(scene)
+    setInterval(function () {
+
+    }, 10000)//hello
     var plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
     plane2.rotation.x = -0.5 * Math.PI;
     plane2.position.set(0, -30, 0);
@@ -380,7 +385,11 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
       let shit = dataArray.reduce(function (prev, next) {
         return prev + next
       }, 0) / dataArray.length
-       window.unrealBloomPass.strength = shit
+      window.shit = shit
+      if (shit > 30)
+      addLines(scene, dataArray)
+
+       //window.unrealBloomPass.strength = shit
     // window.unrealBloomPass.strength =  
     
     let vocals = voiceBuffer.reduce(function (prev, next) {
@@ -416,9 +425,9 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
 
       const timer = Date.now() * 0.00025;
 
-				// particleLight.position.x = Math.sin( timer * 7 ) * 10;
-				// particleLight.position.y = Math.cos( timer * 5 ) * 10;
-				// particleLight.position.z = Math.cos( timer * 3 ) * 10;
+				particleLight.position.x = Math.sin( timer * 7 ) * 10;
+				particleLight.position.y = Math.cos( timer * 5 ) * 10;
+				particleLight.position.z = Math.cos( timer * 3 ) * 10;
     }
 
     function onWindowResize() {
