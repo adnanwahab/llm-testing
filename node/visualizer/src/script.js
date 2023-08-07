@@ -16,6 +16,9 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
 import getusermedia from 'getusermedia'
+import * as Curves from 'three/examples/jsm/curves/CurveExtras.js';
+
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
@@ -161,8 +164,83 @@ const vertexShader = /* glsl */ `
 //singing improves the world - music makes people happy 
 window.lineCount = 0
 
+function makeHelix () {
+    let helix = new Curves.HelixCurve()
+    //console.log(helix)
+    let pt = helix.getPoints(500)
+    const pipeSpline = [
+        new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
+        new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
+        new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
+        new THREE.Vector3( 10, 0, 30 ), new THREE.Vector3( 0, 0, 30 ),
+        new THREE.Vector3( - 10, 10, 30 ), new THREE.Vector3( - 10, 20, 30 ),
+        new THREE.Vector3( 0, 30, 30 ), new THREE.Vector3( 10, 30, 30 ),
+        new THREE.Vector3( 20, 30, 15 ), new THREE.Vector3( 10, 30, 10 ),
+        new THREE.Vector3( 0, 30, 10 ), new THREE.Vector3( - 10, 20, 10 ),
+        new THREE.Vector3( - 10, 10, 10 ), new THREE.Vector3( 0, 0, 10 ),
+        new THREE.Vector3( 10, - 10, 10 ), new THREE.Vector3( 20, - 15, 10 ),
+        new THREE.Vector3( 30, - 15, 10 ), new THREE.Vector3( 40, - 15, 10 ),
+        new THREE.Vector3( 50, - 15, 10 ), new THREE.Vector3( 60, 0, 10 ),
+        new THREE.Vector3( 70, 0, 0 ), new THREE.Vector3( 80, 0, 0 ),
+        new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
+    ]
+    let bezier = []
+    for (let i = 0; i < 100; i++) {
+        bezier.push(
+            new THREE.Vector3(0,0,0)
+        )
+    }
+    pt.forEach(vec => vec.multiplyScalar(10))
+    THREE.CurvePath
+    const curve = new THREE.CatmullRomCurve3(
+        pipeSpline
+    );
+    
+    const points = curve.getPoints( 50 );
+
+
+    window.lineCount += 1
+    const geometry = new MeshLineGeometry()
+    let bool = Math.random() > .5
+    const list = pt//Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
+  
+    
+    //console.log(list)
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color: 0xffffff,
+        transparent: true
+     })
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+        console.log('compile')
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+
+    }
+    material.customProgramCacheKey = function () {
+
+        return 2..toFixed( 1 );
+
+    };
+ 
+    const mesh = new THREE.Mesh(geometry, material)
+     mesh.position.x = window.lineCount - 50
+     mesh.position.y -= 10
+     mesh.position.z = - 1000
+     window.material = material
+     setInterval(function () { 
+        timer.value =  performance.now()
+     }, 100)
+    scene.add(mesh)
+}
+
 function makeRoad () {
 
+    let helix = new Curves.HelixCurve()
+    //console.log(helix)
+    let pt = helix.getPoints(50)
     const pipeSpline = [
         new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
         new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
@@ -197,7 +275,7 @@ function makeRoad () {
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
-    points 
+  
     
     //console.log(list)
     geometry.setPoints(list)
@@ -344,6 +422,8 @@ function play() {
         road.push(makeRoad(scene, dataArray))
     }
 
+    makeHelix()
+
     let template = new THREE.SphereGeometry( 15, 32, 16 );
     let l = template.attributes.position.array
     // lines.forEach((line, i) => {
@@ -372,8 +452,8 @@ function play() {
 //}, 500)
       
     const canvas = document.querySelector('canvas.webgl')
-//const controls = new OrbitControls(camera, canvas)
-//controls.enableDamping = true
+const controls = new TrackballControls(camera, canvas)
+controls.enableDamping = true
     
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
     //var renderer = new WebGPURenderer();
@@ -645,7 +725,7 @@ let shit = {
       //group.rotation.y += 0.005;
       //renderer.render(scene, camera);
       effectComposer.render()
-      //controls.update()
+      controls.update()
       requestAnimationFrame(render);
       //uniforms[ 'time' ].value = performance.now() / 1000;
 
