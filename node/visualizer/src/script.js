@@ -21,6 +21,49 @@ import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 window.voiceBuffer = []
 
+function makeFS(i) {
+    const end = `
+    #include <fog_pars_fragment>
+    #include <logdepthbuf_pars_fragment>
+    
+    uniform sampler2D map;
+    uniform sampler2D alphaMap;
+    uniform float useMap;
+    uniform float useAlphaMap;
+    uniform float useDash;
+    uniform float dashArray;
+    uniform float dashOffset;
+    uniform float dashRatio;
+    uniform float visibility;
+    uniform float alphaTest;
+    uniform vec2 repeat;
+    
+    uniform float time;
+    
+    varying vec2 vUV;
+    varying vec4 vColor;
+    varying float vCounters;
+    
+    void main() {
+      #include <logdepthbuf_fragment>
+      vec4 c = vColor;
+      if (useMap == 1.) c *= texture2D(map, vUV * repeat);
+      if (useAlphaMap == 1.) c.a *= texture2D(alphaMap, vUV * repeat).a;
+      if (c.a < alphaTest) discard;
+      if (true) {
+        c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
+      }
+      gl_FragColor = c;
+      gl_FragColor.r = ${i}/ 100.;
+      gl_FragColor.a *= step(vCounters, visibility);
+      #include <fog_fragment>
+      #include <tonemapping_fragment>
+      #include <encodings_fragment>
+    }
+    `;
+    return end
+}
+
 //rings waveform
 //vortex
 //sphere
@@ -75,8 +118,33 @@ window.voiceBuffer = []
 //vortex 
 //1-6 million vertices - most lines can be somewhat static
 window.lineCount = 0
+
+function makeRoad () {
+    const geometry = new MeshLineGeometry()
+    let bool = Math.random() > .5
+    const list = Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
+    //console.log(list)
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color: 0xffffff
+     })
+     material.fragmentShader = makeFS(Math.random())
+    const mesh = new THREE.Mesh(geometry, material)
+     mesh.position.x = window.lineCount
+     window.material = material
+     setInterval(function () { 
+        material.uniforms.time = Date.now()/ 1000
+     }, 100)
+    scene.add(mesh)
+    return mesh
+}
+
 function addLines (scene, dataArray) {
     window.lineCount += 1
+
+    
+
+
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = Array.from(Array(1000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
@@ -190,15 +258,17 @@ function play() {
     // scene.background = environmentMap
     // scene.environment = environmentMap
     let lines = []
-    for (let i = 0; i < 100; i++)
+    let road = []
+    for (let i = 0; i < 100; i++) {
         lines.push(addLines(scene, dataArray))
+        road.push(makeRoad(scene, dataArray))
+    }
 
 
 //100 * 10,000
 //setInterval(() => {
     let template = new THREE.SphereGeometry( 15, 32, 16 );
     let l = template.attributes.position.array
-    console.time('a')
     lines.forEach((line, i) => {
         const curve = new THREE.QuadraticBezierCurve3(
             new THREE.Vector3( -10, 0, 0 ),
@@ -213,7 +283,6 @@ function play() {
         line.position.z = -i *100
         line.scale.addScalar(i)
     })
-    console.timeEnd('a')
 
 
     
