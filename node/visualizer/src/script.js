@@ -43,11 +43,21 @@ window.voiceBuffer = []
 // });
 
 //fly towards the camera 
-//convert SVG shapes of letters into characters 
+//convert SVG shapes of letters into characters
+
+//railway camera - use a path for debugging -> 5 stops 
+//rings 
+//sphere explosion thing
+//waveform hills
+//midi
+//vortex 
+//1-6 million vertices - most lines can be somewhat static
+window.lineCount = 0
 function addLines (scene, dataArray) {
+    window.lineCount += 1
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
-    const list = Array.from(Array(10000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000), bool ? dataArray[i] : 0]))
+    const list = Array.from(Array(10000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
     //console.log(list)
     geometry.setPoints(list)
     const material = new MeshLineMaterial({
@@ -154,8 +164,8 @@ function play() {
     camera.position.set(0,0,100);
     camera.lookAt(scene.position);
     scene.add(camera);
-    scene.background = environmentMap
-    scene.environment = environmentMap
+    // scene.background = environmentMap
+    // scene.environment = environmentMap
 
     const canvas = document.querySelector('canvas.webgl')
 const controls = new OrbitControls(camera, canvas)
@@ -359,15 +369,15 @@ let shit = {
     }
     
 
-    var ambientLight = new THREE.AmbientLight(0xaaaaaa);
-    scene.add(ambientLight);
+    // var ambientLight = new THREE.AmbientLight(0xaaaaaa);
+    // scene.add(ambientLight);
 
-    var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.intensity = 0.9;
-    spotLight.position.set(-10, 40, 20);
-    spotLight.lookAt(ball);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
+    // var spotLight = new THREE.SpotLight(0xffffff);
+    // spotLight.intensity = 0.9;
+    // spotLight.position.set(-10, 40, 20);
+    // spotLight.lookAt(ball);
+    // spotLight.castShadow = true;
+    // scene.add(spotLight);
     
     //scene.add(group);
 
@@ -620,50 +630,50 @@ gui.add(tintPass.material.uniforms.uTint.value, 'x').min(- 1).max(1).step(0.001)
 gui.add(tintPass.material.uniforms.uTint.value, 'y').min(- 1).max(1).step(0.001).name('green')
 gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001).name('blue')
 
-// Displacement pass
-const DisplacementShader = {
-    uniforms:
-    {
-        tDiffuse: { value: null },
-        uTime: { value: null },
-        uNormalMap: { value: null }
-    },
-    vertexShader: `
-        varying vec2 vUv;
+// // Displacement pass
+// const DisplacementShader = {
+//     uniforms:
+//     {
+//         tDiffuse: { value: null },
+//         uTime: { value: null },
+//         uNormalMap: { value: null }
+//     },
+//     vertexShader: `
+//         varying vec2 vUv;
 
-        void main()
-        {
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+//         void main()
+//         {
+//             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 
-            vUv = uv;
-        }
-    `,
-    fragmentShader: `
-        uniform sampler2D tDiffuse;
-        uniform float uTime;
-        uniform sampler2D uNormalMap;
+//             vUv = uv;
+//         }
+//     `,
+//     fragmentShader: `
+//         uniform sampler2D tDiffuse;
+//         uniform float uTime;
+//         uniform sampler2D uNormalMap;
 
-        varying vec2 vUv;
+//         varying vec2 vUv;
 
-        void main()
-        {
-            vec3 normalColor = texture2D(uNormalMap, vUv).xyz * 2.0 - 1.0;
-            vec2 newUv = vUv + normalColor.xy * 0.1;
-            vec4 color = texture2D(tDiffuse, newUv);
+//         void main()
+//         {
+//             vec3 normalColor = texture2D(uNormalMap, vUv).xyz * 2.0 - 1.0;
+//             vec2 newUv = vUv + normalColor.xy * 0.1;
+//             vec4 color = texture2D(tDiffuse, newUv);
 
-            vec3 lightDirection = normalize(vec3(- 1.0, 1.0, 0.0));
-            float lightness = clamp(dot(normalColor, lightDirection), 0.0, 1.0);
-            color.rgb += lightness * 2.0;
+//             vec3 lightDirection = normalize(vec3(- 1.0, 1.0, 0.0));
+//             float lightness = clamp(dot(normalColor, lightDirection), 0.0, 1.0);
+//             color.rgb += lightness * 2.0;
 
-             gl_FragColor = color;
-        }
-    `
-}
+//              gl_FragColor = color;
+//         }
+//     `
+// }
 
-const displacementPass = new ShaderPass(DisplacementShader)
-displacementPass.material.uniforms.uTime.value = 0
-displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('/textures/interfaceNormalMap.png')
-effectComposer.addPass(displacementPass)
+// const displacementPass = new ShaderPass(DisplacementShader)
+// displacementPass.material.uniforms.uTime.value = 0
+// displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('/textures/interfaceNormalMap.png')
+// effectComposer.addPass(displacementPass)
     return effectComposer
 } 
 
