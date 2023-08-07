@@ -168,9 +168,7 @@ const vertexShader = /* glsl */ `
 window.lineCount = 0
 
 
-function makeTornado() {}
-function makeSphere() {}
-function makeWaterfall() {}
+
 
 
 function leftToRight(mesh) {
@@ -187,8 +185,31 @@ function leftToRight(mesh) {
     return Math.random() - .5
 }
 
+function coneTowardsCamera(mesh)  {
+    let i = window.lineCount
+    let radius = 50
+
+    mesh.position.set(
+        radius * Math.cos(i), radius * Math.sin(i)
+    )
+ 
+    mesh.rotation.y += Math.PI * 1.5
+    mesh.rotation.x -= .8
+    
+    //mesh.lookAt(camera.position)
+
+    let dir = new THREE.Vector3(1,0,0).applyEuler(mesh.rotation)
+        setInterval(function () {
+            mesh.position.add(dir)
+        })
+}
+function collision() {}
+function makeTornado() {}
+function makeSphere() {}
+function makeWaterfall() {}
+
 function drawLines(color) {
-    let i = window.lineCount++;
+    window.lineCount++;
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = []
@@ -216,28 +237,18 @@ function drawLines(color) {
         return 2..toFixed( 1 );
 
     };
-    let radius = 50
 
    
 
  
     const mesh = new THREE.Mesh(geometry, material)
      
-     //leftToRight(mesh)
+   
+    //  leftToRight(mesh) 
+    //  coneTowardsCamera(mesh)
+      
 
-      mesh.position.set(
-        radius * Math.cos(i), radius * Math.sin(i)
-    )
- 
-    mesh.rotation.y += Math.PI * 1.5
-    mesh.rotation.x -= .8
-    
-    //mesh.lookAt(camera.position)
-
-    let dir = new THREE.Vector3(1,0,0).applyEuler(mesh.rotation)
-        setInterval(function () {
-            mesh.position.add(dir)
-        })
+       
      setTimeout(function () {
         scene.remove(mesh)
         mesh.geometry.dispose()
