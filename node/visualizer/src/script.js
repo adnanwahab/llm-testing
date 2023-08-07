@@ -21,9 +21,12 @@ import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 window.voiceBuffer = []
 
-function merge() {}
+function merge(...args) {
+    console.log(args)
+}
 const railWay = merge(
     //scene1
+    1,2,3
     //winding from
 )
 
@@ -136,25 +139,66 @@ const vertexShader = /* glsl */ `
         c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
       }
       gl_FragColor = c;
-      gl_FragColor.r = sin(time * .010) * .01;
+      //gl_FragColor.r = sin(time * .010) * .01;
       gl_FragColor.a *= step(vCounters, visibility);
-      gl_FragColor.a = sin(time * .010) * .1;
-      if (vCounters > time) { discard;}
+      //gl_FragColor.a = sin(time * .010) * .1;
+      //if (vCounters > time) { discard;}
       #include <fog_fragment>
       #include <tonemapping_fragment>
       #include <encodings_fragment>
     }
     `;
 
+//when you turn on the lights -> bear -> hawk 
+//turns into something else when you get closer to it
+//find a shiny spaceship flying saucer model and reflection map it with PBR and use ring + line lights
+//draw scene to texture and use as environment map
 
 
+//What's new about what you're making? 
+
+//add sense of humor - cell shading + gummy bears + care bears + rainbows 
+//singing improves the world - music makes people happy 
 window.lineCount = 0
 
 function makeRoad () {
+
+    const pipeSpline = [
+        new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
+        new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
+        new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
+        new THREE.Vector3( 10, 0, 30 ), new THREE.Vector3( 0, 0, 30 ),
+        new THREE.Vector3( - 10, 10, 30 ), new THREE.Vector3( - 10, 20, 30 ),
+        new THREE.Vector3( 0, 30, 30 ), new THREE.Vector3( 10, 30, 30 ),
+        new THREE.Vector3( 20, 30, 15 ), new THREE.Vector3( 10, 30, 10 ),
+        new THREE.Vector3( 0, 30, 10 ), new THREE.Vector3( - 10, 20, 10 ),
+        new THREE.Vector3( - 10, 10, 10 ), new THREE.Vector3( 0, 0, 10 ),
+        new THREE.Vector3( 10, - 10, 10 ), new THREE.Vector3( 20, - 15, 10 ),
+        new THREE.Vector3( 30, - 15, 10 ), new THREE.Vector3( 40, - 15, 10 ),
+        new THREE.Vector3( 50, - 15, 10 ), new THREE.Vector3( 60, 0, 10 ),
+        new THREE.Vector3( 70, 0, 0 ), new THREE.Vector3( 80, 0, 0 ),
+        new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
+    ]
+    let bezier = []
+    for (let i = 0; i < 100; i++) {
+        bezier.push(
+            new THREE.Vector3(0,0,0)
+        )
+    }
+    THREE.CurvePath
+    const curve = new THREE.CatmullRomCurve3(
+        pipeSpline
+    );
+    
+    const points = curve.getPoints( 50 );
+
+
     window.lineCount += 1
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
+    points 
+    
     //console.log(list)
     geometry.setPoints(list)
     const material = new MeshLineMaterial({
