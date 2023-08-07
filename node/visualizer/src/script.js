@@ -21,8 +21,89 @@ import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 window.voiceBuffer = []
 
-function makeFS(i) {
-    const end = `
+function merge() {}
+const railWay = merge(
+    //scene1
+    //winding from
+)
+
+const vertexShader = /* glsl */ `
+  #include <common>
+  #include <logdepthbuf_pars_vertex>
+  #include <fog_pars_vertex>
+
+  attribute vec3 previous;
+  attribute vec3 next;
+  attribute float side;
+  attribute float width;
+  attribute float counters;
+  
+  uniform vec2 resolution;
+  uniform float lineWidth;
+  uniform vec3 color;
+  uniform float opacity;
+  uniform float sizeAttenuation;
+  
+  varying vec2 vUV;
+  varying vec4 vColor;
+  varying float vCounters;
+  
+  vec2 fix(vec4 i, float aspect) {
+    vec2 res = i.xy / i.w;
+    res.x *= aspect;
+  	vCounters = counters;
+    return res;
+  }
+  
+  void main() {
+    float aspect = resolution.x / resolution.y;
+    vColor = vec4(color, opacity);
+    vUV = uv;
+  
+    mat4 m = projectionMatrix * modelViewMatrix;
+    vec4 finalPosition = m * vec4(position, 1.0);
+    vec4 prevPos = m * vec4(previous, 1.0);
+    vec4 nextPos = m * vec4(next, 1.0);
+  
+    vec2 currentP = fix(finalPosition, aspect);
+    vec2 prevP = fix(prevPos, aspect);
+    vec2 nextP = fix(nextPos, aspect);
+  
+    float w = lineWidth * width;
+  
+    vec2 dir;
+    if (nextP == currentP) dir = normalize(currentP - prevP);
+    else if (prevP == currentP) dir = normalize(nextP - currentP);
+    else {
+      vec2 dir1 = normalize(currentP - prevP);
+      vec2 dir2 = normalize(nextP - currentP);
+      dir = normalize(dir1 + dir2);
+  
+      vec2 perp = vec2(-dir1.y, dir1.x);
+      vec2 miter = vec2(-dir.y, dir.x);
+      //w = clamp(w / dot(miter, perp), 0., 4. * lineWidth * width);
+    }
+  
+    //vec2 normal = (cross(vec3(dir, 0.), vec3(0., 0., 1.))).xy;
+    vec4 normal = vec4(-dir.y, dir.x, 0., 1.);
+    normal.xy *= .5 * w;
+    //normal *= projectionMatrix;
+    if (sizeAttenuation == 0.) {
+      normal.xy *= finalPosition.w;
+      normal.xy /= (vec4(resolution, 0., 1.) * projectionMatrix).xy;
+    }
+  
+    finalPosition.xy += normal.xy * side;
+    gl_Position = finalPosition;
+    #include <logdepthbuf_vertex>
+    #include <fog_vertex>
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    #include <fog_vertex>
+  }
+`
+
+
+    const fs = (i) => `
     #include <fog_pars_fragment>
     #include <logdepthbuf_pars_fragment>
     
@@ -45,6 +126,7 @@ function makeFS(i) {
     varying float vCounters;
     
     void main() {
+      float index = ${i}.;
       #include <logdepthbuf_fragment>
       vec4 c = vColor;
       if (useMap == 1.) c *= texture2D(map, vUV * repeat);
@@ -54,40 +136,58 @@ function makeFS(i) {
         c.a *= ceil(mod(vCounters + dashOffset, dashArray) - (dashArray * dashRatio));
       }
       gl_FragColor = c;
-      gl_FragColor.r = ${i}/ 100.;
+      gl_FragColor.r = sin(time * .010) * .01;
       gl_FragColor.a *= step(vCounters, visibility);
+      gl_FragColor.a = sin(time * .010) * .1;
+      if (vCounters > time) { discard;}
       #include <fog_fragment>
       #include <tonemapping_fragment>
       #include <encodings_fragment>
     }
     `;
-    return end
-}
+
+
 
 window.lineCount = 0
 
 function makeRoad () {
+    window.lineCount += 1
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
     //console.log(list)
     geometry.setPoints(list)
     const material = new MeshLineMaterial({
-        color: 0xffffff
+        color: 0xffffff,
+        transparent: true
      })
-     material.fragmentShader = makeFS(Math.random())
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+        console.log('compile')
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+
+    }
+    material.customProgramCacheKey = function () {
+
+        return 2..toFixed( 1 );
+
+    };
+ 
     const mesh = new THREE.Mesh(geometry, material)
-     mesh.position.x = window.lineCount
+     mesh.position.x = window.lineCount - 50
+     mesh.position.y -= 10
      window.material = material
      setInterval(function () { 
-        material.uniforms.time = Date.now()/ 1000
+        timer.value =  performance.now()
      }, 100)
     scene.add(mesh)
     return mesh
 }
 
 function addLines (scene, dataArray) {
-    window.lineCount += 1
+    
 
     
 
@@ -138,6 +238,7 @@ const sizes = {
 }
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
+window.camera = camera
 const gui = new dat.GUI()
 // import WebGPU from 'three/addons/capabilities/WebGPU.js';
 // 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -163,17 +264,7 @@ var vizInit = function (){
   
 
     audio.addEventListener('play', play)
-// make lines look treesa -> edit the shader so it has - > use a high res wood texture
-//     file.onchange = function(){
-//     fileLabel.classList.add('normal');
-//     audio.classList.add('active');
-//     var files = this.files;
-    
-//     audio.src = URL.createObjectURL(files[0]);
-//     audio.load();
-//     audio.play();
-//     play();
-//   }
+
 const environmentMap = cubeTextureLoader.load([
     '/textures/environmentMaps/0/px.jpg',
     '/textures/environmentMaps/0/nx.jpg',
@@ -200,38 +291,36 @@ function play() {
     var dataArray = new Uint8Array(bufferLength);
     var group = new THREE.Group();
     camera.position.set(0,0,100);
-    //camera.lookAt(scene.position);
     scene.add(camera);
-    // scene.background = environmentMap
-    // scene.environment = environmentMap
-    let lines = []
+ 
+    // let lines = []
     let road = []
     for (let i = 0; i < 100; i++) {
-        lines.push(addLines(scene, dataArray))
+        //lines.push(addLines(scene, dataArray))
         road.push(makeRoad(scene, dataArray))
     }
 
     let template = new THREE.SphereGeometry( 15, 32, 16 );
     let l = template.attributes.position.array
-    lines.forEach((line, i) => {
-        const curve = new THREE.QuadraticBezierCurve3(
-            new THREE.Vector3( -10, 0, 0 ),
-            new THREE.Vector3( 20, 15, 0 ),
-            new THREE.Vector3( 10, 0, 0 )
-        );
+    // lines.forEach((line, i) => {
+    //     const curve = new THREE.QuadraticBezierCurve3(
+    //         new THREE.Vector3( -10, 0, 0 ),
+    //         new THREE.Vector3( 20, 15, 0 ),
+    //         new THREE.Vector3( 10, 0, 0 )
+    //     );
         
-        const points = curve.getPoints( 50 );
+    //     const points = curve.getPoints( 50 );
 
 
-        line.geometry.points = line.geometry.points.map((d,i) => l[i % l.length])
-        line.position.z = -i *100
-        line.scale.addScalar(i)
-    })
+    //     line.geometry.points = line.geometry.points.map((d,i) => l[i % l.length])
+    //     line.position.z = -i *100
+    //     line.scale.addScalar(i)
+    // })
     
 
-    lines[50].geometry.points = lines[50].geometry.points.map(function (d,i) {
-        return [0,0,i]
-    })
+    // lines[50].geometry.points = lines[50].geometry.points.map(function (d,i) {
+    //     return [0,0,i]
+    // })
 
     setInterval(function(){
         camera.position.z -= 1
@@ -239,7 +328,7 @@ function play() {
 //}, 500)
       
     const canvas = document.querySelector('canvas.webgl')
-const controls = new OrbitControls(camera, canvas)
+//const controls = new OrbitControls(camera, canvas)
 //controls.enableDamping = true
     
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
@@ -311,14 +400,7 @@ let shit = {
     // new HDRCubeTextureLoader().setPath('./static/pbr')
     // .load([])
     const geometry = new THREE.BufferGeometry();
-    let particleList = new Float32Array(1e5)
-    for (let i = 0; i < 1e5; i+=3 ) {
-        particleList[i] = Math.random() * 100
-        particleList[i+1] = Math.random() * 100
-        particleList[i+2] = Math.random() * 100
-    }
-    
-    geometry.setAttribute( 'position',  new THREE.BufferAttribute( particleList, 3 ));
+ 
     //geometry.setAttribute( 'initialPosition', positions.clone() );
 
     //geometry.attributes.position.setUsage( THREE.DynamicDrawUsage );
@@ -462,6 +544,29 @@ let shit = {
 
 
     function render() {
+
+
+
+        scene.traverse( function ( child ) {
+
+            if ( child.isMesh ) {
+
+                const shader = child.material.userData.shader;
+
+                if ( shader ) {
+                    //console.log(performance.now())
+                    shader.uniforms.time.value = performance.now()
+
+                }
+
+            }
+
+        } );
+
+
+
+
+
       analyser.getByteFrequencyData(dataArray);
       let shit = dataArray.reduce(function (prev, next) {
         return prev + next
@@ -496,7 +601,7 @@ let shit = {
       //group.rotation.y += 0.005;
       //renderer.render(scene, camera);
       effectComposer.render()
-      controls.update()
+      //controls.update()
       requestAnimationFrame(render);
       //uniforms[ 'time' ].value = performance.now() / 1000;
 
@@ -546,24 +651,6 @@ function avg(arr){
 function max(arr){
     return arr.reduce(function(a, b){ return Math.max(a, b); })
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -665,159 +752,6 @@ gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001)
 
     return effectComposer
 } 
-
-// // /**
-// //  * Base
-// //  */
-// // // Debug
-// // 
-
-// // // Canvas
-
-// // // Scene
-// // const scene = new THREE.Scene()
-
-// // /**
-// //  * Loaders
-// //  */
-// // const gltfLoader = new GLTFLoader()
-// // const cubeTextureLoader = new THREE.CubeTextureLoader()
-// // 
-
-// // /**
-// //  * Update all materials
-// //  */
-// // const updateAllMaterials = () =>
-// // {
-// //     scene.traverse((child) =>
-// //     {
-// //         if(child instanceof THREE.Mesh && child.material instanceof THREE.MeshStandardMaterial)
-// //         {
-// //             child.material.envMapIntensity = 2.5
-// //             child.material.needsUpdate = true
-// //             child.castShadow = true
-// //             child.receiveShadow = true
-// //         }
-// //     })
-// // }
-
-// // /**
-// //  * Environment map
-// //  */
-
-
-// // /**
-// //  * Models
-// //  */
-// // gltfLoader.load(
-// //     '/models/DamagedHelmet/glTF/DamagedHelmet.gltf',
-// //     (gltf) =>
-// //     {
-// //         gltf.scene.scale.set(2, 2, 2)
-// //         gltf.scene.rotation.y = Math.PI * 0.5
-// //         scene.add(gltf.scene)
-
-// //         updateAllMaterials()
-// //     }
-// // )
-
-// // /**
-// //  * Lights
-// //  */
-// // const directionalLight = new THREE.DirectionalLight('#ffffff', 3)
-// // directionalLight.castShadow = true
-// // directionalLight.shadow.mapSize.set(1024, 1024)
-// // directionalLight.shadow.camera.far = 15
-// // directionalLight.shadow.normalBias = 0.05
-// // directionalLight.position.set(0.25, 3, - 2.25)
-// // scene.add(directionalLight)
-
-// // /**
-// //  * Sizes
-// //  */
-
-
-// // window.addEventListener('resize', () =>
-// // {
-// //     // Update sizes
-// //     sizes.width = window.innerWidth
-// //     sizes.height = window.innerHeight
-
-// //     // Update camera
-// //     camera.aspect = sizes.width / sizes.height
-// //     camera.updateProjectionMatrix()
-
-// //     // Update renderer
-// //     renderer.setSize(sizes.width, sizes.height)
-// //     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-// //     // Update effect composer
-
-// // })
-
-// // /**
-// //  * Camera
-// //  */
-// // // Base camera
-// // const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-// // camera.position.set(4, 1, - 4)
-// // scene.add(camera)
-
-// // // Controls
-// // const controls = new OrbitControls(camera, canvas)
-// // controls.enableDamping = true
-
-// // /**
-// //  * Renderer
-// //  */
-// // const renderer = new THREE.WebGLRenderer({
-// //     canvas: canvas,
-// //     antialias: true
-// // })
-// // renderer.shadowMap.enabled = true
-// // renderer.shadowMap.type = THREE.PCFShadowMap
-// // renderer.useLegacyLights = false
-
-// // renderer.setSize(sizes.width, sizes.height)
-// // renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-
-// // /**
-// //  * Post processing
-// //  */
-// // const renderTarget = new THREE.WebGLRenderTarget(
-// //     800,
-// //     600,
-// //     {
-// //         samples: 2
-// //     }
-// // )
-
-// // // Effect composer
-
-// // /**
-// //  * Animate
-// //  */
-// // const clock = new THREE.Clock()
-
-// // const tick = () =>
-// // {
-// //     const elapsedTime = clock.getElapsedTime()
-
-// //     // Update passes
-// //     displacementPass.material.uniforms.uTime.value = elapsedTime
-
-// //     // Update controls
-// //     controls.update()
-
-// //     // Render
-// //     // renderer.render(scene, camera)
-// //     effectComposer.render()
-
-// //     // Call tick again on the next frame
-// //     window.requestAnimationFrame(tick)
-// // }
-
-// // tick()
 
 
 
