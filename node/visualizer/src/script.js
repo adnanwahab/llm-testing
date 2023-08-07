@@ -156,6 +156,7 @@ const vertexShader = /* glsl */ `
       if (vCounters > .9) gl_FragColor.a = 1.;
       //gl_FragColor.a = .1;
       //if (vCounters * 100. > time) { discard;}
+      //gl_FragColor += .1;
       #include <fog_fragment>
       #include <tonemapping_fragment>
       #include <encodings_fragment>
@@ -213,7 +214,7 @@ function drawLines(color) {
         return 2..toFixed( 1 );
 
     };
-    let radius = 5
+    let radius = 50
 
    
 
@@ -226,7 +227,12 @@ function drawLines(color) {
         radius * Math.cos(i), radius * Math.sin(i)
     )
  
-    mesh.rotation.y += Math.PI * .4
+    mesh.rotation.y += Math.PI * 1.5
+    mesh.rotation.x -= .8
+    //mesh.lookAt(camera.position)
+        setInterval(function () {
+            mesh.position.z -= .1
+        })
      setTimeout(function () {
         scene.remove(mesh)
         mesh.geometry.dispose()
