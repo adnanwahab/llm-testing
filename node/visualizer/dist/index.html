@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>33 - Post-processing</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script> 
+
+    <style>
+        span {
+            color: green;
+        } 
+        canvas {
+            position: absolute;
+            right:0;
+    outline: none;
+        }
+
+
+        li:hover {
+            background: purple;
+            cursor:pointer;
+        }
+    </style>
+  <script type="module" crossorigin src="./assets/index-78cc4df6.js"></script>
+  <link rel="stylesheet" href="./assets/index-fc0ef56f.css">
+</head>
+<body>
+<!-- //https://codepen.io/serversideup/pen/Vwrgoea -->
+    <div id="content">
+    
+        <!-- <label for="thefile" class="file"> Choose an audio file
+          <input type="file" id="thefile" accept="audio/*" />
+        </label> -->
+    
+        <!-- <audio id="audio" controls></audio> -->
+        <div id="out"></div>
+      </div>
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/simplex-noise/2.3.0/simplex-noise.min.js'></script>
+
+<div class="absolute top-0 left-0 bg-pink-100 border-indigo-500 border border-5 z-50">
+
+    <h3 class="lyrics lyrics mt-2 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl"></h3>
+
+    <div class="lyric-match"></div>
+    
+    
+    <div class="w-32 ml-4">
+        <label for="yt" class="block text-sm font-medium leading-6 text-gray-900">Song Search</label>
+        <div class="">
+          <input type="yt" name="yt" id="yt" class="yt block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" placeholder="you@example.com">
+        </div>
+      </div>
+  
+      <ul class="search-results"></ul>
+    <br>
+   
+
+    <button type="button" class=" play-button rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500">
+        click here to play random song
+    </button>
+
+    <audio controls autoplay muted>
+      <!-- <source src="/media/youtubeRobot Doctor ｜ D Billions Kids Songs.mp3" type="audio/mpeg"> -->
+      Your browser does not support the audio tag.
+      <source src="/media/[nextorrent.com] 7Os8Os9Os/79. Status Quo  - Living On An Island.mp3" type="audio/mpeg">
+      
+  </audio>
+<div class="recognizedText"></div>
+</div>
+    <canvas class="webgl"></canvas>
+    
+    
+
+
+      <!-- two visual indicators on the transcript -->
+      <!-- one is for the expected tempo?  -->
+      <!-- the other is for the speakers tempo -> tokenized match (noisy bar) -->
+
+      <!-- split audio and send two files (background + speaker) -->
+
+
+
+      <!-- different modes , conventional - transition the mask at a constant rate -->
+
+
+      <!-- tokenized match  -->
+
+      <!-- compare audio streams on server for pitch, and so on -->
+
+      <!-- regular song + split song - lower volume of the original speech -->
+
+</body>
+</html>
