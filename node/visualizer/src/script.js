@@ -22,17 +22,23 @@ import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
+function getVocals () {
+    if (! window.voiceBuffer.analyser) return console.log('no ssl sorry!')
+    window.voiceBuffer.analyser.getByteFrequencyData(window.voiceBuffer)
+
+    let vocals = voiceBuffer.reduce(function (prev, next) {
+        return prev + next
+      }, 0) / voiceBuffer.length
+      window.voiceBuffer.amplitude = vocals;
+      return vocals
+}
+
 window.voiceBuffer = []
 const canvas = document.querySelector('canvas.webgl')
 
 function merge(...args) {
     console.log(args)
 }
-const railWay = merge(
-    //scene1
-    1,2,3
-    //winding from
-)
 
 const vertexShader = /* glsl */ `
   #include <common>
@@ -145,8 +151,10 @@ const vertexShader = /* glsl */ `
       gl_FragColor = c;
       //gl_FragColor.r = sin(time * .010) * .01;
       gl_FragColor.a *= step(vCounters, visibility);
-      gl_FragColor.a = sin(time * .0010) * .4;
-      if (vCounters > sin(time * .001)) gl_FragColor.a = 1.;
+      gl_FragColor.a = .1;
+      //if (vCounters > sin(time * .001)) gl_FragColor.a = 1.;
+      if (vCounters > .9) gl_FragColor.a = 1.;
+      //gl_FragColor.a = .1;
       //if (vCounters * 100. > time) { discard;}
       #include <fog_fragment>
       #include <tonemapping_fragment>
@@ -154,18 +162,12 @@ const vertexShader = /* glsl */ `
     }
     `;
 
-//when you turn on the lights -> bear -> hawk 
-//turns into something else when you get closer to it
-//find a shiny spaceship flying saucer model and reflection map it with PBR and use ring + line lights
-//draw scene to texture and use as environment map
-
-
-//What's new about what you're making? 
-
-//add sense of humor - cell shading + gummy bears + care bears + rainbows 
-//singing improves the world - music makes people happy 
 window.lineCount = 0
 
+
+function makeTornado() {}
+function makeSphere() {}
+function makeWaterfall() {}
 
 function drawLines(color) {
     const geometry = new MeshLineGeometry()
@@ -175,8 +177,10 @@ function drawLines(color) {
         list.push(new THREE.Vector3(i * 1, 0, 0))
     }
     
-    //console.log(list)
+    
     geometry.setPoints(list)
+
+
     const material = new MeshLineMaterial({
         color,
         transparent: true
@@ -194,281 +198,52 @@ function drawLines(color) {
         return 2..toFixed( 1 );
 
     };
+
+    function makeRand() {
+        return Math.random() - .5
+    }
  
     const mesh = new THREE.Mesh(geometry, material)
      //mesh.position.x = window.lineCount - 50
-     mesh.position.x = -5
-     mesh.position.y = Math.random() * 10
+     mesh.position.x = -100
+     mesh.position.y = makeRand() * 200
      mesh.position.z = 0
      window.material = material
      setInterval(function () { 
         timer.value =  performance.now()
         mesh.position.x += 1
      }, 100)
+
+     setTimeout(function () {
+        scene.remove(mesh)
+        mesh.geometry.dispose()
+        mesh.material.dispose()
+     }, 5000)
     scene.add(mesh)
 }
 
-
-function makeMoreRoad () {
-    let helix = new Curves.HelixCurve()
-    //console.log(helix)
-    let pt = helix.getPoints(500)
-    const pipeSpline = [
-        new THREE.Vector3(35, 0, 530.40625),
-
-        new THREE.Vector3(58,0, 10.40625),
+if (! navigator.mediaDevices) console.log('you need SSL probably') 
+else {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(function(stream) {
+      const context = new AudioContext()
+          const analyser = context.createAnalyser()
         
-            new THREE.Vector3(588, 0, 600),
+          // And then we connect them together
+          context.createMediaStreamSource(stream).connect(analyser)
         
-                new THREE.Vector3(870, 0, 182.40625)
-    ].reverse()
-  
-    THREE.CurvePath
-    const curve = new THREE.CatmullRomCurve3(
-        pipeSpline
-    );
-    
+          // Here we preallocate buffers for streaming audio data
+          const fftSize = analyser.frequencyBinCount
+          const frequencies = new Uint8Array(fftSize)
+          window.voiceBuffer = frequencies
+          window.voiceBuffer.analyser = analyser;
         
-
-    window.lineCount += 1
-    const geometry = new MeshLineGeometry()
-    let bool = Math.random() > .5
-    const list = curve.getPoints(50)
-  
-    
-    //console.log(list)
-    geometry.setPoints(list)
-    const material = new MeshLineMaterial({
-        color: 0xff0000,
-        transparent: true
-     })
-     let timer = { value: 0 };
-     material.onBeforeCompile = function (shader) {
-        console.log('compile')
-        shader.uniforms.time = timer
-        shader.fragmentShader = fs(window.lineCount)
-        material.userData.shader = shader;
-
-    }
-    material.customProgramCacheKey = function () {
-
-        return 2..toFixed( 1 );
-
-    };
- 
-    const mesh = new THREE.Mesh(geometry, material)
-     mesh.position.x = window.lineCount - 50
-     mesh.position.y -= 10
-     mesh.position.z = - 1000
-     window.material = material
-     setInterval(function () { 
-        timer.value =  performance.now()
-     }, 100)
-    scene.add(mesh)
+    })
+    .catch(function(err) {
+      /* Handle the error */
+      console.error("Error: " + err);
+    });
 }
-
-function makeHelix () {
-    let helix = new Curves.HelixCurve()
-    //console.log(helix)
-    let pt = helix.getPoints(500)
-    const pipeSpline = [
-        new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
-        new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
-        new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
-        new THREE.Vector3( 10, 0, 30 ), new THREE.Vector3( 0, 0, 30 ),
-        new THREE.Vector3( - 10, 10, 30 ), new THREE.Vector3( - 10, 20, 30 ),
-        new THREE.Vector3( 0, 30, 30 ), new THREE.Vector3( 10, 30, 30 ),
-        new THREE.Vector3( 20, 30, 15 ), new THREE.Vector3( 10, 30, 10 ),
-        new THREE.Vector3( 0, 30, 10 ), new THREE.Vector3( - 10, 20, 10 ),
-        new THREE.Vector3( - 10, 10, 10 ), new THREE.Vector3( 0, 0, 10 ),
-        new THREE.Vector3( 10, - 10, 10 ), new THREE.Vector3( 20, - 15, 10 ),
-        new THREE.Vector3( 30, - 15, 10 ), new THREE.Vector3( 40, - 15, 10 ),
-        new THREE.Vector3( 50, - 15, 10 ), new THREE.Vector3( 60, 0, 10 ),
-        new THREE.Vector3( 70, 0, 0 ), new THREE.Vector3( 80, 0, 0 ),
-        new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
-    ]
-    let bezier = []
-    for (let i = 0; i < 100; i++) {
-        bezier.push(
-            new THREE.Vector3(0,0,0)
-        )
-    }
-    pt.forEach(vec => vec.multiplyScalar(10))
-    THREE.CurvePath
-    const curve = new THREE.CatmullRomCurve3(
-        pipeSpline
-    );
-    
-    const points = curve.getPoints( 50 );
-
-
-    window.lineCount += 1
-    const geometry = new MeshLineGeometry()
-    let bool = Math.random() > .5
-    const list = pt//Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
-  
-    
-    //console.log(list)
-    geometry.setPoints(list)
-    const material = new MeshLineMaterial({
-        color: 0xffffff,
-        transparent: true
-     })
-     let timer = { value: 0 };
-     material.onBeforeCompile = function (shader) {
-        console.log('compile')
-        shader.uniforms.time = timer
-        shader.fragmentShader = fs(window.lineCount)
-        material.userData.shader = shader;
-
-    }
-    material.customProgramCacheKey = function () {
-
-        return 2..toFixed( 1 );
-
-    };
- 
-    const mesh = new THREE.Mesh(geometry, material)
-     mesh.position.x = window.lineCount - 50
-     mesh.position.y -= 10
-     mesh.position.z = - 1000
-     window.material = material
-     setInterval(function () { 
-        timer.value =  performance.now()
-     }, 100)
-    scene.add(mesh)
-}
-
-function makeRoad () {
-
-    let helix = new Curves.HelixCurve()
-    //console.log(helix)
-    let pt = helix.getPoints(50)
-    const pipeSpline = [
-        new THREE.Vector3( 0, 10, - 10 ), new THREE.Vector3( 10, 0, - 10 ),
-        new THREE.Vector3( 20, 0, 0 ), new THREE.Vector3( 30, 0, 10 ),
-        new THREE.Vector3( 30, 0, 20 ), new THREE.Vector3( 20, 0, 30 ),
-        new THREE.Vector3( 10, 0, 30 ), new THREE.Vector3( 0, 0, 30 ),
-        new THREE.Vector3( - 10, 10, 30 ), new THREE.Vector3( - 10, 20, 30 ),
-        new THREE.Vector3( 0, 30, 30 ), new THREE.Vector3( 10, 30, 30 ),
-        new THREE.Vector3( 20, 30, 15 ), new THREE.Vector3( 10, 30, 10 ),
-        new THREE.Vector3( 0, 30, 10 ), new THREE.Vector3( - 10, 20, 10 ),
-        new THREE.Vector3( - 10, 10, 10 ), new THREE.Vector3( 0, 0, 10 ),
-        new THREE.Vector3( 10, - 10, 10 ), new THREE.Vector3( 20, - 15, 10 ),
-        new THREE.Vector3( 30, - 15, 10 ), new THREE.Vector3( 40, - 15, 10 ),
-        new THREE.Vector3( 50, - 15, 10 ), new THREE.Vector3( 60, 0, 10 ),
-        new THREE.Vector3( 70, 0, 0 ), new THREE.Vector3( 80, 0, 0 ),
-        new THREE.Vector3( 90, 0, 0 ), new THREE.Vector3( 100, 0, 0 )
-    ]
-    let bezier = []
-    for (let i = 0; i < 100; i++) {
-        bezier.push(
-            new THREE.Vector3(0,0,0)
-        )
-    }
-    THREE.CurvePath
-    const curve = new THREE.CatmullRomCurve3(
-        pipeSpline
-    );
-    
-    const points = curve.getPoints( 50 );
-
-
-    window.lineCount += 1
-    const geometry = new MeshLineGeometry()
-    let bool = Math.random() > .5
-    const list = Array.from(Array(1000).keys().map((d, i) => [ 0, 0, -i * 10 ]))
-  
-    
-    //console.log(list)
-    geometry.setPoints(list)
-    const material = new MeshLineMaterial({
-        color: 0xffffff,
-        transparent: true
-     })
-     let timer = { value: 0 };
-     material.onBeforeCompile = function (shader) {
-        console.log('compile')
-        shader.uniforms.time = timer
-        shader.fragmentShader = fs(window.lineCount)
-        material.userData.shader = shader;
-
-    }
-    material.customProgramCacheKey = function () {
-
-        return 2..toFixed( 1 );
-
-    };
- 
-    const mesh = new THREE.Mesh(geometry, material)
-     mesh.position.x = window.lineCount - 50
-     mesh.position.y += 40
-     window.material = material
-     setInterval(function () { 
-        timer.value =  performance.now()
-     }, 100)
-    scene.add(mesh)
-    return mesh
-}
-
-function addLines (scene, dataArray) {
-    const geometry = new MeshLineGeometry()
-    let bool = Math.random() > .5
-    const list = Array.from(Array(1000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
-    //console.log(list)
-    geometry.setPoints(list)
-    const material = new MeshLineMaterial({
-        color: 0xffffff
-     })
-    const mesh = new THREE.Mesh(geometry, material)
-    setInterval(function () {
-        //mesh.scale.addScalar(.1)
-    }, 100)
-    scene.add(mesh)
-    return mesh
-}
-
-//setTimeout(function () {
-//     const constraints = {audio: true}
-//     navigator.webkitGetUserMedia(constraints)
-//   .then(handleUserMedia)
-//   .catch((err) => {
-//     console.log(err)
-//   });
-    
-// navigator.getUserMedia  = navigator.getUserMedia ||
-//                             navigator.webkitGetUserMedia ||
-//                             navigator.mozGetUserMedia ||
-//                             navigator.msGetUserMedia;
-
-// console.log(navigator.getUserMedia)
-// if (navigator.getUserMedia) {
-//     navigator.getUserMedia({audio: true}, handleUserMedia, (err) => {console.log(err)});
-// } 
-navigator.mediaDevices.getUserMedia({ audio: true })
-  .then(function(stream) {
-    const context = new AudioContext()
-        const analyser = context.createAnalyser()
-      
-        // And then we connect them together
-        context.createMediaStreamSource(stream).connect(analyser)
-      
-        // Here we preallocate buffers for streaming audio data
-        const fftSize = analyser.frequencyBinCount
-        const frequencies = new Uint8Array(fftSize)
-        window.voiceBuffer = frequencies
-        window.voiceBuffer.analyser = analyser;
-      
-  })
-  .catch(function(err) {
-    /* Handle the error */
-    console.error("Error: " + err);
-  });
-
-
-
-    
-//})
 
 const sizes = {
     width: window.innerWidth,
@@ -476,53 +251,19 @@ const sizes = {
 }
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
-window.camera = camera
 var controls = new MapControls( camera, canvas);
-
 const gui = new dat.GUI()
-// import WebGPU from 'three/addons/capabilities/WebGPU.js';
-// 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
-import {EXRLoader} from 'three/examples/jsm/loaders/EXRLoader'
-//import { loadConfigFromFile } from 'vite'
-const textureLoader = new THREE.TextureLoader()
-//  import  {HDRCubeTextureLoader } from 'three/examples/jsm/loaders/HDRCubeTextureLoader.js'
-//https://www.youtube.com/watch?v=SZzehktUeko&ab_channel=ChrisJones
-//https://www.youtube.com/watch?v=gxxqdrrpgZc&ab_channel=HDCOLORS-ColorfulKaleidoscopeswithAddedValue
-//var noise = new SimplexNoise();
-//https://github.com/junni-inc/next.junni.co.jp/tree/master/src/assets
-//change camera angle according to beat in smooth physics fashion
-//https://exp-gemini.lusion.co/style
-//https://particle-love.com/
-//https://github.com/adarkforce/3D-Earth-Music-Visualizer
-const cubeTextureLoader = new THREE.CubeTextureLoader()
+
 let particleLight 
-var vizInit = function (){
-
-  var file = document.getElementById("thefile");
-  var audio = document.querySelector("audio");
-  var fileLabel = document.querySelector("label.file");
-  
-
-    audio.addEventListener('play', play)
-
-const environmentMap = cubeTextureLoader.load([
-    '/textures/environmentMaps/0/px.jpg',
-    '/textures/environmentMaps/0/nx.jpg',
-    '/textures/environmentMaps/0/py.jpg',
-    '/textures/environmentMaps/0/ny.jpg',
-    '/textures/environmentMaps/0/pz.jpg',
-    '/textures/environmentMaps/0/nz.jpg'
-])
-environmentMap.colorSpace = THREE.SRGBColorSpace
 
 
+let audio = document.querySelector('audio')
+audio.addEventListener('play', play)
 function play() {
-
-
     window.camera = camera
 
     var context = new AudioContext();
-    var src = context.createMediaElementSource(audio);
+    var src = context.createMediaElementSource(document.querySelector('audio'));
     var analyser = context.createAnalyser();
     src.connect(analyser);
     analyser.connect(context.destination);
@@ -531,209 +272,133 @@ function play() {
     var dataArray = new Uint8Array(bufferLength);
     var group = new THREE.Group();
     camera.position.set(0,100,100);
-    //camera.rotation.z -= 10
+
     scene.add(camera);
  
-   
-
-      
-
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
-    //var renderer = new WebGPURenderer();
-renderer.toneMapping = THREE.ReinhardToneMapping
-renderer.toneMappingExposure = 100.5
+    renderer.toneMapping = THREE.ReinhardToneMapping
+    renderer.toneMappingExposure = 100.5
     renderer.setSize(sizes.width, sizes.height);
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
     new THREE.MeshBasicMaterial({color: 'red'}))
     ;
-var bulbLight;
-    particleLight.add(
-        bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 )
-
-        )
-        bulbLight.castShadow = true;
-        
+    var bulbLight;
+    particleLight.add(bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 ))        
     scene.add(particleLight)
     var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
     scene.add( hemiLight );
-
 
     bulbLight.power = 3500
 
 
 
     var icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
-    // var lambertMaterial = new THREE.MeshLambertMaterial({
-    //     color: 0xff00ee,
-    //     wireframe: false
-    // });
-    // new HDRCubeTextureLoader().setPath('./static/pbr')
-    // .load([])
-    const geometry = new THREE.BufferGeometry();
- 
-    //geometry.setAttribute( 'initialPosition', positions.clone() );
 
-    //geometry.attributes.position.setUsage( THREE.DynamicDrawUsage );
-
-    let mesh = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 20, color: 'red' } ) );
-
-  
-    var textureLoader = new THREE.TextureLoader()
-
-    let textures = [
-        '/pbr_low_res/ao_map.jpg',
-        '/pbr_low_res/color_map.jpg',
-        '/pbr_low_res/displacement_map.jpg',
-        '/pbr_low_res/metalness_map.jpg',
-        '/pbr_low_res/normal_map_opengl.jpg',
-        '/pbr_low_res/render_map.jpg',
-        '/pbr_low_res/roughness_map.jpg'
-    ]
-
-
-    const aoTexture = textureLoader.load(textures[0])
-    const colorTexture = textureLoader.load(textures[1])
-    const displacementTexture = textureLoader.load(textures[2])
-    const metalnessTexture = textureLoader.load(textures[3])
-    const normalTexture = textureLoader.load(textures[4])
-    const renderTexture = textureLoader.load(textures[5])
-    const roughnessTexture = textureLoader.load(textures[6])
-    normalTexture.wrapS = THREE.RepeatWrapping;
-    normalTexture.wrapT = THREE.RepeatWrapping;
-    normalTexture.repeat.x = 10;
-    normalTexture.repeat.y = 6;
-    normalTexture.anisotropy = 16;
-    const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
+    // const aoTexture = textureLoader.load(textures[0])
+    // const colorTexture = textureLoader.load(textures[1])
+    // const displacementTexture = textureLoader.load(textures[2])
+    // const metalnessTexture = textureLoader.load(textures[3])
+    // const normalTexture = textureLoader.load(textures[4])
+    // const renderTexture = textureLoader.load(textures[5])
+    // const roughnessTexture = textureLoader.load(textures[6])
+    // normalTexture.wrapS = THREE.RepeatWrapping;
+    // normalTexture.wrapT = THREE.RepeatWrapping;
+    // normalTexture.repeat.x = 10;
+    // normalTexture.repeat.y = 6;
+    // normalTexture.anisotropy = 16;
+    // const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
 
    
-    let material = new THREE.MeshPhysicalMaterial( {
-        iridescenceMap : colorTexture,
-		iridescenceIOR :0.3,
-		iridescenceThicknessRange :[ 100, 400 ],
-		iridescenceThicknessMap: displacementTexture,
+    // let material = new THREE.MeshPhysicalMaterial( {
+    //     iridescenceMap : colorTexture,
+	// 	iridescenceIOR :0.3,
+	// 	iridescenceThicknessRange :[ 100, 400 ],
+	// 	iridescenceThicknessMap: displacementTexture,
 
-		// sheenColor: new THREE.Color( 0xff0000 ),
-		// sheenColorMap:renderTexture,
-		//sheenRoughness: 1.0,
-		//sheenRoughnessMap:colorTexture,
+	// 	// sheenColor: new THREE.Color( 0xff0000 ),
+	// 	// sheenColorMap:renderTexture,
+	// 	//sheenRoughness: 1.0,
+	// 	//sheenRoughnessMap:colorTexture,
 
-		// transmissionMap:roughnessTexture,
+	// 	// transmissionMap:roughnessTexture,
 
-		// thickness:0,
-		// thicknessMap:roughnessTexture,
-	    // attenuationDistance:Infinity,
-		// attenuationColor:new THREE.Color( 1, 1, 1 ),
+	// 	// thickness:0,
+	// 	// thicknessMap:roughnessTexture,
+	//     // attenuationDistance:Infinity,
+	// 	// attenuationColor:new THREE.Color( 1, 1, 1 ),
 
-		// specularIntensity:1.0,
-		// specularIntensityMap:renderTexture,
-		// specularColor:new THREE.Color( 1, 1, 1 ),
-		// specularColorMap:colorTexture,
+	// 	// specularIntensity:1.0,
+	// 	// specularIntensityMap:renderTexture,
+	// 	// specularColor:new THREE.Color( 1, 1, 1 ),
+	// 	// specularColorMap:colorTexture,
 
-		// // _anisotropy = 0;
-		// // _clearcoat = 0;
-		// // _iridescence = 0;
-		// // _sheen = 0.0;
-		// // _transmission = 0;
+	// 	// // _anisotropy = 0;
+	// 	// // _clearcoat = 0;
+	// 	// // _iridescence = 0;
+	// 	// // _sheen = 0.0;
+	// 	// // _transmission = 0;
 
-        // anisotropyRotation: 0,
-		// anisotropyMap:null,
+    //     // anisotropyRotation: 0,
+	// 	// anisotropyMap:null,
 
-		// clearcoatMap:aoTexture,
-	    // clearcoatRoughness:0.0,
-		 clearcoatRoughness: 0,
-		// clearcoatNormalScale :new THREE.Vector2( 1, 1 ),
-		// clearcoatNormalMap:null,
+	// 	// clearcoatMap:aoTexture,
+	//     // clearcoatRoughness:0.0,
+	// 	 clearcoatRoughness: 0,
+	// 	// clearcoatNormalScale :new THREE.Vector2( 1, 1 ),
+	// 	// clearcoatNormalMap:null,
 
-		// ior:1.5,
+	// 	// ior:1.5,
 
-        // clearcoat: 1.0,
-        // clearcoatRoughness: 0.1,
-        reflectivity: 1,
-        metalness: 1.0,
-        roughness:0.0,
-        //color: 0x0000ff,
-        normalMap: normalTexture,
-        flatShading: false,
-        // clearcoatNormalMap: roughnessTexture,
+    //     // clearcoat: 1.0,
+    //     // clearcoatRoughness: 0.1,
+    //     reflectivity: 1,
+    //     metalness: 1.0,
+    //     roughness:0.0,
+    //     //color: 0x0000ff,
+    //     normalMap: normalTexture,
+    //     flatShading: false,
+    //     // clearcoatNormalMap: roughnessTexture,
 
-        // normalScale: new THREE.Vector2( 0.15, 0.15 )
-    } );
+    //     // normalScale: new THREE.Vector2( 0.15, 0.15 )
+    // } );
     
-    for (let i = 0; i < 1; i++) {
-        var ball = new THREE.Mesh(icosahedronGeometry, material);
+    // for (let i = 0; i < 1; i++) {
+    //     var ball = new THREE.Mesh(icosahedronGeometry, material);
 
-        ball.position.set(i % 200, Math.floor(i / 200), Math.floor(i / 2000) );
-        group.add(ball);
-    }
+    //     ball.position.set(i % 200, Math.floor(i / 200), Math.floor(i / 2000) );
+    //     group.add(ball);
+    // }
     
-
-    // var ambientLight = new THREE.AmbientLight(0xaaaaaa);
-    // scene.add(ambientLight);
-
-    // var spotLight = new THREE.SpotLight(0xffffff);
-    // spotLight.intensity = 0.9;
-    // spotLight.position.set(-10, 40, 20);
-    // spotLight.lookAt(ball);
-    // spotLight.castShadow = true;
-    // scene.add(spotLight);
-    
-    //scene.add(group);
-
-   
-
     window.addEventListener('resize', onWindowResize, false);
     const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
     var effectComposer = applyPostProcessing(renderer, renderTarget)
 
     render();
 
-
     function render() {
-
-
-
         scene.traverse( function ( child ) {
-
             if ( child.isMesh ) {
-
                 const shader = child.material.userData.shader;
-
                 if ( shader ) {
-                    //console.log(performance.now())
                     shader.uniforms.time.value = performance.now()
-
                 }
-
             }
-
         } );
-
-
-
 
 
       analyser.getByteFrequencyData(dataArray);
       let amplitude = dataArray.reduce(function (prev, next) {
         return prev + next
       }, 0) / dataArray.length
-   
       
-      if (amplitude > 20) drawLines(0xff0000)
+
+     window.unrealBloomPass.strength = 1
      
+      if (amplitude > 10) drawLines(0x0093fe) //teal
+      if (getVocals() > 1) drawLines(0xfb4f87) //fuschia
 
-       //window.unrealBloomPass.strength = shit
-     window.unrealBloomPass.strength = 3 
-     window.voiceBuffer.analyser.getByteFrequencyData(window.voiceBuffer)
-
-    let vocals = voiceBuffer.reduce(function (prev, next) {
-        return prev + next
-      }, 0) / voiceBuffer.length
-      window.voiceBuffer.amplitude = vocals;
-      if (vocals > 1) drawLines(0x0000ff)
-      //if (Math.random () > .9) console.log(voiceBuffer, vocals)
-
-        //console.log(dataArray)
+   
       var lowerHalfArray = dataArray.slice(0, (dataArray.length/2) - 1);
       var upperHalfArray = dataArray.slice((dataArray.length/2) - 1, dataArray.length - 1);
 
@@ -748,20 +413,16 @@ var bulbLight;
       var upperMaxFr = upperMax / upperHalfArray.length;
       var upperAvgFr = upperAvg / upperHalfArray.length;
 
-      //group.rotation.y += 0.005;
-      //renderer.render(scene, camera);
       controls.update();
       effectComposer.render()
       
       requestAnimationFrame(render);
       //uniforms[ 'time' ].value = performance.now() / 1000;
 
-
       const timer = Date.now() * 0.00025;
-
-				particleLight.position.x = Math.sin( timer * 7 ) * 10;
-				particleLight.position.y = Math.cos( timer * 5 ) * 10;
-				particleLight.position.z = Math.cos( timer * 3 ) * 10;
+        particleLight.position.x = Math.sin( timer * 7 ) * 10;
+        particleLight.position.y = Math.cos( timer * 5 ) * 10;
+        particleLight.position.z = Math.cos( timer * 3 ) * 10;
     }
 
     function onWindowResize() {
@@ -774,15 +435,9 @@ var bulbLight;
     }
 
   };
-}
 
-vizInit();
 
 document.body.addEventListener('touchend', function(ev) { context.resume(); });
-
-
-
-
 
 function fractionate(val, minVal, maxVal) {
     return (val - minVal)/(maxVal - minVal);
@@ -803,64 +458,58 @@ function max(arr){
     return arr.reduce(function(a, b){ return Math.max(a, b); })
 }
 
-
-
-
-
-
 function applyPostProcessing(renderer, renderTarget) {
     const effectComposer = new EffectComposer(renderer, renderTarget)
-effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-effectComposer.setSize(sizes.width, sizes.height)
+    effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+    effectComposer.setSize(sizes.width, sizes.height)
 
-// Render pass
-const renderPass = new RenderPass(scene, camera)
-effectComposer.addPass(renderPass)
+    // Render pass
+    const renderPass = new RenderPass(scene, camera)
+    effectComposer.addPass(renderPass)
 
-// Dot screen pass
-const dotScreenPass = new DotScreenPass()
-dotScreenPass.enabled = false
-effectComposer.addPass(dotScreenPass)
+    // Dot screen pass
+    const dotScreenPass = new DotScreenPass()
+    dotScreenPass.enabled = false
+    effectComposer.addPass(dotScreenPass)
 
-// Glitch pass
-const glitchPass = new GlitchPass()
-glitchPass.goWild = true
-glitchPass.enabled = false
-effectComposer.addPass(glitchPass)
+    // Glitch pass
+    const glitchPass = new GlitchPass()
+    glitchPass.goWild = true
+    glitchPass.enabled = false
+    effectComposer.addPass(glitchPass)
 
-// RGB Shift pass
-const rgbShiftPass = new ShaderPass(RGBShiftShader)
-rgbShiftPass.enabled = false
-effectComposer.addPass(rgbShiftPass)
+    // RGB Shift pass
+    const rgbShiftPass = new ShaderPass(RGBShiftShader)
+    rgbShiftPass.enabled = false
+    effectComposer.addPass(rgbShiftPass)
 
-// Gamma correction pass
-const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader)
-effectComposer.addPass(gammaCorrectionPass)
+    // Gamma correction pass
+    const gammaCorrectionPass = new ShaderPass(GammaCorrectionShader)
+    effectComposer.addPass(gammaCorrectionPass)
 
-// Antialias pass
-if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2)
-{
-    const smaaPass = new SMAAPass()
-    effectComposer.addPass(smaaPass)
+    // Antialias pass
+    if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2)
+    {
+        const smaaPass = new SMAAPass()
+        effectComposer.addPass(smaaPass)
 
-    console.log('Using SMAA')
-}
+        console.log('Using SMAA')
+    }
 
-// Unreal Bloom pass
-window.unrealBloomPass = new UnrealBloomPass()
-unrealBloomPass.enabled = true
-effectComposer.addPass(unrealBloomPass)
+    // Unreal Bloom pass
+    window.unrealBloomPass = new UnrealBloomPass()
+    unrealBloomPass.enabled = true
+    effectComposer.addPass(unrealBloomPass)
 
-unrealBloomPass.strength = 2
-unrealBloomPass.radius = 1
-unrealBloomPass.threshold = 0.6
+    unrealBloomPass.strength = 2
+    unrealBloomPass.radius = 1
+    unrealBloomPass.threshold = 0.6
 
-gui.add(unrealBloomPass, 'enabled')
-gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
-gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
+    gui.add(unrealBloomPass, 'enabled')
+    gui.add(unrealBloomPass, 'strength').min(0).max(2).step(0.001)
+    gui.add(unrealBloomPass, 'radius').min(0).max(2).step(0.001)
+    gui.add(unrealBloomPass, 'threshold').min(0).max(1).step(0.001)
 
-// Tin pass
 const TintShader = {
     uniforms:
     {
@@ -893,18 +542,16 @@ const TintShader = {
     `
 }
 
-const tintPass = new ShaderPass(TintShader)
-tintPass.material.uniforms.uTint.value = new THREE.Vector3()
-effectComposer.addPass(tintPass)
+    const tintPass = new ShaderPass(TintShader)
+    tintPass.material.uniforms.uTint.value = new THREE.Vector3()
+    effectComposer.addPass(tintPass)
 
-gui.add(tintPass.material.uniforms.uTint.value, 'x').min(- 1).max(1).step(0.001).name('red')
-gui.add(tintPass.material.uniforms.uTint.value, 'y').min(- 1).max(1).step(0.001).name('green')
-gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001).name('blue')
+    gui.add(tintPass.material.uniforms.uTint.value, 'x').min(- 1).max(1).step(0.001).name('red')
+    gui.add(tintPass.material.uniforms.uTint.value, 'y').min(- 1).max(1).step(0.001).name('green')
+    gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001).name('blue')
 
     return effectComposer
 } 
-
-
 
 //rings waveform
 //vortex
