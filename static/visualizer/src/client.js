@@ -32,11 +32,30 @@ const startNewSong = async (e) => {
       recur()
   }
 
+//https://www.shadertoy.com/view/Xllfzl - bird
+
+
+//https://www.shadertoy.com/view/XsBXWt fractal candy land cartyoon 
+
+//https://www.shadertoy.com/view/cddSRM best
+// https://www.shadertoy.com/view/md3Sz4
+//  
+//  https://www.shadertoy.com/view/XtcXWM fractal
+//  https://www.shadertoy.com/view/tsGGRw fractal
+//https://www.shadertoy.com/view/stGGzz fractal mouse 
+//https://www.shadertoy.com/view/wdjGzz
+
+//https://www.shadertoy.com/view/7lfBWj
+
+//https://www.shadertoy.com/view/NstyzB
+
+//https://www.shadertoy.com/view/ldsBRn watwe
+///https://www.shadertoy.com/view/4ttGDH cell
+//https://www.shadertoy.com/view/cddSRM
 
 //https://www.shadertoy.com/view/4slGz4
-//https://www.shadertoy.com/view/MslGWN
-//https://www.shadertoy.com/view/XdByzy
-//https://www.shadertoy.com/view/ldlXRS
+//https://www.shadertoy.com/view/XdByzy stvoi
+//https://www.shadertoy.com/view/ldlXRS ring
 //make the worrds work good - use d3 and text spans around each word and then - word by word karaoke matching 
 let audioTag = document.querySelector('audio')
 //audioTag.currentTime = 30;

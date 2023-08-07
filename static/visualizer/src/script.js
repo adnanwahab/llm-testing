@@ -15,6 +15,29 @@ import { GammaCorrectionShader } from 'three/examples/jsm/shaders/GammaCorrectio
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
+import getusermedia from 'getusermedia'
+window.voiceBuffer = []
+
+getusermedia({audio: true}, function (err, stream) {
+    console.log(stream)
+    if (err) {
+      return console.log(err)
+    }
+  
+    // Next we create an analyser node to intercept data from the mic
+    const context = new AudioContext()
+    const analyser = context.createAnalyser()
+  
+    // And then we connect them together
+    context.createMediaStreamSource(stream).connect(analyser)
+  
+    // Here we preallocate buffers for streaming audio data
+    const fftSize = analyser.frequencyBinCount
+    const frequencies = new Uint8Array(fftSize)
+    window.voiceBuffer = frequencies
+  
+  })
+
 
 const sizes = {
     width: window.innerWidth,
@@ -95,7 +118,7 @@ function play() {
 const controls = new OrbitControls(camera, canvas)
 //controls.enableDamping = true
     
-    var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
     //var renderer = new WebGPURenderer();
 renderer.toneMapping = THREE.ReinhardToneMapping
 renderer.toneMappingExposure = 1.5
@@ -103,11 +126,39 @@ renderer.toneMappingExposure = 1.5
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
     new THREE.MeshBasicMaterial({color: 'red'}))
-
-    particleLight.add(new THREE.PointLight(0xffffff, 30))
-
+    ;
+var bulbLight;
+    particleLight.add(
+        bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 )
+        //new THREE.PointLight(0xffffff, 300)
+        )
+        bulbLight.castShadow = true;
+        
     scene.add(particleLight)
+    var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
+    scene.add( hemiLight );
 
+
+    bulbLight.power = 3500
+
+let shit = {
+    '0.0001 lx (Moonless Night)': 0.0001,
+    '0.002 lx (Night Airglow)': 0.002,
+    '0.5 lx (Full Moon)': 0.5,
+    '3.4 lx (City Twilight)': 3.4,
+    '50 lx (Living Room)': 50,
+    '100 lx (Very Overcast)': 100,
+    '350 lx (Office Room)': 350,
+    '400 lx (Sunrise/Sunset)': 400,
+    '1000 lx (Overcast)': 1000,
+    '18000 lx (Daylight)': 18000,
+    '50000 lx (Direct Sun)': 50000
+}
+
+    //gui.add(shit, )
+
+    hemiLight.intensity = 50000
+    //bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 );
     var planeGeometry = new THREE.PlaneGeometry(800, 800, 20, 20);
     var planeMaterial = new THREE.MeshLambertMaterial({
         color: 0x6904ce,
@@ -135,9 +186,9 @@ renderer.toneMappingExposure = 1.5
     const geometry = new THREE.BufferGeometry();
     let particleList = new Float32Array(1e5)
     for (let i = 0; i < 1e5; i+=3 ) {
-        particleList[i] = Math.random() * 10
+        particleList[i] = Math.random() * 100
         particleList[i+1] = Math.random() * 100
-        particleList[i+2] = Math.random() * 100000
+        particleList[i+2] = Math.random() * 100
     }
     
     geometry.setAttribute( 'position',  new THREE.BufferAttribute( particleList, 3 ));
@@ -202,10 +253,10 @@ renderer.toneMappingExposure = 1.5
 
    
     let material = new THREE.MeshPhysicalMaterial( {
-        // iridescenceMap : renderTexture,
-		// iridescenceIOR :0.3,
-		// iridescenceThicknessRange :[ 100, 400 ],
-		// iridescenceThicknessMap: displacementTexture,
+        iridescenceMap : colorTexture,
+		iridescenceIOR :0.3,
+		iridescenceThicknessRange :[ 100, 400 ],
+		iridescenceThicknessMap: displacementTexture,
 
 		// sheenColor: new THREE.Color( 0xff0000 ),
 		// sheenColorMap:renderTexture,
@@ -246,7 +297,7 @@ renderer.toneMappingExposure = 1.5
         reflectivity: 1,
         metalness: 1.0,
         roughness:0.0,
-        color: 0x0000ff,
+        //color: 0x0000ff,
         normalMap: normalTexture,
         flatShading: false,
         // clearcoatNormalMap: roughnessTexture,
@@ -254,10 +305,13 @@ renderer.toneMappingExposure = 1.5
         // normalScale: new THREE.Vector2( 0.15, 0.15 )
     } );
     
-    var ball = new THREE.Mesh(icosahedronGeometry, material);
+    for (let i = 0; i < 10000; i++) {
+        var ball = new THREE.Mesh(icosahedronGeometry, material);
 
-    ball.position.set(0, 0, 0);
-    group.add(ball);
+        ball.position.set(i % 200, Math.floor(i / 200), Math.floor(i / 2000) );
+        group.add(ball);
+    }
+    
 
     var ambientLight = new THREE.AmbientLight(0xaaaaaa);
     scene.add(ambientLight);
@@ -271,10 +325,10 @@ renderer.toneMappingExposure = 1.5
     
     scene.add(group);
 
-    document.getElementById('out').appendChild(renderer.domElement);
+   
 
     window.addEventListener('resize', onWindowResize, false);
-const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
+const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
     var effectComposer = applyPostProcessing(renderer, renderTarget)
 
     render();
@@ -282,7 +336,16 @@ const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
 
     function render() {
       analyser.getByteFrequencyData(dataArray);
+      let shit = dataArray.reduce(function (prev, next) {
+        return prev + next
+      }, 0) / dataArray.length
+    //   window.unrealBloomPass.strength = shit
+    window.unrealBloomPass.strength =  voiceBuffer.reduce(function (prev, next) {
+        return prev + next
+      }, 0) / voiceBuffer.length
+      console.log(voiceBuffer, window.unrealBloomPass.strength)
 
+        //console.log(dataArray)
       var lowerHalfArray = dataArray.slice(0, (dataArray.length/2) - 1);
       var upperHalfArray = dataArray.slice((dataArray.length/2) - 1, dataArray.length - 1);
 
@@ -302,7 +365,7 @@ const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
       
       makeRoughBall(ball, modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8), modulate(upperAvgFr, 0, 1, 0, 4));
 
-      group.rotation.y += 0.005;
+      //group.rotation.y += 0.005;
       //renderer.render(scene, camera);
       effectComposer.render()
       controls.update()
@@ -310,9 +373,9 @@ const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
 
       const timer = Date.now() * 0.00025;
 
-				particleLight.position.x = Math.sin( timer * 7 ) * 10;
-				particleLight.position.y = Math.cos( timer * 5 ) * 40;
-				particleLight.position.z = Math.cos( timer * 3 ) * 30;
+				// particleLight.position.x = Math.sin( timer * 7 ) * 10;
+				// particleLight.position.y = Math.cos( timer * 5 ) * 10;
+				// particleLight.position.z = Math.cos( timer * 3 ) * 10;
     }
 
     function onWindowResize() {
@@ -325,8 +388,7 @@ const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
     }
 
     function makeRoughBall(mesh, bassFr, treFr) {
-        //console.log(mesh)
-        //console.log(mesh)
+        
         mesh.geometry.attributes.position.array.forEach(function (vertex, i) {
             var offset = mesh.geometry.parameters.radius;
             //console.log(offset)
@@ -338,7 +400,7 @@ const renderTarget = new THREE.WebGLRenderTarget(800,600,{samples: 2})
             //var distance = (offset + bassFr ) + noise.noise3D(val + time *rf*7, val +  time*rf*8, val + time*rf*9) * amp * treFr;
             // vertex.multiplyScalar(distance);
             // console.log(mesh.geometry.attributes.position.array)
-            //mesh.geometry.attributes.position.array[i] *= distance * .1
+            //mesh.geometry.attributes.position.array[i] *= Math.random()
         });
         mesh.geometry.verticesNeedUpdate = true;
         mesh.geometry.normalsNeedUpdate = true;
@@ -452,8 +514,8 @@ if(renderer.getPixelRatio() === 1 && !renderer.capabilities.isWebGL2)
 }
 
 // Unreal Bloom pass
-const unrealBloomPass = new UnrealBloomPass()
-unrealBloomPass.enabled = false
+window.unrealBloomPass = new UnrealBloomPass()
+unrealBloomPass.enabled = true
 effectComposer.addPass(unrealBloomPass)
 
 unrealBloomPass.strength = 0.3
@@ -705,3 +767,61 @@ effectComposer.addPass(displacementPass)
 // // }
 
 // // tick()
+
+
+
+
+
+
+
+function init() {
+
+    const container = document.getElementById( 'container' );
+
+    camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+
+    scene = new THREE.Scene();
+
+    const geometry = new THREE.PlaneGeometry( 2, 2 );
+
+    uniforms = {
+        time: { value: 1.0 }
+    };
+
+    const material = new THREE.ShaderMaterial( {
+
+        uniforms: uniforms,
+        vertexShader: document.getElementById( 'vertexShader' ).textContent,
+        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
+
+    } );
+
+    const mesh = new THREE.Mesh( geometry, material );
+    scene.add( mesh );
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio( window.devicePixelRatio );
+    renderer.setSize( window.innerWidth, window.innerHeight );
+    container.appendChild( renderer.domElement );
+
+    window.addEventListener( 'resize', onWindowResize );
+
+}
+
+function onWindowResize() {
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
+
+}
+
+//
+
+function animate() {
+
+    requestAnimationFrame( animate );
+
+    uniforms[ 'time' ].value = performance.now() / 1000;
+
+    renderer.render( scene, camera );
+
+}

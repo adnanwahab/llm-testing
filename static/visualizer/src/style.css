@@ -11,5 +11,7 @@ body
 }
 
 canvas {
-    z-index: 9999;
+    z-index: 10;
 }
+
+/* https://threejs.org/examples/?q=shader#webgl_shaders_sky */
