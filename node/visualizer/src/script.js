@@ -167,6 +167,48 @@ const vertexShader = /* glsl */ `
 window.lineCount = 0
 
 
+function drawLines(color) {
+    console.log(color, 'drawLines')
+    const geometry = new MeshLineGeometry()
+    let bool = Math.random() > .5
+    const list = []
+    for (let i = 0; i< 100; i++) {
+        list.push(new THREE.Vector3(i * 1, 0, 0))
+    }
+    
+    //console.log(list)
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color,
+        transparent: true
+     })
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+
+    }
+    material.customProgramCacheKey = function () {
+
+        return 2..toFixed( 1 );
+
+    };
+ 
+    const mesh = new THREE.Mesh(geometry, material)
+     //mesh.position.x = window.lineCount - 50
+     mesh.position.x = -5
+     mesh.position.y = Math.random() * 10
+     mesh.position.z = 0
+     window.material = material
+     setInterval(function () { 
+        timer.value =  performance.now()
+        mesh.position.x += 1
+     }, 100)
+    scene.add(mesh)
+}
+
 
 function makeMoreRoad () {
     let helix = new Curves.HelixCurve()
@@ -475,41 +517,8 @@ function play() {
     //camera.rotation.z -= 10
     scene.add(camera);
  
-    // let lines = []
-    let road = []
-    for (let i = 0; i < 100; i++) {
-        //lines.push(addLines(scene, dataArray))
-        road.push(makeRoad(scene, dataArray))
-    }
-    makeMoreRoad()
-    makeHelix()
+   
 
-    let template = new THREE.SphereGeometry( 15, 32, 16 );
-    let l = template.attributes.position.array
-    // lines.forEach((line, i) => {
-    //     const curve = new THREE.QuadraticBezierCurve3(
-    //         new THREE.Vector3( -10, 0, 0 ),
-    //         new THREE.Vector3( 20, 15, 0 ),
-    //         new THREE.Vector3( 10, 0, 0 )
-    //     );
-        
-    //     const points = curve.getPoints( 50 );
-
-
-    //     line.geometry.points = line.geometry.points.map((d,i) => l[i % l.length])
-    //     line.position.z = -i *100
-    //     line.scale.addScalar(i)
-    // })
-    
-
-    // lines[50].geometry.points = lines[50].geometry.points.map(function (d,i) {
-    //     return [0,0,i]
-    // })
-
-    setInterval(function(){
-        camera.position.z -= 1
-    }, 8)
-//}, 500)
       
 
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
@@ -535,43 +544,7 @@ var bulbLight;
 
     bulbLight.power = 3500
 
-let shit = {
-    '0.0001 lx (Moonless Night)': 0.0001,
-    '0.002 lx (Night Airglow)': 0.002,
-    '0.5 lx (Full Moon)': 0.5,
-    '3.4 lx (City Twilight)': 3.4,
-    '50 lx (Living Room)': 50,
-    '100 lx (Very Overcast)': 100,
-    '350 lx (Office Room)': 350,
-    '400 lx (Sunrise/Sunset)': 400,
-    '1000 lx (Overcast)': 1000,
-    '18000 lx (Daylight)': 18000,
-    '50000 lx (Direct Sun)': 50000
-}
 
-    //gui.add(shit, )
-
-    hemiLight.intensity = 50000
-    //bulbMat.emissiveIntensity = bulbLight.intensity / Math.pow( 0.02, 2.0 );
-    var planeGeometry = new THREE.PlaneGeometry(800, 800, 20, 20);
-    var planeMaterial = new THREE.MeshLambertMaterial({
-        color: 0x6904ce,
-        side: THREE.DoubleSide,
-        wireframe: false
-    });
-    
-    var plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane.rotation.x = -0.5 * Math.PI;
-    plane.position.set(0, 30, 0);
-    //group.add(plane);
-    
-    setInterval(function () {
-
-    }, 10000)//hello
-    var plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
-    plane2.rotation.x = -0.5 * Math.PI;
-    plane2.position.set(0, -30, 0);
-    //group.add(plane2);
 
     var icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
     // var lambertMaterial = new THREE.MeshLambertMaterial({
@@ -588,32 +561,7 @@ let shit = {
 
     let mesh = new THREE.Points( geometry, new THREE.PointsMaterial( { size: 20, color: 'red' } ) );
 
-    //scene.add(mesh)
-
-    // new EXRLoader()
-    // .load( 'pbr/color_map.exr', function ( texture, textureData ) {
-
-    //     // memorial.exr is NPOT
-
-    //     //console.log( textureData );
-    //     //console.log( texture );
-
-    //     // EXRLoader sets these default settings
-    //     //texture.generateMipmaps = false;
-    //     //texture.minFilter = LinearFilter;
-    //     //texture.magFilter = LinearFilter;
-    //     //console.log(textureData, texture)
-    //     const material = new THREE.MeshBasicMaterial( { map: texture } );
-
-    //     const quad = new THREE.PlaneGeometry( 10.5 * textureData.width / textureData.height, 1.5 );
-
-    //     const mesh = new THREE.Mesh( quad, material );
-
-    //     scene.add( mesh );
-
-    //     //render();
-
-    // } );
+  
     var textureLoader = new THREE.TextureLoader()
 
     let textures = [
@@ -749,15 +697,16 @@ let shit = {
 
 
       analyser.getByteFrequencyData(dataArray);
-      let shit = dataArray.reduce(function (prev, next) {
+      let amplitude = dataArray.reduce(function (prev, next) {
         return prev + next
       }, 0) / dataArray.length
-      window.shit = shit
+   
       
-      
+      if (amplitude > 20) drawLines(0xff0000)
+      if (Math.random() > .999) drawLines(0x0000ff)
 
        //window.unrealBloomPass.strength = shit
-    // window.unrealBloomPass.strength =  
+     window.unrealBloomPass.strength = 3 
     
     let vocals = voiceBuffer.reduce(function (prev, next) {
         return prev + next
