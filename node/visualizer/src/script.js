@@ -203,6 +203,8 @@ function coneTowardsCamera(mesh)  {
             mesh.position.add(dir)
         })
 }
+
+//waveform 
 function collision() {}
 function makeTornado() {}
 function makeSphere() {}
@@ -211,10 +213,12 @@ function makeWaterfall() {}
 function drawLines(color) {
     window.lineCount++;
     const geometry = new MeshLineGeometry()
-    let bool = Math.random() > .5
+ 
     const list = []
     for (let i = 0; i< 100; i++) {
-        list.push(new THREE.Vector3(i * 1, 0, 0))
+             list.push(new THREE.Vector3(i , 0, 0))
+
+        // list.push(new THREE.Vector3(Math.cos(i / 50), Math.sin(i / 50), 0))
     }
     
     
@@ -227,25 +231,20 @@ function drawLines(color) {
      })
      let timer = { value: 0 };
      material.onBeforeCompile = function (shader) {
-
         shader.uniforms.time = timer
         shader.fragmentShader = fs(window.lineCount)
         material.userData.shader = shader;
-
     }
-    material.customProgramCacheKey = function () {
-        return 2..toFixed( 1 );
-
-    };
+    material.customProgramCacheKey = function () { return 2..toFixed( 1 );};
 
    
 
  
     const mesh = new THREE.Mesh(geometry, material)
      
-   
+    //mesh.position.x = makeRand() * 1000
     //  leftToRight(mesh) 
-    //  coneTowardsCamera(mesh)
+     coneTowardsCamera(mesh)
       
 
        
@@ -319,12 +318,12 @@ function play() {
     new THREE.MeshBasicMaterial({color: 'red'}))
     ;
     var bulbLight;
-    particleLight.add(bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 ))        
-    scene.add(particleLight)
+    //particleLight.add(bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 ))        
+    //scene.add(particleLight)
     var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
     scene.add( hemiLight );
 
-    bulbLight.power = 3500
+    //bulbLight.power = 3500
 
 
 
@@ -455,9 +454,9 @@ function play() {
       //uniforms[ 'time' ].value = performance.now() / 1000;
 
       const timer = Date.now() * 0.00025;
-        particleLight.position.x = Math.sin( timer * 7 ) * 10;
-        particleLight.position.y = Math.cos( timer * 5 ) * 10;
-        particleLight.position.z = Math.cos( timer * 3 ) * 10;
+        // particleLight.position.x = Math.sin( timer * 7 ) * 10;
+        // particleLight.position.y = Math.cos( timer * 5 ) * 10;
+        // particleLight.position.z = Math.cos( timer * 3 ) * 10;
     }
 
     function onWindowResize() {
