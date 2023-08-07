@@ -20,6 +20,8 @@ import * as Curves from 'three/examples/jsm/curves/CurveExtras.js';
 import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
 
+
+import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 function getVocals () {
@@ -229,9 +231,12 @@ function drawLines(color) {
  
     mesh.rotation.y += Math.PI * 1.5
     mesh.rotation.x -= .8
+    
     //mesh.lookAt(camera.position)
+
+    let dir = new THREE.Vector3(1,0,0).applyEuler(mesh.rotation)
         setInterval(function () {
-            mesh.position.z -= .1
+            mesh.position.add(dir)
         })
      setTimeout(function () {
         scene.remove(mesh)
