@@ -18,26 +18,29 @@ import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
 import getusermedia from 'getusermedia'
 window.voiceBuffer = []
 
-getusermedia({audio: true}, function (err, stream) {
-    console.log(stream)
-    if (err) {
-      return console.log(err)
-    }
-  
-    // Next we create an analyser node to intercept data from the mic
-    const context = new AudioContext()
-    const analyser = context.createAnalyser()
-  
-    // And then we connect them together
-    context.createMediaStreamSource(stream).connect(analyser)
-  
-    // Here we preallocate buffers for streaming audio data
-    const fftSize = analyser.frequencyBinCount
-    const frequencies = new Uint8Array(fftSize)
-    window.voiceBuffer = frequencies
-  
-  })
-
+setTimeout(function () {
+    
+    getusermedia({audio: true}, function (err, stream) {
+        console.log(stream)
+        if (err) {
+          return console.log(err)
+        }
+      
+        // Next we create an analyser node to intercept data from the mic
+        const context = new AudioContext()
+        const analyser = context.createAnalyser()
+      
+        // And then we connect them together
+        context.createMediaStreamSource(stream).connect(analyser)
+      
+        // Here we preallocate buffers for streaming audio data
+        const fftSize = analyser.frequencyBinCount
+        const frequencies = new Uint8Array(fftSize)
+        window.voiceBuffer = frequencies
+      
+      })
+    
+})
 
 const sizes = {
     width: window.innerWidth,
@@ -92,7 +95,7 @@ const environmentMap = cubeTextureLoader.load([
 environmentMap.colorSpace = THREE.SRGBColorSpace
 
 
-
+play()
 
 function play() {
 
@@ -339,7 +342,7 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
       let shit = dataArray.reduce(function (prev, next) {
         return prev + next
       }, 0) / dataArray.length
-    //   window.unrealBloomPass.strength = shit
+       window.unrealBloomPass.strength = shit
     window.unrealBloomPass.strength =  voiceBuffer.reduce(function (prev, next) {
         return prev + next
       }, 0) / voiceBuffer.length
