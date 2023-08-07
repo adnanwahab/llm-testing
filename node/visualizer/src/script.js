@@ -17,12 +17,13 @@ import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
 import getusermedia from 'getusermedia'
 import * as Curves from 'three/examples/jsm/curves/CurveExtras.js';
+import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
-import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls.js';
 
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 window.voiceBuffer = []
+const canvas = document.querySelector('canvas.webgl')
 
 function merge(...args) {
     console.log(args)
@@ -144,8 +145,9 @@ const vertexShader = /* glsl */ `
       gl_FragColor = c;
       //gl_FragColor.r = sin(time * .010) * .01;
       gl_FragColor.a *= step(vCounters, visibility);
-      //gl_FragColor.a = sin(time * .010) * .1;
-      //if (vCounters > time) { discard;}
+      gl_FragColor.a = sin(time * .0010) * .4;
+      if (vCounters > sin(time * .001)) gl_FragColor.a = 1.;
+      //if (vCounters * 100. > time) { discard;}
       #include <fog_fragment>
       #include <tonemapping_fragment>
       #include <encodings_fragment>
@@ -163,6 +165,66 @@ const vertexShader = /* glsl */ `
 //add sense of humor - cell shading + gummy bears + care bears + rainbows 
 //singing improves the world - music makes people happy 
 window.lineCount = 0
+
+
+
+function makeMoreRoad () {
+    let helix = new Curves.HelixCurve()
+    //console.log(helix)
+    let pt = helix.getPoints(500)
+    const pipeSpline = [
+        new THREE.Vector3(35, 0, 530.40625),
+
+        new THREE.Vector3(58,0, 10.40625),
+        
+            new THREE.Vector3(588, 0, 600),
+        
+                new THREE.Vector3(870, 0, 182.40625)
+    ].reverse()
+  
+    THREE.CurvePath
+    const curve = new THREE.CatmullRomCurve3(
+        pipeSpline
+    );
+    
+        
+
+    window.lineCount += 1
+    const geometry = new MeshLineGeometry()
+    let bool = Math.random() > .5
+    const list = curve.getPoints(50)
+  
+    
+    //console.log(list)
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color: 0xff0000,
+        transparent: true
+     })
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+        console.log('compile')
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+
+    }
+    material.customProgramCacheKey = function () {
+
+        return 2..toFixed( 1 );
+
+    };
+ 
+    const mesh = new THREE.Mesh(geometry, material)
+     mesh.position.x = window.lineCount - 50
+     mesh.position.y -= 10
+     mesh.position.z = - 1000
+     window.material = material
+     setInterval(function () { 
+        timer.value =  performance.now()
+     }, 100)
+    scene.add(mesh)
+}
 
 function makeHelix () {
     let helix = new Curves.HelixCurve()
@@ -299,7 +361,7 @@ function makeRoad () {
  
     const mesh = new THREE.Mesh(geometry, material)
      mesh.position.x = window.lineCount - 50
-     mesh.position.y -= 10
+     mesh.position.y += 40
      window.material = material
      setInterval(function () { 
         timer.value =  performance.now()
@@ -309,11 +371,6 @@ function makeRoad () {
 }
 
 function addLines (scene, dataArray) {
-    
-
-    
-
-
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = Array.from(Array(1000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
@@ -361,6 +418,8 @@ const sizes = {
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
 window.camera = camera
+var controls = new MapControls( camera, canvas);
+
 const gui = new dat.GUI()
 // import WebGPU from 'three/addons/capabilities/WebGPU.js';
 // 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -412,7 +471,8 @@ function play() {
     var bufferLength = analyser.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
     var group = new THREE.Group();
-    camera.position.set(0,0,100);
+    camera.position.set(0,100,100);
+    //camera.rotation.z -= 10
     scene.add(camera);
  
     // let lines = []
@@ -421,7 +481,7 @@ function play() {
         //lines.push(addLines(scene, dataArray))
         road.push(makeRoad(scene, dataArray))
     }
-
+    makeMoreRoad()
     makeHelix()
 
     let template = new THREE.SphereGeometry( 15, 32, 16 );
@@ -451,10 +511,7 @@ function play() {
     }, 8)
 //}, 500)
       
-    const canvas = document.querySelector('canvas.webgl')
-const controls = new TrackballControls(camera, canvas)
-controls.enableDamping = true
-    
+
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
     //var renderer = new WebGPURenderer();
 renderer.toneMapping = THREE.ReinhardToneMapping
@@ -724,8 +781,9 @@ let shit = {
 
       //group.rotation.y += 0.005;
       //renderer.render(scene, camera);
+      controls.update();
       effectComposer.render()
-      controls.update()
+      
       requestAnimationFrame(render);
       //uniforms[ 'time' ].value = performance.now() / 1000;
 

@@ -112,7 +112,7 @@ document.querySelector('.yt').addEventListener('keyup', function(event) {
         get('.search-results').innerHTML = shit.join('')
      })
 })
-let mockData = {title: "03. Jamiroquai - Cosmic Girl (Remastered).mp3", href: "./media/Various Artists - 90's Smash hits (2022) Mp3 320kbps [PMEDIA] \u2b50\ufe0f/03. Jamiroquai - Cosmic Girl (Remastered).mp3"}
+let mockData = {title: "./dance.mp3", href: "./dance.mp3"}
 
 document.querySelector('.search-results').addEventListener('click', clickSearchResults)
 

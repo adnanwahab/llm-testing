@@ -1,15 +1,7 @@
 from pathlib import Path
 import json
-# from basic_pitch.inference import predict_and_save
+from basic_pitch.inference import predict_and_save
 
-# predict_and_save(
-#     ['./media/youtube/kygo.mp3'],
-#     'media/youtube/',
-#     True,
-#     True,
-#     True,
-#     True,
-# )
 
 from faster_whisper import WhisperModel
 
@@ -85,7 +77,7 @@ def saveJSON(file_path, data):
 
 import os
 
-main_dir = './media/'
+main_dir = './node/visualizer/static/'
 
 # execution_time = timeit.timeit(transcribe, number=100)  # Run the function 100 times
 # print(f"Execution time: {execution_time:.6f} seconds")
@@ -106,13 +98,21 @@ all_files = filter(is_mp3, get_all_files_in_directory( directory_path))
 
 # Printing all the file paths found in the directory and its subdirectories
 import time
-
+# predict_and_save(
+#     [main_dir + 'dance.mp3'],
+#     main_dir,
+#     True,
+#     True,
+#     True,
+#     True,
+# )
+music_directory_json = './node/music_directory.json'
 
 if __name__ == '__main__': 
     print('indexing directory of length', (len(list(all_files))))
     print(all_files)
     cache = {}
-    with open('music_directory.json', 'r') as file:
+    with open(music_directory_json, 'r') as file:
             data_dict = json.load(file)
             for key in data_dict: 
                  cache[key] = data_dict[key]
@@ -127,6 +127,6 @@ if __name__ == '__main__':
         t1 = time.perf_counter() - t0
         print("Time elapsed: ", t1 - t0) # CPU seconds elapsed (floating point)
         cache[file_name] = file_path
-        with open('music_directory.json', 'w') as json_file:
+        with open(music_directory_json, 'w') as json_file:
             json.dump(cache, json_file)
 
