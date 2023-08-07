@@ -64,59 +64,6 @@ function makeFS(i) {
     return end
 }
 
-//rings waveform
-//vortex
-//sphere
-
-
-//lines 
-//optical illusions
-//collections of objects moving in patterns
-//or changing luminosity 
-
-//midi csv
-//post processing = wave form
-
-//gradients of motion and light according to sound
-//gyroscope / astrolabe
-
-//delight + wonder
-//black + white => greytone + laser + shiny
-
-//pbr spackled batons in a ring with xy rotation by index
-
-//make words out of particles, lines, triangles or shader -> each word poofs into something 
-
-// const options = {
-//     audio: true,
-//     success: function (cts) {console.log(cts)},
-//     failure: function (cts) {console.log(cts)}
-
-// }
-// navigator.mediaDevices.getUserMedia(options).then((tabStream) => {
-//     const context = new AudioContext()
-//             const analyser = context.createAnalyser()
-          
-//             // And then we connect them together
-//             context.createMediaStreamSource(tabStream).connect(analyser)
-          
-//             // Here we preallocate buffers for streaming audio data
-//             const fftSize = analyser.frequencyBinCount
-//             const frequencies = new Uint8Array(fftSize)
-//             window.voiceBuffer = frequencies
-//     // at this point the sound of the tab becomes muted with no way to unmute it
-// });
-
-//fly towards the camera 
-//convert SVG shapes of letters into characters
-
-//railway camera - use a path for debugging -> 5 stops 
-//rings 
-//sphere explosion thing
-//waveform hills
-//midi
-//vortex 
-//1-6 million vertices - most lines can be somewhat static
 window.lineCount = 0
 
 function makeRoad () {
@@ -264,9 +211,6 @@ function play() {
         road.push(makeRoad(scene, dataArray))
     }
 
-
-//100 * 10,000
-//setInterval(() => {
     let template = new THREE.SphereGeometry( 15, 32, 16 );
     let l = template.attributes.position.array
     lines.forEach((line, i) => {
@@ -283,10 +227,6 @@ function play() {
         line.position.z = -i *100
         line.scale.addScalar(i)
     })
-
-
-    
-
     
 
     lines[50].geometry.points = lines[50].geometry.points.map(function (d,i) {
@@ -515,7 +455,7 @@ let shit = {
    
 
     window.addEventListener('resize', onWindowResize, false);
-const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
+    const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
     var effectComposer = applyPostProcessing(renderer, renderTarget)
 
     render();
@@ -553,16 +493,13 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
       var upperMaxFr = upperMax / upperHalfArray.length;
       var upperAvgFr = upperAvg / upperHalfArray.length;
 
-      makeRoughGround(plane, modulate(upperAvgFr, 0, 1, 0.5, 4));
-      makeRoughGround(plane2, modulate(lowerMaxFr, 0, 1, 0.5, 4));
-      
-      makeRoughBall(ball, modulate(Math.pow(lowerMaxFr, 0.8), 0, 1, 0, 8), modulate(upperAvgFr, 0, 1, 0, 4));
-
       //group.rotation.y += 0.005;
       //renderer.render(scene, camera);
       effectComposer.render()
       controls.update()
       requestAnimationFrame(render);
+      //uniforms[ 'time' ].value = performance.now() / 1000;
+
 
       const timer = Date.now() * 0.00025;
 
@@ -580,41 +517,6 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
         effectComposer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
     }
 
-    function makeRoughBall(mesh, bassFr, treFr) {
-        
-        mesh.geometry.attributes.position.array.forEach(function (vertex, i) {
-            var offset = mesh.geometry.parameters.radius;
-            //console.log(offset)
-            var amp = 7;
-            var time = window.performance.now();
-            //vertex.normalize();
-            var rf = 0.00001;
-            //let val = mesh.geometry.attributes.position.array[i]
-            //var distance = (offset + bassFr ) + noise.noise3D(val + time *rf*7, val +  time*rf*8, val + time*rf*9) * amp * treFr;
-            // vertex.multiplyScalar(distance);
-            // console.log(mesh.geometry.attributes.position.array)
-            //mesh.geometry.attributes.position.array[i] *= Math.random()
-        });
-        mesh.geometry.verticesNeedUpdate = true;
-        mesh.geometry.normalsNeedUpdate = true;
-        // mesh.geometry.computeVertexNormals();
-        // mesh.geometry.computeFaceNormals();
-    }
-
-    function makeRoughGround(mesh, distortionFr) {
-        // mesh.geometry.vertices.forEach(function (vertex, i) {
-        //     var amp = 2;
-        //     var time = Date.now();
-        //     var distance = (noise.noise2D(vertex.x + time * 0.0003, vertex.y + time * 0.0001) + 0) * distortionFr * amp;
-        //     vertex.z = distance;
-        // });
-        // mesh.geometry.verticesNeedUpdate = true;
-        // mesh.geometry.normalsNeedUpdate = true;
-        // mesh.geometry.computeVertexNormals();
-        // mesh.geometry.computeFaceNormals();
-    }
-
-    audio.play();
   };
 }
 
@@ -711,7 +613,7 @@ window.unrealBloomPass = new UnrealBloomPass()
 unrealBloomPass.enabled = true
 effectComposer.addPass(unrealBloomPass)
 
-unrealBloomPass.strength = 0.3
+unrealBloomPass.strength = 2
 unrealBloomPass.radius = 1
 unrealBloomPass.threshold = 0.6
 
@@ -761,50 +663,6 @@ gui.add(tintPass.material.uniforms.uTint.value, 'x').min(- 1).max(1).step(0.001)
 gui.add(tintPass.material.uniforms.uTint.value, 'y').min(- 1).max(1).step(0.001).name('green')
 gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001).name('blue')
 
-// // Displacement pass
-// const DisplacementShader = {
-//     uniforms:
-//     {
-//         tDiffuse: { value: null },
-//         uTime: { value: null },
-//         uNormalMap: { value: null }
-//     },
-//     vertexShader: `
-//         varying vec2 vUv;
-
-//         void main()
-//         {
-//             gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-
-//             vUv = uv;
-//         }
-//     `,
-//     fragmentShader: `
-//         uniform sampler2D tDiffuse;
-//         uniform float uTime;
-//         uniform sampler2D uNormalMap;
-
-//         varying vec2 vUv;
-
-//         void main()
-//         {
-//             vec3 normalColor = texture2D(uNormalMap, vUv).xyz * 2.0 - 1.0;
-//             vec2 newUv = vUv + normalColor.xy * 0.1;
-//             vec4 color = texture2D(tDiffuse, newUv);
-
-//             vec3 lightDirection = normalize(vec3(- 1.0, 1.0, 0.0));
-//             float lightness = clamp(dot(normalColor, lightDirection), 0.0, 1.0);
-//             color.rgb += lightness * 2.0;
-
-//              gl_FragColor = color;
-//         }
-//     `
-// }
-
-// const displacementPass = new ShaderPass(DisplacementShader)
-// displacementPass.material.uniforms.uTime.value = 0
-// displacementPass.material.uniforms.uNormalMap.value = textureLoader.load('/textures/interfaceNormalMap.png')
-// effectComposer.addPass(displacementPass)
     return effectComposer
 } 
 
@@ -963,58 +821,56 @@ gui.add(tintPass.material.uniforms.uTint.value, 'z').min(- 1).max(1).step(0.001)
 
 
 
+//rings waveform
+//vortex
+//sphere
 
 
+//lines 
+//optical illusions
+//collections of objects moving in patterns
+//or changing luminosity 
 
+//midi csv
+//post processing = wave form
 
-function init() {
+//gradients of motion and light according to sound
+//gyroscope / astrolabe
 
-    const container = document.getElementById( 'container' );
+//delight + wonder
+//black + white => greytone + laser + shiny
 
-    camera = new THREE.OrthographicCamera( - 1, 1, 1, - 1, 0, 1 );
+//pbr spackled batons in a ring with xy rotation by index
 
-    scene = new THREE.Scene();
+//make words out of particles, lines, triangles or shader -> each word poofs into something 
 
-    const geometry = new THREE.PlaneGeometry( 2, 2 );
+// const options = {
+//     audio: true,
+//     success: function (cts) {console.log(cts)},
+//     failure: function (cts) {console.log(cts)}
 
-    uniforms = {
-        time: { value: 1.0 }
-    };
+// }
+// navigator.mediaDevices.getUserMedia(options).then((tabStream) => {
+//     const context = new AudioContext()
+//             const analyser = context.createAnalyser()
+          
+//             // And then we connect them together
+//             context.createMediaStreamSource(tabStream).connect(analyser)
+          
+//             // Here we preallocate buffers for streaming audio data
+//             const fftSize = analyser.frequencyBinCount
+//             const frequencies = new Uint8Array(fftSize)
+//             window.voiceBuffer = frequencies
+//     // at this point the sound of the tab becomes muted with no way to unmute it
+// });
 
-    const material = new THREE.ShaderMaterial( {
+//fly towards the camera 
+//convert SVG shapes of letters into characters
 
-        uniforms: uniforms,
-        vertexShader: document.getElementById( 'vertexShader' ).textContent,
-        fragmentShader: document.getElementById( 'fragmentShader' ).textContent
-
-    } );
-
-    const mesh = new THREE.Mesh( geometry, material );
-    scene.add( mesh );
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio( window.devicePixelRatio );
-    renderer.setSize( window.innerWidth, window.innerHeight );
-    container.appendChild( renderer.domElement );
-
-    window.addEventListener( 'resize', onWindowResize );
-
-}
-
-function onWindowResize() {
-
-    renderer.setSize( window.innerWidth, window.innerHeight );
-
-}
-
-//
-
-function animate() {
-
-    requestAnimationFrame( animate );
-
-    uniforms[ 'time' ].value = performance.now() / 1000;
-
-    renderer.render( scene, camera );
-
-}
+//railway camera - use a path for debugging -> 5 stops 
+//rings 
+//sphere explosion thing
+//waveform hills
+//midi
+//vortex 
+//1-6 million vertices - most lines can be somewhat static
