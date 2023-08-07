@@ -29,6 +29,7 @@ export default {
 
     server:
     {
+        https: true,
         host: true,
         open: !isCodeSandbox,
         cors: true,

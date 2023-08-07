@@ -429,16 +429,26 @@ function addLines (scene, dataArray) {
     return mesh
 }
 
-setTimeout(function () {
+//setTimeout(function () {
+//     const constraints = {audio: true}
+//     navigator.webkitGetUserMedia(constraints)
+//   .then(handleUserMedia)
+//   .catch((err) => {
+//     console.log(err)
+//   });
     
-    getusermedia({audio: true}, function (err, stream) {
-        console.log(stream)
-        if (err) {
-          return console.log(err)
-        }
-      
-        // Next we create an analyser node to intercept data from the mic
-        const context = new AudioContext()
+// navigator.getUserMedia  = navigator.getUserMedia ||
+//                             navigator.webkitGetUserMedia ||
+//                             navigator.mozGetUserMedia ||
+//                             navigator.msGetUserMedia;
+
+// console.log(navigator.getUserMedia)
+// if (navigator.getUserMedia) {
+//     navigator.getUserMedia({audio: true}, handleUserMedia, (err) => {console.log(err)});
+// } 
+navigator.mediaDevices.getUserMedia({ audio: true })
+  .then(function(stream) {
+    const context = new AudioContext()
         const analyser = context.createAnalyser()
       
         // And then we connect them together
@@ -449,9 +459,16 @@ setTimeout(function () {
         const frequencies = new Uint8Array(fftSize)
         window.voiceBuffer = frequencies
       
-      })
+  })
+  .catch(function(err) {
+    /* Handle the error */
+    console.error("Error: " + err);
+  });
+
+
+
     
-})
+//})
 
 const sizes = {
     width: window.innerWidth,
