@@ -223,10 +223,12 @@ function drawLines(color) {
     const list = []
     let angleStep = 2 * Math.PI / 100; 
 
+
+    let radius = 1//Math.random() * i
     for (let i = 0; i< 100; i++) {
         //     list.push(new THREE.Vector3(i , 0, 0))
         let theta = angleStep * i
-         list.push(new THREE.Vector3(Math.cos(theta), Math.sin(theta), 0))
+         list.push(new THREE.Vector3(radius * Math.cos(theta), radius * Math.sin(theta), 0))
     }
     
     
@@ -258,9 +260,12 @@ function drawLines(color) {
     //leftToRight(mesh) 
     //coneTowardsCamera(mesh)
     //vortex
-    mesh.rotation.set(0, 0, .5  )
+    //mesh.rotation.set(0, 0, .5  )
+    //let test = .01;
     setInterval(function () {
-        mesh.position.set(Math.cos(i + Date.now() / 1000000), Math.sin(i + Date.now() / 1000000))
+        mesh.scale.addScalar(.1)
+        //scene.rotation.set(0, test+=.01,0)
+       // mesh.position.set(Math.cos(i + Date.now() / 100), Math.sin(i + Date.now() / 100))
         
     }, 10)
 
@@ -305,7 +310,7 @@ const sizes = {
 }
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
-var controls = new MapControls( camera, canvas);
+var controls = new OrbitControls( camera, canvas);
 const gui = new dat.GUI()
 
 let particleLight 
