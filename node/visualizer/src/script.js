@@ -20,6 +20,17 @@ import getusermedia from 'getusermedia'
 import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
 
 window.voiceBuffer = []
+
+//rings waveform
+//vortex
+//sphere
+
+
+
+
+
+
+
 //make words out of particles, lines, triangles or shader -> each word poofs into something 
 
 // const options = {
@@ -57,17 +68,18 @@ function addLines (scene, dataArray) {
     window.lineCount += 1
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
-    const list = Array.from(Array(10000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
+    const list = Array.from(Array(1000).keys().map((d, i) => [ Math.cos(i/ 1000),  Math.sin(i/ 1000),  i / 1000 ]))
     //console.log(list)
     geometry.setPoints(list)
     const material = new MeshLineMaterial({
-        color: 0xff0000 * Math.random() | 0 
+        color: 0xffffff
      })
     const mesh = new THREE.Mesh(geometry, material)
     setInterval(function () {
-        mesh.scale.addScalar(.1)
+        //mesh.scale.addScalar(.1)
     }, 100)
     scene.add(mesh)
+    return mesh
 }
 
 setTimeout(function () {
@@ -99,7 +111,7 @@ const sizes = {
     height: window.innerHeight
 }
 var scene = new THREE.Scene();
-var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100000);
 const gui = new dat.GUI()
 // import WebGPU from 'three/addons/capabilities/WebGPU.js';
 // 			import WebGPURenderer from 'three/addons/renderers/webgpu/WebGPURenderer.js';
@@ -166,7 +178,27 @@ function play() {
     scene.add(camera);
     // scene.background = environmentMap
     // scene.environment = environmentMap
+    let lines = []
+    for (let i = 0; i < 100; i++)
+        lines.push(addLines(scene, dataArray))
 
+
+//100 * 10,000
+//setInterval(() => {
+    let template = new THREE.SphereGeometry( 15, 32, 16 );
+    let l = template.attributes.position.array
+    console.time('a')
+    lines.forEach((line, i) => {
+        line.geometry.points = line.geometry.points.map((d,i) => l[i % l.length])
+        line.position.z = -i *100
+    })
+    console.timeEnd('a')
+
+    setInterval(function(){
+        //camera.position.z -= 1
+    }, 8)
+//}, 500)
+      
     const canvas = document.querySelector('canvas.webgl')
 const controls = new OrbitControls(camera, canvas)
 //controls.enableDamping = true
@@ -396,8 +428,8 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
         return prev + next
       }, 0) / dataArray.length
       window.shit = shit
-      if (shit > 30)
-      addLines(scene, dataArray)
+      
+      
 
        //window.unrealBloomPass.strength = shit
     // window.unrealBloomPass.strength =  
