@@ -16,7 +16,46 @@ import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPa
 import { SMAAPass } from 'three/examples/jsm/postprocessing/SMAAPass.js'
 import { FlakesTexture } from 'three/examples/jsm/textures/FlakesTexture.js';
 import getusermedia from 'getusermedia'
+
+import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
+
 window.voiceBuffer = []
+//make words out of particles, lines, triangles or shader -> each word poofs into something 
+
+// const options = {
+//     audio: true,
+//     success: function (cts) {console.log(cts)},
+//     failure: function (cts) {console.log(cts)}
+
+// }
+// navigator.mediaDevices.getUserMedia(options).then((tabStream) => {
+//     const context = new AudioContext()
+//             const analyser = context.createAnalyser()
+          
+//             // And then we connect them together
+//             context.createMediaStreamSource(tabStream).connect(analyser)
+          
+//             // Here we preallocate buffers for streaming audio data
+//             const fftSize = analyser.frequencyBinCount
+//             const frequencies = new Uint8Array(fftSize)
+//             window.voiceBuffer = frequencies
+//     // at this point the sound of the tab becomes muted with no way to unmute it
+// });
+
+//fly towards the camera 
+//convert SVG shapes of letters into characters 
+function addLines (scene) {
+    const geometry = new MeshLineGeometry()
+    const list = Array.from(Array(1e5).keys().map(d => Math.random() * 100))
+    console.log(list)
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color: 0xff0000
+     })
+    const mesh = new THREE.Mesh(geometry, material)
+    //mesh.raycast = raycast
+    scene.add(mesh)
+}
 
 setTimeout(function () {
     
@@ -112,8 +151,8 @@ function play() {
     camera.position.set(0,0,100);
     camera.lookAt(scene.position);
     scene.add(camera);
-    scene.background = environmentMap
-    scene.environment = environmentMap
+    // scene.background = environmentMap
+    // scene.environment = environmentMap
 
     const canvas = document.querySelector('canvas.webgl')
 const controls = new OrbitControls(camera, canvas)
@@ -172,6 +211,7 @@ let shit = {
     plane.position.set(0, 30, 0);
     //group.add(plane);
     
+    addLines(scene)
     var plane2 = new THREE.Mesh(planeGeometry, planeMaterial);
     plane2.rotation.x = -0.5 * Math.PI;
     plane2.position.set(0, -30, 0);
@@ -306,7 +346,7 @@ let shit = {
         // normalScale: new THREE.Vector2( 0.15, 0.15 )
     } );
     
-    for (let i = 0; i < 10000; i++) {
+    for (let i = 0; i < 1; i++) {
         var ball = new THREE.Mesh(icosahedronGeometry, material);
 
         ball.position.set(i % 200, Math.floor(i / 200), Math.floor(i / 2000) );
@@ -324,7 +364,7 @@ let shit = {
     spotLight.castShadow = true;
     scene.add(spotLight);
     
-    scene.add(group);
+    //scene.add(group);
 
    
 
@@ -341,10 +381,12 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
         return prev + next
       }, 0) / dataArray.length
        window.unrealBloomPass.strength = shit
-    window.unrealBloomPass.strength =  voiceBuffer.reduce(function (prev, next) {
+    // window.unrealBloomPass.strength =  
+    
+    let vocals = voiceBuffer.reduce(function (prev, next) {
         return prev + next
       }, 0) / voiceBuffer.length
-      if (Math.random () > .999) console.log(voiceBuffer, window.unrealBloomPass.strength)
+      //if (Math.random () > .9) console.log(voiceBuffer, vocals)
 
         //console.log(dataArray)
       var lowerHalfArray = dataArray.slice(0, (dataArray.length/2) - 1);
