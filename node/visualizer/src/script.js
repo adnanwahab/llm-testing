@@ -209,16 +209,24 @@ function collision() {}
 function makeTornado() {}
 function makeSphere() {}
 function makeWaterfall() {}
+function makeRings() {}
+function makeWaveForm(mesh) {
+    mesh.rotation.z = window.lineCount 
+    mesh.rotation.x = .5
+}
 
+let lines = []
 function drawLines(color) {
-    window.lineCount++;
+    let i = window.lineCount++;
     const geometry = new MeshLineGeometry()
  
     const list = []
-    for (let i = 0; i< 100; i++) {
-             list.push(new THREE.Vector3(i , 0, 0))
+    let angleStep = 2 * Math.PI / 100; 
 
-        // list.push(new THREE.Vector3(Math.cos(i / 50), Math.sin(i / 50), 0))
+    for (let i = 0; i< 100; i++) {
+        //     list.push(new THREE.Vector3(i , 0, 0))
+        let theta = angleStep * i
+         list.push(new THREE.Vector3(Math.cos(theta), Math.sin(theta), 0))
     }
     
     
@@ -227,7 +235,11 @@ function drawLines(color) {
 
     const material = new MeshLineMaterial({
         color,
-        transparent: true
+        transparent: true,
+        lineWidth: .1
+        //resolution: [innerWidth, innerHeight],
+        // sizeAttenuation: 0,
+        // lineWidth: 1.
      })
      let timer = { value: 0 };
      material.onBeforeCompile = function (shader) {
@@ -243,10 +255,18 @@ function drawLines(color) {
     const mesh = new THREE.Mesh(geometry, material)
      
     //mesh.position.x = makeRand() * 1000
-    //  leftToRight(mesh) 
-     coneTowardsCamera(mesh)
-      
+    //leftToRight(mesh) 
+    //coneTowardsCamera(mesh)
+    //vortex
+    mesh.rotation.set(0, 0, .5  )
+    setInterval(function () {
+        mesh.position.set(Math.cos(i + Date.now() / 1000000), Math.sin(i + Date.now() / 1000000))
+        
+    }, 10)
 
+    
+    //mesh.rotation.y = Math.cos(window.lineCount)
+    lines.push(mesh)
        
      setTimeout(function () {
         scene.remove(mesh)
@@ -316,94 +336,9 @@ function play() {
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
     new THREE.MeshBasicMaterial({color: 'red'}))
-    ;
-    var bulbLight;
-    //particleLight.add(bulbLight = new THREE.PointLight( 0xffee88, 100000000000, 0, 0 ))        
-    //scene.add(particleLight)
+ 
     var hemiLight = new THREE.HemisphereLight( 0xddeeff, 0x0f0e0d, 0.02 );
     scene.add( hemiLight );
-
-    //bulbLight.power = 3500
-
-
-
-    var icosahedronGeometry = new THREE.IcosahedronGeometry(10, 4);
-
-    // const aoTexture = textureLoader.load(textures[0])
-    // const colorTexture = textureLoader.load(textures[1])
-    // const displacementTexture = textureLoader.load(textures[2])
-    // const metalnessTexture = textureLoader.load(textures[3])
-    // const normalTexture = textureLoader.load(textures[4])
-    // const renderTexture = textureLoader.load(textures[5])
-    // const roughnessTexture = textureLoader.load(textures[6])
-    // normalTexture.wrapS = THREE.RepeatWrapping;
-    // normalTexture.wrapT = THREE.RepeatWrapping;
-    // normalTexture.repeat.x = 10;
-    // normalTexture.repeat.y = 6;
-    // normalTexture.anisotropy = 16;
-    // const normalMap3 = new THREE.CanvasTexture( new FlakesTexture() );
-
-   
-    // let material = new THREE.MeshPhysicalMaterial( {
-    //     iridescenceMap : colorTexture,
-	// 	iridescenceIOR :0.3,
-	// 	iridescenceThicknessRange :[ 100, 400 ],
-	// 	iridescenceThicknessMap: displacementTexture,
-
-	// 	// sheenColor: new THREE.Color( 0xff0000 ),
-	// 	// sheenColorMap:renderTexture,
-	// 	//sheenRoughness: 1.0,
-	// 	//sheenRoughnessMap:colorTexture,
-
-	// 	// transmissionMap:roughnessTexture,
-
-	// 	// thickness:0,
-	// 	// thicknessMap:roughnessTexture,
-	//     // attenuationDistance:Infinity,
-	// 	// attenuationColor:new THREE.Color( 1, 1, 1 ),
-
-	// 	// specularIntensity:1.0,
-	// 	// specularIntensityMap:renderTexture,
-	// 	// specularColor:new THREE.Color( 1, 1, 1 ),
-	// 	// specularColorMap:colorTexture,
-
-	// 	// // _anisotropy = 0;
-	// 	// // _clearcoat = 0;
-	// 	// // _iridescence = 0;
-	// 	// // _sheen = 0.0;
-	// 	// // _transmission = 0;
-
-    //     // anisotropyRotation: 0,
-	// 	// anisotropyMap:null,
-
-	// 	// clearcoatMap:aoTexture,
-	//     // clearcoatRoughness:0.0,
-	// 	 clearcoatRoughness: 0,
-	// 	// clearcoatNormalScale :new THREE.Vector2( 1, 1 ),
-	// 	// clearcoatNormalMap:null,
-
-	// 	// ior:1.5,
-
-    //     // clearcoat: 1.0,
-    //     // clearcoatRoughness: 0.1,
-    //     reflectivity: 1,
-    //     metalness: 1.0,
-    //     roughness:0.0,
-    //     //color: 0x0000ff,
-    //     normalMap: normalTexture,
-    //     flatShading: false,
-    //     // clearcoatNormalMap: roughnessTexture,
-
-    //     // normalScale: new THREE.Vector2( 0.15, 0.15 )
-    // } );
-    
-    // for (let i = 0; i < 1; i++) {
-    //     var ball = new THREE.Mesh(icosahedronGeometry, material);
-
-    //     ball.position.set(i % 200, Math.floor(i / 200), Math.floor(i / 2000) );
-    //     group.add(ball);
-    // }
-    
     window.addEventListener('resize', onWindowResize, false);
     const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
     var effectComposer = applyPostProcessing(renderer, renderTarget)
@@ -425,12 +360,15 @@ function play() {
       let amplitude = dataArray.reduce(function (prev, next) {
         return prev + next
       }, 0) / dataArray.length
-      
+      //lines.forEach((line, i) => {line.scale.setScalar(dataArray[i])})
 
      window.unrealBloomPass.strength = 1
-     
-      //if (amplitude > 10) drawLines(0x0093fe) //teal
-      if (getVocals() > 1) drawLines(0xfb4f87) //fuschia
+      let colors = {
+        teal: 0x0093fe,
+        red: 0xfb4f87
+      }
+      if (amplitude > 10) drawLines(colors.red) //teal
+      if (getVocals() > 1) drawLines(colors.teal) //fuschia
 
    
       var lowerHalfArray = dataArray.slice(0, (dataArray.length/2) - 1);
@@ -452,11 +390,6 @@ function play() {
       
       requestAnimationFrame(render);
       //uniforms[ 'time' ].value = performance.now() / 1000;
-
-      const timer = Date.now() * 0.00025;
-        // particleLight.position.x = Math.sin( timer * 7 ) * 10;
-        // particleLight.position.y = Math.cos( timer * 5 ) * 10;
-        // particleLight.position.z = Math.cos( timer * 3 ) * 10;
     }
 
     function onWindowResize() {
@@ -508,7 +441,6 @@ function applyPostProcessing(renderer, renderTarget) {
 
     // Glitch pass
     const glitchPass = new GlitchPass()
-    glitchPass.goWild = true
     glitchPass.enabled = false
     effectComposer.addPass(glitchPass)
 
@@ -640,3 +572,48 @@ const TintShader = {
 //midi
 //vortex 
 //1-6 million vertices - most lines can be somewhat static
+
+
+
+
+// const blur5 = `
+// vec4 blur5(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+//     vec4 color = vec4(0.0);
+//     vec2 off1 = vec2(1.3333333333333333) * direction;
+//     color += texture2D(image, uv) * 0.29411764705882354;
+//     color += texture2D(image, uv + (off1 / resolution)) * 0.35294117647058826;
+//     color += texture2D(image, uv - (off1 / resolution)) * 0.35294117647058826;
+//     return color;
+//   }`;
+  
+//   const blur9 = `
+//   vec4 blur9(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+//     vec4 color = vec4(0.0);
+//     vec2 off1 = vec2(1.3846153846) * direction;
+//     vec2 off2 = vec2(3.2307692308) * direction;
+//     color += texture2D(image, uv) * 0.2270270270;
+//     color += texture2D(image, uv + (off1 / resolution)) * 0.3162162162;
+//     color += texture2D(image, uv - (off1 / resolution)) * 0.3162162162;
+//     color += texture2D(image, uv + (off2 / resolution)) * 0.0702702703;
+//     color += texture2D(image, uv - (off2 / resolution)) * 0.0702702703;
+//     return color;
+//   }`;
+  
+//   const blur13 = `
+//   vec4 blur13(sampler2D image, vec2 uv, vec2 resolution, vec2 direction) {
+//     vec4 color = vec4(0.0);
+//     vec2 off1 = vec2(1.411764705882353) * direction;
+//     vec2 off2 = vec2(3.2941176470588234) * direction;
+//     vec2 off3 = vec2(5.176470588235294) * direction;
+//     color += texture2D(image, uv) * 0.1964825501511404;
+//     color += texture2D(image, uv + (off1 / resolution)) * 0.2969069646728344;
+//     color += texture2D(image, uv - (off1 / resolution)) * 0.2969069646728344;
+//     color += texture2D(image, uv + (off2 / resolution)) * 0.09447039785044732;
+//     color += texture2D(image, uv - (off2 / resolution)) * 0.09447039785044732;
+//     color += texture2D(image, uv + (off3 / resolution)) * 0.010381362401148057;
+//     color += texture2D(image, uv - (off3 / resolution)) * 0.010381362401148057;
+//     return color;
+//   }
+//   `;
+  
+//   export { blur5, blur9, blur13 };
