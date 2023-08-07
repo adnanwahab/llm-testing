@@ -5,18 +5,12 @@ import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
-let baseName = 
-
-
-window.location.host === 'localhost:5173' || window.location.host === '192.168.1.181:5173'
-
-? 'http://localhost:3000/' : 'http://karaoke.ngrok.io/'
+let baseName = window.location.host === 'localhost:5173' || window.location.host === '192.168.1.181:5173' ? 'http://localhost:3000/' : 'http://karaoke.ngrok.io/'
 
 //deploy nodeapp with fly.io -> deploy music directory to s3 
 
 
 const startNewSong = async (e) => {
-    console.log(e)
     audioTag.children[0].src= e.href 
     audioTag.play()
     let lyrics =e.Lyrics || e.lyrics
@@ -72,7 +66,9 @@ let audioTag = document.querySelector('audio')
 audioTag.volume = 0.02;
 
 const startApp = () => {
-    getTranscript(mockData.title, mockData.href)
+  fetch('./dance_mac.json').then(req => req.json()).then(json => startNewSong(json))
+
+    //getTranscript(mockData.title, mockData.href)
     //audioTag.children[0].src = mockData.href
     //https://drive.google.com/u/0/uc?id=1ED0mshSxI5TuykjtLcUbUVNNm7zKYz-i&export=download
     audioTag.load()
@@ -122,12 +118,14 @@ let mockData = {title: "./dance.mp3", href: "./dance.mp3"}
 document.querySelector('.search-results').addEventListener('click', clickSearchResults)
 
 function getTranscript (title, href) {
-    fetch(baseName + 'play-song', {
-    mode: "cors",
-    method: "POST",
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({title, href})
-    }).then(req => req.json()).then( json => startNewSong(json))
+  fetch('./dance_mac.json').then(req => req.json()).then(json => startNewSong(json))
+  //startNewSong
+    // fetch(baseName + 'play-song', {
+    // mode: "cors",
+    // method: "POST",
+    // headers: {'Content-Type': 'application/json'},
+    // body: JSON.stringify({title, href})
+    // }).then(req => req.json()).then( json => startNewSong(json))
 } 
 
 function clickSearchResults(e) {

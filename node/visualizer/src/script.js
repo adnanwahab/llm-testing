@@ -168,7 +168,6 @@ window.lineCount = 0
 
 
 function drawLines(color) {
-    console.log(color, 'drawLines')
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = []
@@ -458,6 +457,7 @@ navigator.mediaDevices.getUserMedia({ audio: true })
         const fftSize = analyser.frequencyBinCount
         const frequencies = new Uint8Array(fftSize)
         window.voiceBuffer = frequencies
+        window.voiceBuffer.analyser = analyser;
       
   })
   .catch(function(err) {
@@ -720,14 +720,17 @@ var bulbLight;
    
       
       if (amplitude > 20) drawLines(0xff0000)
-      if (Math.random() > .999) drawLines(0x0000ff)
+     
 
        //window.unrealBloomPass.strength = shit
      window.unrealBloomPass.strength = 3 
-    
+     window.voiceBuffer.analyser.getByteFrequencyData(window.voiceBuffer)
+
     let vocals = voiceBuffer.reduce(function (prev, next) {
         return prev + next
       }, 0) / voiceBuffer.length
+      window.voiceBuffer.amplitude = vocals;
+      if (vocals > 1) drawLines(0x0000ff)
       //if (Math.random () > .9) console.log(voiceBuffer, vocals)
 
         //console.log(dataArray)
