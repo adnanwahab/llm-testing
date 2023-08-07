@@ -25,8 +25,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { MeshLineGeometry, MeshLineMaterial } from '@lume/three-meshline'
 
 function getVocals () {
-    if (! window.voiceBuffer.analyser) return 
-    //  console.log('no ssl sorry!')
+    if (! window.voiceBuffer.analyser) return console.log('no ssl sorry!')
     window.voiceBuffer.analyser.getByteFrequencyData(window.voiceBuffer)
 
     let vocals = voiceBuffer.reduce(function (prev, next) {
@@ -194,13 +193,13 @@ function coneTowardsCamera(mesh)  {
         radius * Math.cos(i), radius * Math.sin(i)
     )
  
-    //mesh.rotation.y += Math.PI * 1.5
-    //mesh.rotation.x -= .8
+    mesh.rotation.y += Math.PI * 1.5
+    mesh.rotation.x -= .8
     
     //mesh.lookAt(camera.position)
     //window.mesh = mesh
 
-    let dir = new THREE.Vector3(0,0,1).applyEuler(mesh.rotation)
+    let dir = new THREE.Vector3(1,0,0).applyEuler(mesh.rotation)
         setInterval(function () {
             mesh.position.add(dir)
         })
@@ -249,7 +248,7 @@ function drawLines(color, dataArray) {
     const geometry = new MeshLineGeometry()
     const list = []
     for (let i = 0; i< 100; i+=1) {
-         list.push(0, 0, i * 2 - 1000)
+         list.push(i * 2, 0, 0)
     }
     //console.log(list)
     //debugger
@@ -338,13 +337,10 @@ function play() {
     var bufferLength = analyser.frequencyBinCount;
     var dataArray = new Uint8Array(bufferLength);
     var group = new THREE.Group();
-    //camera.position.set(0,10,10);
-    //camera.lookAt(new THREE.Vector3(0,100,100));
+    camera.position.set(0,100,100);
+
     scene.add(camera);
  
-    canvas.addEventListener('mousewheel', function (e ) {
-        console.log(e)
-    })
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
     renderer.toneMapping = THREE.ReinhardToneMapping
     renderer.toneMappingExposure = 100.5
