@@ -169,7 +169,23 @@ function makeTornado() {}
 function makeSphere() {}
 function makeWaterfall() {}
 
+
+function leftToRight(mesh) {
+    mesh.position.x = -100
+    mesh.position.y = makeRand() * 200
+    mesh.position.z = 0
+    
+    setInterval(function () { 
+       //timer.value =  performance.now()
+       mesh.position.x += 1
+    }, 100)
+ }
+ function makeRand() {
+    return Math.random() - .5
+}
+
 function drawLines(color) {
+    let i = window.lineCount++;
     const geometry = new MeshLineGeometry()
     let bool = Math.random() > .5
     const list = []
@@ -194,26 +210,23 @@ function drawLines(color) {
 
     }
     material.customProgramCacheKey = function () {
-
         return 2..toFixed( 1 );
 
     };
+    let radius = 5
 
-    function makeRand() {
-        return Math.random() - .5
-    }
+   
+
  
     const mesh = new THREE.Mesh(geometry, material)
-     //mesh.position.x = window.lineCount - 50
-     mesh.position.x = -100
-     mesh.position.y = makeRand() * 200
-     mesh.position.z = 0
-     window.material = material
-     setInterval(function () { 
-        timer.value =  performance.now()
-        mesh.position.x += 1
-     }, 100)
+     
+     //leftToRight(mesh)
 
+      mesh.position.set(
+        radius * Math.cos(i), radius * Math.sin(i)
+    )
+ 
+    mesh.rotation.y += Math.PI * .4
      setTimeout(function () {
         scene.remove(mesh)
         mesh.geometry.dispose()
