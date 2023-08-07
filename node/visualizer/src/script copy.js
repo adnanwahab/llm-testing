@@ -1,4 +1,61 @@
 
+const hexagon_coordinates = [
+    [1, 0, 0],
+    [0.5, 0.866, 0],
+    [-0.5, 0.866, 0],
+    [-1, 0, 0],
+    [-0.5, -0.866, 0],
+    [0.5, -0.866, 0 ],
+    [1,0,0]
+].flat()
+
+function drawLines(color, dataArray) {
+    if (Math.random() < .99) return;
+    let i = window.lineCount++;
+    if (currentKeyframe == 2) return drawLinesCircle(color)
+    const geometry = new MeshLineGeometry()
+    const list = []
+    for (let i = 0; i< hexagon_coordinates.flat().length; i+=3) {
+         list.push(new THREE.Vector3(hexagon_coordinates[i], hexagon_coordinates[i+1], hexagon_coordinates[i+2]))
+    }
+    //console.log(list)
+    //debugger
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color,
+        transparent: false,
+        lineWidth: .5,
+//        sizeAttenuation: false,
+//        dashArray: 1,
+//        animateDashArray:true
+     })
+     let timer = { value: 0 };
+     
+     material.onBeforeCompile = function (shader) {
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+    }
+
+    const mesh = new THREE.Mesh(geometry, material)
+    mesh.rotation.x -= .3
+    setInterval(function () {
+        //  mesh.position.z -= 1
+         mesh.scale.multiplyScalar(.9)
+     }, 8)
+     mesh.scale.multiplyScalar(100)
+
+    //mesh.position.y = i
+    keyFrames[currentKeyframe](mesh)
+    lines.push(mesh)
+     setTimeout(function () {
+        scene.remove(mesh)
+        mesh.geometry.dispose()
+        mesh.material.dispose()
+     }, 5000)
+    scene.add(mesh)
+}
+
 
 import * as THREE from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
