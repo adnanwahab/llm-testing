@@ -22,7 +22,7 @@ import { MapControls } from 'three/examples/jsm/controls/MapControls.js';
 
 
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls.js';
-import { MeshLineGeometry, MeshLineMaterial, raycast } from 'meshline'
+import { MeshLineGeometry, MeshLineMaterial } from '@lume/three-meshline'
 
 function getVocals () {
     if (! window.voiceBuffer.analyser) return console.log('no ssl sorry!')
@@ -216,32 +216,23 @@ function makeWaveForm(mesh) {
 }
 
 let lines = []
-function drawLines(color) {
+function drawLinesCircle(color) {
     let i = window.lineCount++;
     const geometry = new MeshLineGeometry()
- 
     const list = []
     let angleStep = 2 * Math.PI / 100; 
-
-
     let radius = 1//Math.random() * i
-    for (let i = 0; i< 100; i++) {
+    for (let i = 0; i< 101; i++) {
         //     list.push(new THREE.Vector3(i , 0, 0))
-        let theta = angleStep * i
+         let theta = angleStep * i
          list.push(new THREE.Vector3(radius * Math.cos(theta), radius * Math.sin(theta), 0))
     }
-    
-    
     geometry.setPoints(list)
-
-
     const material = new MeshLineMaterial({
         color,
         transparent: true,
-        lineWidth: .1
-        //resolution: [innerWidth, innerHeight],
-        // sizeAttenuation: 0,
-        // lineWidth: 1.
+        lineWidth: .1,
+     
      })
      let timer = { value: 0 };
      material.onBeforeCompile = function (shader) {
@@ -249,30 +240,48 @@ function drawLines(color) {
         shader.fragmentShader = fs(window.lineCount)
         material.userData.shader = shader;
     }
-    material.customProgramCacheKey = function () { return 2..toFixed( 1 );};
-
-   
-
- 
     const mesh = new THREE.Mesh(geometry, material)
-     
-    //mesh.position.x = makeRand() * 1000
-    //leftToRight(mesh) 
-    //coneTowardsCamera(mesh)
-    //vortex
-    //mesh.rotation.set(0, 0, .5  )
-    //let test = .01;
+  
     setInterval(function () {
         mesh.scale.addScalar(.1)
-        //scene.rotation.set(0, test+=.01,0)
-       // mesh.position.set(Math.cos(i + Date.now() / 100), Math.sin(i + Date.now() / 100))
-        
     }, 10)
 
-    
-    //mesh.rotation.y = Math.cos(window.lineCount)
-    lines.push(mesh)
+        lines.push(mesh)
        
+        
+     setTimeout(function () {
+        scene.remove(mesh)
+        mesh.geometry.dispose()
+        mesh.material.dispose()
+     }, 5000)
+    scene.add(mesh)
+}
+
+function drawLines(color) {
+    let i = window.lineCount++;
+    const geometry = new MeshLineGeometry()
+    const list = []
+    for (let i = 0; i< 101; i++) {
+         list.push(new THREE.Vector3(i, 0, 0))
+    }
+    geometry.setPoints(list)
+    const material = new MeshLineMaterial({
+        color,
+        transparent: true,
+        lineWidth: .1,
+//        sizeAttenuation: false,
+//        dashArray: 1,
+//        animateDashArray:true
+     })
+     let timer = { value: 0 };
+     material.onBeforeCompile = function (shader) {
+        shader.uniforms.time = timer
+        shader.fragmentShader = fs(window.lineCount)
+        material.userData.shader = shader;
+    }
+    const mesh = new THREE.Mesh(geometry, material)
+    leftToRight(mesh)
+    lines.push(mesh)
      setTimeout(function () {
         scene.remove(mesh)
         mesh.geometry.dispose()
@@ -351,6 +360,15 @@ function play() {
     render();
 
     function render() {
+        // lines.forEach(function (l, i) {
+        //     let params = {}
+        //     params.animateDashOffset = true
+        //     let time = Date.now()
+        //     if (params.animateWidth) l.material.uniforms.lineWidth.value = params.lineWidth * (1 + 0.5 * Math.sin(5 * t + i))
+        //     if (params.autoRotate) l.rotation.y += 0.125 * delta
+        //     l.material.uniforms.visibility.value = params.animateVisibility ? (time / 3000) % 1.0 : 1.0
+        //     l.material.uniforms.dashOffset.value -= params.animateDashOffset ? 0.01 : 0
+        // })
         scene.traverse( function ( child ) {
             if ( child.isMesh ) {
                 const shader = child.material.userData.shader;
