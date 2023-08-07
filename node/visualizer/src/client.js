@@ -5,7 +5,12 @@ import Fuse from 'https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.esm.js'
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
 
-let baseName = window.location.host === 'localhost:5173' ? 'http://localhost:3000/' : 'http://karaoke.ngrok.io/'
+let baseName = 
+
+
+window.location.host === 'localhost:5173' || window.location.host === '192.168.1.181:5173'
+
+? 'http://localhost:3000/' : 'http://karaoke.ngrok.io/'
 
 //deploy nodeapp with fly.io -> deploy music directory to s3 
 
