@@ -1,9 +1,4 @@
 const isCodeSandbox = 'SANDBOX_URL' in process.env || 'CODESANDBOX_HOST' in process.env
-// import { createProxy } from 'http-proxy-middleware';
-import tls from 'tls';
-import { defineConfig } from 'vite';
-import pkg from 'file:///home/awahab/llm-testing/static/visualizer/node_modules/http-proxy-middleware/dist/index.js';
-const { createProxy } = pkg;
 
 
 // export default defineConfig({

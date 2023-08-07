@@ -95,8 +95,6 @@ const environmentMap = cubeTextureLoader.load([
 environmentMap.colorSpace = THREE.SRGBColorSpace
 
 
-play()
-
 function play() {
 
 
@@ -343,10 +341,10 @@ const renderTarget = new THREE.WebGLRenderTarget(800,60,{samples: 2})
         return prev + next
       }, 0) / dataArray.length
        window.unrealBloomPass.strength = shit
-    window.unrealBloomPass.strength =  voiceBuffer.reduce(function (prev, next) {
-        return prev + next
-      }, 0) / voiceBuffer.length
-      console.log(voiceBuffer, window.unrealBloomPass.strength)
+    // window.unrealBloomPass.strength =  voiceBuffer.reduce(function (prev, next) {
+    //     return prev + next
+    //   }, 0) / voiceBuffer.length
+    //   console.log(voiceBuffer, window.unrealBloomPass.strength)
 
         //console.log(dataArray)
       var lowerHalfArray = dataArray.slice(0, (dataArray.length/2) - 1);

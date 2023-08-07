@@ -13,10 +13,15 @@ let music_directory = JSON.parse(fs.readFileSync('./music_directory.json'))
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/templates/media-server.html');
-
 })
 
+app.get('/start-game', (req, res) => {
+  res.sendFile(__dirname + '/visualizer/dist/src/index.html');
+})
 
+app.get('/start-game2', (req, res) => {
+  res.sendFile(__dirname + '/visualizer/dist/src/');
+})
 
 app.get('/fs', (req, res) => {
   let data = fs.readdirSync('./media').map(link => {  
