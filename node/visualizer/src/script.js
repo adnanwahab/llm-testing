@@ -26,10 +26,21 @@ window.voiceBuffer = []
 //sphere
 
 
+//lines 
+//optical illusions
+//collections of objects moving in patterns
+//or changing luminosity 
 
+//midi csv
+//post processing = wave form
 
+//gradients of motion and light according to sound
+//gyroscope / astrolabe
 
+//delight + wonder
+//black + white => greytone + laser + shiny
 
+//pbr spackled batons in a ring with xy rotation by index
 
 //make words out of particles, lines, triangles or shader -> each word poofs into something 
 
@@ -162,7 +173,7 @@ environmentMap.colorSpace = THREE.SRGBColorSpace
 function play() {
 
 
-
+    window.camera = camera
 
     var context = new AudioContext();
     var src = context.createMediaElementSource(audio);
@@ -174,7 +185,7 @@ function play() {
     var dataArray = new Uint8Array(bufferLength);
     var group = new THREE.Group();
     camera.position.set(0,0,100);
-    camera.lookAt(scene.position);
+    //camera.lookAt(scene.position);
     scene.add(camera);
     // scene.background = environmentMap
     // scene.environment = environmentMap
@@ -189,13 +200,32 @@ function play() {
     let l = template.attributes.position.array
     console.time('a')
     lines.forEach((line, i) => {
+        const curve = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3( -10, 0, 0 ),
+            new THREE.Vector3( 20, 15, 0 ),
+            new THREE.Vector3( 10, 0, 0 )
+        );
+        
+        const points = curve.getPoints( 50 );
+
+
         line.geometry.points = line.geometry.points.map((d,i) => l[i % l.length])
         line.position.z = -i *100
+        line.scale.addScalar(i)
     })
     console.timeEnd('a')
 
+
+    
+
+    
+
+    lines[50].geometry.points = lines[50].geometry.points.map(function (d,i) {
+        return [0,0,i]
+    })
+
     setInterval(function(){
-        //camera.position.z -= 1
+        camera.position.z -= 1
     }, 8)
 //}, 500)
       
@@ -206,7 +236,7 @@ const controls = new OrbitControls(camera, canvas)
     var renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, canvas: canvas });
     //var renderer = new WebGPURenderer();
 renderer.toneMapping = THREE.ReinhardToneMapping
-renderer.toneMappingExposure = 1.5
+renderer.toneMappingExposure = 100.5
     renderer.setSize(sizes.width, sizes.height);
 
     particleLight= new THREE.Mesh(new THREE.SphereGeometry( 3, 8, 8),
