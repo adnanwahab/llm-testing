@@ -9,10 +9,43 @@ const cors = require('cors')
 app.use(cors({ origin: 'http://localhost:5000' }));
 app.use(express.json());
 let music_directory = JSON.parse(fs.readFileSync('./music_directory.json'))
-
+//finish poll -> people decide what the government does daily.
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/templates/media-server.html');
+
+  axios.get(url, { params })
+  .then(response => {
+    // Check if the request was successful
+    if (response.status === 200) {
+      // Extract and print the video titles and video IDs from the search results
+      const data = response.data;
+      cb(data)
+    } else {
+      console.error(`Error: ${response.status}`);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error.message);
+  });
+  
+})
+
+app.get('/relay-gdrive', (req, res) => {
+  axios.get(req.url, { params })
+  .then(response => {
+    // Check if the request was successful
+    if (response.status === 200) {
+      // Extract and print the video titles and video IDs from the search results
+      const data = response.data;
+      res.send(data)
+    } else {
+      console.error(`Error: ${response.status}`);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error.message);
+  });
 })
 
 app.get('/start-game', (req, res) => {

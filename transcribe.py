@@ -1,6 +1,6 @@
 from pathlib import Path
 import json
-from basic_pitch.inference import predict_and_save
+#from basic_pitch.inference import predict_and_save
 
 
 from faster_whisper import WhisperModel
@@ -14,11 +14,11 @@ def transcribe(fp):
     print(fp)
     _, file_extension = os.path.splitext(fp)
 
-    if file_extension:
-        fp = _
-    else:
-        print("File has no extension.")
-    json_fp = fp + '.json'
+    # if file_extension:
+    #     fp = _
+    # else:
+    #     print("File has no extension.")
+    json_fp = _ + '.json'
 
     if Path(json_fp).is_file():
         with open(json_fp, 'r') as file:
@@ -26,7 +26,7 @@ def transcribe(fp):
         return data_dict
     
   
-    segments, info = model.transcribe(fp  + '.mp3', beam_size=5)
+    segments, info = model.transcribe(fp, beam_size=5)
 
   
     data = []
@@ -77,7 +77,7 @@ def saveJSON(file_path, data):
 
 import os
 
-main_dir = './node/visualizer/static/'
+main_dir = './TV/'
 
 # execution_time = timeit.timeit(transcribe, number=100)  # Run the function 100 times
 # print(f"Execution time: {execution_time:.6f} seconds")
@@ -93,7 +93,8 @@ def get_all_files_in_directory(directory):
 directory_path = main_dir
 def is_mp3(fp):
     ext = os.path.splitext(fp)[-1].lower()
-    return ext == '.mp3'
+    #return ext == '.mp3'
+    return True
 all_files = filter(is_mp3, get_all_files_in_directory( directory_path))
 
 # Printing all the file paths found in the directory and its subdirectories
@@ -106,8 +107,8 @@ import time
 #     True,
 #     True,
 # )
-music_directory_json = './node/music_directory.json'
-
+music_directory_json = './node/tv_directory.json'
+print('start transcbie')
 if __name__ == '__main__': 
     print('indexing directory of length', (len(list(all_files))))
     print(all_files)
