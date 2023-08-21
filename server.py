@@ -107,7 +107,47 @@ model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
 import json 
 
+from flask import Flask, request  # import main Flask class and request object
+import random
+app1 = Flask(__name__)  # create the Flask app
+from flask import jsonify
+from Bio import SeqIO
 
+filename = 'maize_pseudohap.fasta'
+filename = 'symA3_37.fasta'
+
+
+seq = []
+def hasGenome(filename):
+    count = 0
+    with open(filename, "r") as fasta_file:
+        for record in SeqIO.parse(fasta_file, "fasta"):
+            if count > 10: return (seq)
+            #print(record.id)   # Prints the sequence header (identifier)
+            seq.append(str(record.seq))  # Prints the sequence
+            count += 1
+    
+
+@app1.route('/status', methods=['GET'])
+def a_live():
+    print('shit', hasGenome(filename)[0])
+    return jsonify(hasGenome(filename))
+
+@app1.route('/predict', methods=['GET'])
+def predict():
+    demo=random.randint(2000, 5000)    
+    return str(demo)
+
+app1.run(port=5000)  # run app in debug mode on port 5000
+
+
+#actually make it so when user requests 
+
+# i want this tree to be purple
+
+# create a dropdrown of other colors it can be 
+#dont have a prompt -> just creates toggles for shit that peple want 
+# actually changes the shader to be those colors ??!??!?! ?! 
 
 import os
 
