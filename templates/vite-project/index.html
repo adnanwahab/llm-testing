@@ -1,0 +1,72 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blue BioTech Support Tool</title>
+ <script src="https://cdn.tailwindcss.com"></script> 
+ <style>
+
+  li {
+
+    color:#0099ff;
+    padding: 10px;
+    cursor:pointer;
+  }
+  li:hover {
+    text-decoration: underline;
+  }
+
+  ul {
+    list-style-type: decimal;
+
+  }
+
+
+/* 
+https://www.ncbi.nlm.nih.gov/Structure/icn3d/full.html
+
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9780023/
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7698662/
+https://bioinformatics.psb.ugent.be/plaza/versions/pico-plaza/
+https://academic.oup.com/database/article/doi/10.1093/database/bay072/5055577
+https://github.com/charlesrocabert/MetEvolSim
+https://en.wikipedia.org/wiki/List_of_sequenced_algae_genomes
+
+*/
+  canvas {
+    border: 1px dotted blue;
+  }
+  head, body {
+        margin: 0;
+        border: 0;
+        padding: 0;
+        max-height: 100vh
+      }
+
+
+      ul {
+        width: 400px;
+        overflow: scroll;
+        height: 250px;
+      }
+ </style>
+</head>
+<body>
+  <h1 class="absolute top-0">Blue BioTech Support Application</h1>
+  <input type="color" value="#006465" class="absolute top-32 m-2">
+  <select  class="dropdown absolute top-48 m-2">
+    <option>tree</option>
+    <option>algae</option>
+  </select>
+
+  <div class=" m-6 grid grid-cols-3 gap-4 w-full">
+   
+    <svg></svg>
+    <canvas></canvas>
+  <ul class="kmers"></ul>
+  </div> 
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html> 
