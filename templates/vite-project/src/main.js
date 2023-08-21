@@ -16,17 +16,17 @@ import { setupCounter } from './counter.ts'
 import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
    
-let kmers =  d3.json('/mock.json', {
+let kmers = d3.json('/mock.json', {
   crossOrigin: "anonymous",
   headers : { 
 
-}}).then((kmers ) => {
+}}).then (kmers => {
+	console.log()
 	d3.select('ul.kmers').selectAll('li').data(kmers.kmers).join('li').text(data => data)
 	.on('click', function (data) {
 		renderTree(data)
 	})
-
-})
+}) 
 
 
 const svg = d3.select('svg')
