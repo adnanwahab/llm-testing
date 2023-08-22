@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Blue BioTech Support Tool</title>
  <script src="https://cdn.tailwindcss.com"></script> 
+
  <style>
 
   li {
@@ -33,7 +34,7 @@ https://bioinformatics.psb.ugent.be/plaza/versions/pico-plaza/
 https://academic.oup.com/database/article/doi/10.1093/database/bay072/5055577
 https://github.com/charlesrocabert/MetEvolSim
 https://en.wikipedia.org/wiki/List_of_sequenced_algae_genomes
-
+https://observablehq.com/@pallada-92/3d-engine-in-dna-code
 */
   canvas {
     border: 1px dotted blue;
@@ -51,14 +52,21 @@ https://en.wikipedia.org/wiki/List_of_sequenced_algae_genomes
         overflow: scroll;
         height: 250px;
       }
+ 
  </style>
 </head>
 <body>
+  <script src="https://unpkg.com/seqviz"></script>
+
+  <div id="viewer"></div>
   <h1 class="absolute top-0">Blue BioTech Support Application</h1>
+  <!-- <iframe width="100%" height="234" frameborder="0"
+  src="https://observablehq.com/embed/@aravindj/dna-helix?cells=chart"></iframe> -->
+  
   <input type="color" value="#006465" class="absolute top-32 m-2">
   <select  class="dropdown absolute top-48 m-2">
     <option>tree</option>
-    <option>algae</option>
+    <option selected="true">algae</option>
   </select>
 
   <div class=" m-6 grid grid-cols-3 gap-4 w-full">

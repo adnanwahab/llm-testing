@@ -4,41 +4,215 @@ import viteLogo from '/vite.svg'
 import { setupCounter } from './counter.ts'
 
 
-//viewers
+
+import * as d3 from "d3";
+
+import { SeqViz } from "seqviz";
 
 
-
-
-
-
-
-
-import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-import _, { map } from 'https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.13.6/underscore-esm-min.js';
-   
-let kmers = d3.json('/mock.json', {
+// https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fdevteam%2Fdgidb_annotator%2Fdgidb_annotator%2F0.1&version=latest
+//https://colab.research.google.com/github/deepmind/alphafold/blob/main/notebooks/AlphaFold.ipynb#scrollTo=XUo6foMQxwS2
+//https://github.com/pablo-arantes/Making-it-rain
+let kmers = d3.json('/kmers.json', {
   crossOrigin: "anonymous",
   headers : { 
-
+	//https://github.com/Lattice-Automation/seqviz
+//https://medium.com/this-week-in-synthetic-biology/python-meet-synthetic-biology-the-dna-computing-issue-cf46114fa7b1
 }}).then (kmers => {
 	console.log()
-	d3.select('ul.kmers').selectAll('li').data(kmers.kmers).join('li').text(data => data)
+	d3.select('ul.kmers').selectAll('li')
+	.data(kmers).join('li').text(data => data)
+	.classed('text-ellipsis overflow-hidden ...', true)
+
 	.on('click', function (data) {
+		console.log('123')
 		renderTree(data)
 	})
 }) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function getInformationAboutGeneEditing(seq){
+	let data = {}
+  // Specify the charts’ dimensions. The height is variable, depending on the layout.
+  const width = 928;
+  const marginTop = 10;
+  const marginRight = 10;
+  const marginBottom = 10;
+  const marginLeft = 40;
+
+  // Rows are separated by dx pixels, columns by dy pixels. These names can be counter-intuitive
+  // (dx is a height, and dy a width). This because the tree must be viewed with the root at the
+  // “bottom”, in the data domain. The width of a column is based on the tree’s height.
+  const root = d3.hierarchy(data);
+  const dx = 10;
+  const dy = (width - marginRight - marginLeft) / (1 + root.height);
+
+  // Define the tree layout and the shape for links.
+  const tree = d3.tree().nodeSize([dx, dy]);
+  const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
+
+  // Create the SVG container, a layer for the links and a layer for the nodes.
+  const svg = d3.select("svg")
+      .attr("width", width)
+      .attr("height", dx)
+      .attr("viewBox", [-marginLeft, -marginTop, width, dx])
+      .attr("style", "max-width: 100%; height: auto; font: 10px sans-serif; user-select: none;");
+
+  const gLink = svg.append("g")
+      .attr("fill", "none")
+      .attr("stroke", "#555")
+      .attr("stroke-opacity", 0.4)
+      .attr("stroke-width", 1.5);
+
+  const gNode = svg.append("g")
+      .attr("cursor", "pointer")
+      .attr("pointer-events", "all");
+
+  function update(event, source) {
+    const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
+    const nodes = root.descendants().reverse();
+    const links = root.links();
+
+    // Compute the new tree layout.
+    tree(root);
+
+    let left = root;
+    let right = root;
+    root.eachBefore(node => {
+      if (node.x < left.x) left = node;
+      if (node.x > right.x) right = node;
+    });
+
+    const height = right.x - left.x + marginTop + marginBottom;
+
+    const transition = svg.transition()
+        .duration(duration)
+        .attr("height", height)
+        .attr("viewBox", [-marginLeft, left.x - marginTop, width, height])
+        .tween("resize", window.ResizeObserver ? null : () => () => svg.dispatch("toggle"));
+
+    // Update the nodes…
+    const node = gNode.selectAll("g")
+      .data(nodes, d => d.id);
+
+    // Enter any new nodes at the parent's previous position.
+    const nodeEnter = node.enter().append("g")
+        .attr("transform", d => `translate(${source.y0},${source.x0})`)
+        .attr("fill-opacity", 0)
+        .attr("stroke-opacity", 0)
+        .on("click", (event, d) => {
+          d.children = d.children ? null : d._children;
+          update(event, d);
+        });
+
+    nodeEnter.append("circle")
+        .attr("r", 2.5)
+        .attr("fill", d => d._children ? "#555" : "#999")
+        .attr("stroke-width", 10);
+
+    nodeEnter.append("text")
+        .attr("dy", "0.31em")
+        .attr("x", d => d._children ? -6 : 6)
+        .attr("text-anchor", d => d._children ? "end" : "start")
+        .text(d => d.data.name)
+      .clone(true).lower()
+        .attr("stroke-linejoin", "round")
+        .attr("stroke-width", 3)
+        .attr("stroke", "white");
+
+    // Transition nodes to their new position.
+    const nodeUpdate = node.merge(nodeEnter).transition(transition)
+        .attr("transform", d => `translate(${d.y},${d.x})`)
+        .attr("fill-opacity", 1)
+        .attr("stroke-opacity", 1);
+
+    // Transition exiting nodes to the parent's new position.
+    const nodeExit = node.exit().transition(transition).remove()
+        .attr("transform", d => `translate(${source.y},${source.x})`)
+        .attr("fill-opacity", 0)
+        .attr("stroke-opacity", 0);
+
+    // Update the links…
+    const link = gLink.selectAll("path")
+      .data(links, d => d.target.id);
+
+    // Enter any new links at the parent's previous position.
+    const linkEnter = link.enter().append("path")
+        .attr("d", d => {
+          const o = {x: source.x0, y: source.y0};
+          return diagonal({source: o, target: o});
+        });
+
+    // Transition links to their new position.
+    link.merge(linkEnter).transition(transition)
+        .attr("d", diagonal);
+
+    // Transition exiting nodes to the parent's new position.
+    link.exit().transition(transition).remove()
+        .attr("d", d => {
+          const o = {x: source.x, y: source.y};
+          return diagonal({source: o, target: o});
+        });
+
+    // Stash the old positions for transition.
+    root.eachBefore(d => {
+      d.x0 = d.x;
+      d.y0 = d.y;
+    });
+  }
+
+  // Do the first update to the initial configuration of the tree — where a number of nodes
+  // are open (arbitrarily selected as the root, plus nodes with 7 letters).
+  root.x0 = dy / 2;
+  root.y0 = 0;
+  root.descendants().forEach((d, i) => {
+    d.id = i;
+    d._children = d.children;
+    if (d.depth && d.data.name.length !== 7) d.children = null;
+  });
+
+ update(null, root);
+
+  return svg.node();
+}
 
 
 const svg = d3.select('svg')
 
 function renderTree() {
 	
-	svg.append('circle').attr('cx', Math.random() * 500)
-	.attr('cy', Math.random() * 500)
-	.attr('r', 10).attr('fill', 'blue')
+	// svg.append('circle')
+	// .attr('cx', Math.random() * 300)
+	// .attr('cy', Math.random() * 150)
+	// .attr('r', 10).attr('fill', 'blue')
 
-	svg.append('line').attr('x1', 0)
-	.attr('y1', 0).attr('y2', 0).attr('x2', 0)
+	// svg.append('line').attr('x1', 0)
+	// .attr('y1', 0).attr('y2', 0).attr('x2', 0)
+	getInformationAboutGeneEditing()
 }
 //visualize how editing one gene affects the cell
 //see how the changes in the cell affect the tisues
@@ -58,27 +232,27 @@ function renderTree() {
 //design algorithm along with the output (wysiwyg)
 
 
-fetch('http://localhost:5000/genomics').then(req => req.json).then(json =>renderGenomics(json))
-fetch('http://localhost:5000/transcriptomics').then(req => req.json).then(json => renderTranscriptomics(json))
-fetch('http://localhost:5000/proteomics').then(req => req.json).then(json => renderProteomics(json))
+// fetch('http://localhost:5000/genomics').then(req => req.json).then(json =>renderGenomics(json))
+// fetch('http://localhost:5000/transcriptomics').then(req => req.json).then(json => renderTranscriptomics(json))
+// fetch('http://localhost:5000/proteomics').then(req => req.json).then(json => renderProteomics(json))
 
-function renderGenomics(json) {
-	get('.genomics')
-	//render the sequences and possible edits to them
-}
-function renderTranscriptomics(json) {
-	get('.Transcriptomics')
-	//render a list of changes to the RNA
-}
-function renderProteomics(json) {
-	let container = get('.proteomics')
-	for (let i = 0; i < json.length; i++) {
+// function renderGenomics(json) {
+// 	get('.genomics')
+// 	//render the sequences and possible edits to them
+// }
+// function renderTranscriptomics(json) {
+// 	get('.Transcriptomics')
+// 	//render a list of changes to the RNA
+// }
+// function renderProteomics(json) {
+// 	let container = get('.proteomics')
+// 	for (let i = 0; i < json.length; i++) {
 
-	}
-	//render a list of proteins 
-	//when you interact with the item, changes propagate across the sequence of views into the cell
-	//
-}
+// 	}
+// 	//render a list of proteins 
+// 	//when you interact with the item, changes propagate across the sequence of views into the cell
+// 	//
+// }
 
 const get = (get) => document.querySelector(get)
 //https://www.shadertoy.com/view/tlGGz1
@@ -105,11 +279,6 @@ let camera, scene, renderer, labelRenderer;
 let controls;
 
 let root;
-
-
-const params = {
-	molecule: 'caffeine.pdb'
-};
 
 const loader = new PDBLoader();
 const offset = new THREE.Vector3();
@@ -149,31 +318,18 @@ function init() {
 	labelRenderer.domElement.style.position = 'absolute';
 	labelRenderer.domElement.style.top = '0px';
 	labelRenderer.domElement.style.pointerEvents = 'none';
-	//document.getElementById( 'container' ).appendChild( labelRenderer.domElement );
-
-	//
-
 	controls = new TrackballControls( camera, renderer.domElement );
 	controls.minDistance = 500;
 	controls.maxDistance = 2000;
-
-	//
-
-	loadMolecule( params.molecule );
-
-	//
-
+	loadMolecule(  );
 	window.addEventListener( 'resize', onWindowResize );
-
-	//
-
 }
 
 //
 
-function loadMolecule( model ) {
+function loadMolecule(  ) {
 
-	const url = '/graphite.pdb';
+	const url = '/1w5c.pdb';
 
 	while ( root.children.length > 0 ) {
 
@@ -217,8 +373,8 @@ function loadMolecule( model ) {
 
 			const object = new THREE.Mesh( sphereGeometry, material );
 			object.position.copy( position );
-			object.position.multiplyScalar( 75 );
-			object.scale.multiplyScalar( 25 );
+			object.position.multiplyScalar( 10 );
+			object.scale.multiplyScalar( 10 );
 			root.add( object );
 
 			const atom = json.atoms[ i ];
@@ -249,13 +405,13 @@ function loadMolecule( model ) {
 			end.y = positions.getY( i + 1 );
 			end.z = positions.getZ( i + 1 );
 
-			start.multiplyScalar( 75 );
-			end.multiplyScalar( 75 );
+			start.multiplyScalar( .1 );
+			end.multiplyScalar( .1 );
 
 			const object = new THREE.Mesh( boxGeometry, new THREE.MeshPhongMaterial( 0xffffff ) );
 			object.position.copy( start );
 			object.position.lerp( end, 0.5 );
-			object.scale.set( 5, 5, start.distanceTo( end ) );
+			object.scale.set( 10, 10, start.distanceTo( end ) );
 			object.lookAt( end );
 			root.add( object );
 
@@ -288,8 +444,8 @@ function animate() {
 
 	const time = Date.now() * 0.0004;
 
-	root.rotation.x = time;
-	root.rotation.y = time * 0.7;
+	// root.rotation.x = time;
+	// root.rotation.y = time * 0.7;
 
 	render();
 
