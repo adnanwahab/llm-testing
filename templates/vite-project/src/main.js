@@ -32,6 +32,24 @@ let kmers = d3.json('/kmers.json', {
 
 
 
+//what feature would complete the application
+//Typical User = Biologist that works in a lab -> sequencing genome
+//get genome information about organism
+//alignments
+//sequences -> alignmnets -> genome -> enzymes -> design crispr / (vaccine / whatever user wants)
+//Thats not what we want.
+//code
+//halo = more people watching than you think
+//Something kinda contrived and kinda funny about whats going on today
+//Had to be extrmeley different since July 8.
+//What if it didnt matter how much code you wrote today. 
+//What if you just clearly define the problem and redefine it 
+//read about and take notes on 
+//what if you actually wanted to "solve" the "problem"
+//problem is - tools for biologists are probably kinda who knows
+//Maybe they are great
+//try a couple and see what the workflows are, then come out with something that is different and possibly better for soem of them
+//
 
 
 
@@ -39,6 +57,19 @@ let kmers = d3.json('/kmers.json', {
 
 
 
+
+
+
+
+
+
+//code something that matters - 10x more impressive than karaoke 
+async function getPossibleEdits() {
+	let req = await fetch('/getPossibleEdits')
+	let json = req.json()
+
+
+}
 
 
 
