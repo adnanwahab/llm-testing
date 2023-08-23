@@ -14,15 +14,47 @@ import urllib
 import urllib.parse
 import urllib.request
 from bs4 import BeautifulSoup
-
+#https://www.ncbi.nlm.nih.gov/genbank/fastaformat/
 #perfect programming
 #human has 50 trillion cells
 #human has 50 protein million molecules per cell
 #proteins have average of 1500 atoms 
 #20,000 proteins types in a human
+#what is the overlap between the reference sequence and the existing sequences of the target nucleus
 
 #corn is solved https://www.maizegdb.org/
+#https://algae.biocyc.org/gene-search.shtm
+#https://mycocosm.jgi.doe.gov/cgi-bin/ToGo?accession=GO:0008150&species=Astpho2
+#https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2863401/
+#https://www.sciencedirect.com/science/article/abs/pii/S2211926423001017
+#https://www.nature.com/articles/srep24951
 
+#Phaeodactylum tricornutum
+#https://www.cell.com/molecular-plant/pdf/S1674-2052(18)30250-8.pdf
+#CpSRP54 is both a gene and a prtein? 
+#https://escholarship.org/uc/item/3xz420hv
+
+
+#add this gene to another algae so it has more photosynthesis ?
+
+# >sp|P37107|SR54C_ARATH Signal recognition particle subunit SRP54, chloroplastic OS=Arabidopsis thaliana OX=3702 GN=FFC PE=1 SV=1
+# MEALQFSSVNRVPCTLSCTGNRRIKAAFSSAFTGGTINSASLSSSRNLSTREIWSWVKSK
+# TVVGHGRYRRSQVRAEMFGQLTGGLEAAWSKLKGEEVLTKDNIAEPMRDIRRALLEADVS
+# LPVVRRFVQSVSDQAVGMGVIRGVKPDQQLVKIVHDELVKLMGGEVSELQFAKSGPTVIL
+# LAGLQGVGKTTVCAKLACYLKKQGKSCMLIAGDVYRPAAIDQLVILGEQVGVPVYTAGTD
+# VKPADIAKQGLKEAKKNNVDVVIMDTAGRLQIDKGMMDELKDVKKFLNPTEVLLVVDAMT
+# GQEAAALVTTFNVEIGITGAILTKLDGDSRGGAALSVKEVSGKPIKLVGRGERMEDLEPF
+# YPDRMAGRILGMGDVLSFVEKATEVMRQEDAEDLQKKIMSAKFDFNDFLKQTRAVAKMGS
+# MTRVLGMIPGMGKVSPAQIREAEKNLLVMEAMIEVMTPEERERPELLAESPERRKRIAKD
+# SGKTEQQVSALVAQIFQMRVKMKNLMGVMEGGSIPALSGLEDALKAEQKAPPGTARRKRK
+# ADSRKKFVESASSKPGPRGFGSGN
+#convert above gene to nucleotide sequence -> append to existing fasta
+#convert that to an sg-rna for sequenced organism
+#https://www.uniprot.org/uniprotkb/P37107/entry
+#get fasta file
+#get gene file
+#get protein of expressed gene
+#finale: so that this gene can be edited and the expressed protein changes
 fname=  'F1maize.FINAL.fasta'
 def get_uniprot (query='',query_type='PDB_ID'):
     #code found at <a href="https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/">https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/</a>
@@ -47,9 +79,251 @@ def get_uniprot (query='',query_type='PDB_ID'):
     accession_number = query_output[1].strip().split(' ')[-1].strip(';')
 
 from Bio import SeqIO
+#protein updates involve which things in a cell - enzymes - especially for glowing and most of the things ?
+#glowing plant = 
+
+#just use a csv
+#@route
+
+
+os.shell
+
+execAF = '''python3 docker/run_docker.py \
+  --fasta_paths=monomer.fasta \
+  --max_template_date=2021-11-01 \
+  --model_preset=monomer \
+  --data_dir=$DOWNLOAD_DIR \
+  --output_dir=/home/user/absolute_path_to_the_output_dir'''
+
+
+# Importing required module
+import subprocess
+ 
+# Using system() method to
+# execute shell commands
+subprocess.Popen(execAF, shell=True)
+
+
+def runAF():
+    run_relax = True  #@param {type:"boolean"}
+    relax_use_gpu = False  #@param {type:"boolean"}
+    multimer_model_max_num_recycles = 3  #@param {type:"integer"}
+# --- Run the model ---
+    if model_type_to_use == ModelType.MONOMER:
+    model_names = config.MODEL_PRESETS['monomer'] + ('model_2_ptm',)
+    elif model_type_to_use == ModelType.MULTIMER:
+    model_names = config.MODEL_PRESETS['multimer']
+
+    output_dir = 'prediction'
+    os.makedirs(output_dir, exist_ok=True)
+
+    plddts = {}
+    ranking_confidences = {}
+    pae_outputs = {}
+    unrelaxed_proteins = {}
+
+    for model_name in model_names:
+        cfg = config.model_config(model_name)
+        if model_type_to_use == ModelType.MONOMER: cfg.data.eval.num_ensemble = 1
+        elif model_type_to_use == ModelType.MULTIMER: cfg.model.num_ensemble_eval = 1
+
+        if model_type_to_use == ModelType.MULTIMER:
+            cfg.model.num_recycle = multimer_model_max_num_recycles
+            cfg.model.recycle_early_stop_tolerance = 0.5
+
+        params = data.get_model_haiku_params(model_name, './alphafold/data')
+        model_runner = model.RunModel(cfg, params)
+        processed_feature_dict = model_runner.process_features(np_example, random_seed=0)
+        prediction = model_runner.predict(processed_feature_dict, random_seed=random.randrange(sys.maxsize))
+
+        mean_plddt = prediction['plddt'].mean()
+
+        if model_type_to_use == ModelType.MONOMER:
+            if 'predicted_aligned_error' in prediction:
+                pae_outputs[model_name] = (prediction['predicted_aligned_error'],
+                                            prediction['max_predicted_aligned_error'])
+            else:
+                ranking_confidences[model_name] = prediction['ranking_confidence']
+                plddts[model_name] = prediction['plddt']
+        elif model_type_to_use == ModelType.MULTIMER:
+            ranking_confidences[model_name] = prediction['ranking_confidence']
+            plddts[model_name] = prediction['plddt']
+            pae_outputs[model_name] = (prediction['predicted_aligned_error'],
+                                        prediction['max_predicted_aligned_error'])
+        final_atom_mask = prediction['structure_module']['final_atom_mask']
+        b_factors = prediction['plddt'][:, None] * final_atom_mask
+        unrelaxed_protein = protein.from_prediction(
+            processed_feature_dict,
+            prediction,
+            b_factors=b_factors,
+            remove_leading_feature_dimension=(
+                model_type_to_use == ModelType.MONOMER))
+        unrelaxed_proteins[model_name] = unrelaxed_protein
+        del model_runner
+        del params
+        del prediction
+        best_model_name = max(ranking_confidences.keys(), key=lambda x: ranking_confidences[x])
+
+    if run_relax:
+        amber_relaxer = relax.AmberRelaxation(
+            max_iterations=0,
+            tolerance=2.39,
+            stiffness=10.0,
+            exclude_residues=[],
+            max_outer_iterations=3,
+            use_gpu=relax_use_gpu)
+        relaxed_pdb, _, _ = amber_relaxer.process(prot=unrelaxed_proteins[best_model_name])
+    else:
+        print('Warning: Running without the relaxation stage.')
+        relaxed_pdb = protein.to_pdb(unrelaxed_proteins[best_model_name])
+
+    # Construct multiclass b-factors to indicate confidence bands
+    # 0=very low, 1=low, 2=confident, 3=very high
+    banded_b_factors = []
+    for plddt in plddts[best_model_name]:
+        for idx, (min_val, max_val, _) in enumerate(PLDDT_BANDS):
+            if plddt >= min_val and plddt <= max_val: banded_b_factors.append(idx)
+            break
+    banded_b_factors = np.array(banded_b_factors)[:, None] * final_atom_mask
+    to_visualize_pdb = utils.overwrite_b_factors(relaxed_pdb, banded_b_factors)
+
+    pred_output_path = os.path.join(output_dir, 'selected_prediction.pdb')
+    with open(pred_output_path, 'w') as f: f.write(relaxed_pdb)
+    show_sidechains = True
+    print('done')
+# def plot_plddt_legend():
+#   """Plots the legend for pLDDT."""
+#   thresh = ['Very low (pLDDT < 50)',
+#             'Low (70 > pLDDT > 50)',
+#             'Confident (90 > pLDDT > 70)',
+#             'Very high (pLDDT > 90)']
+
+#   colors = [x[2] for x in PLDDT_BANDS]
+
+#   plt.figure(figsize=(2, 2))
+#   for c in colors:
+#     plt.bar(0, 0, color=c)
+#   plt.legend(thresh, frameon=False, loc='center', fontsize=20)
+#   plt.xticks([])
+#   plt.yticks([])
+#   ax = plt.gca()
+#   ax.spines['right'].set_visible(False)
+#   ax.spines['top'].set_visible(False)
+#   ax.spines['left'].set_visible(False)
+#   ax.spines['bottom'].set_visible(False)
+#   plt.title('Model Confidence', fontsize=20, pad=20)
+#   return plt
+
+# Show the structure coloured by chain if the multimer model has been used.
+if model_type_to_use == ModelType.MULTIMER:
+  multichain_view = py3Dmol.view(width=800, height=600)
+  multichain_view.addModelsAsFrames(to_visualize_pdb)
+  multichain_style = {'cartoon': {'colorscheme': 'chain'}}
+  multichain_view.setStyle({'model': -1}, multichain_style)
+  multichain_view.zoomTo()
+  multichain_view.show()
+
+# Color the structure by per-residue pLDDT
+color_map = {i: bands[2] for i, bands in enumerate(PLDDT_BANDS)}
+#view = py3Dmol.view(width=800, height=600)
+#view.addModelsAsFrames(to_visualize_pdb)
+style = {'cartoon': {'colorscheme': {'prop': 'b', 'map': color_map}}}
+if show_sidechains:
+  style['stick'] = {}
+#view.setStyle({'model': -1}, style)
+#view.zoomTo()
+
+grid = GridspecLayout(1, 2)
+out = Output()
+with out:
+  view.show()
+grid[0, 0] = out
+
+out = Output()
+with out:
+  plot_plddt_legend().show()
+grid[0, 1] = out
+
+#display.display(grid)
+
+# Display pLDDT and predicted aligned error (if output by the model).
+# if pae_outputs:
+#   num_plots = 2
+# else:
+#   num_plots = 1
+
+# plt.figure(figsize=[8 * num_plots, 6])
+# plt.subplot(1, num_plots, 1)
+# plt.plot(plddts[best_model_name])
+# plt.title('Predicted LDDT')
+# plt.xlabel('Residue')
+# plt.ylabel('pLDDT')
+
+# if num_plots == 2:
+#   plt.subplot(1, 2, 2)
+#   pae, max_pae = list(pae_outputs.values())[0]
+#   plt.imshow(pae, vmin=0., vmax=max_pae, cmap='Greens_r')
+#   plt.colorbar(fraction=0.046, pad=0.04)
+
+#   # Display lines at chain boundaries.
+#   best_unrelaxed_prot = unrelaxed_proteins[best_model_name]
+#   total_num_res = best_unrelaxed_prot.residue_index.shape[-1]
+#   chain_ids = best_unrelaxed_prot.chain_index
+#   for chain_boundary in np.nonzero(chain_ids[:-1] - chain_ids[1:]):
+#     if chain_boundary.size:
+#       plt.plot([0, total_num_res], [chain_boundary, chain_boundary], color='red')
+#       plt.plot([chain_boundary, chain_boundary], [0, total_num_res], color='red')
+
+#   plt.title('Predicted Aligned Error')
+#   plt.xlabel('Scored residue')
+#   plt.ylabel('Aligned residue')
+
+# Save the predicted aligned error (if it exists).
+pae_output_path = os.path.join(output_dir, 'predicted_aligned_error.json')
+if pae_outputs:
+  # Save predicted aligned error in the same format as the AF EMBL DB.
+  pae_data = confidence.pae_json(pae=pae, max_pae=max_pae.item())
+  with open(pae_output_path, 'w') as f:
+    f.write(pae_data)
+
+
+def difference(one, two):
+    return [item for item in one if item in two]
+
+def readFasta(filename):
+    return SeqIO.parse(open(filename),'fasta')
+
+def runSimulations(first, second):
+    result1 = simulateMolecularDynamics(first)
+    result2 = simulateMolecularDynamics(second)
+    return difference(result1, result2)
+
+
+def alphaFold():
+    return 123
+
+def applyGeneEdit(first_protein, edit):
+    return first_protein.replace(first_protein, edit)
+
+def edit_Gene_Get_New_Protein_And_Diff_TheResults(organism, gene, edit):
+    first = readFasta(organism)
+    geneToEdit = readFasta(gene)
+    protein_name = sql.query('select prot from protein where gene_name = (?)', gene)
+    first_protein = readFasta(protein_name)
+    updatedGene = applyGeneEdit(first_protein, edit)
+    updatedGenome = first.replace(geneToEdit, updatedGene) # display this
+    updatedProtein = alphaFold(updatedGene)
+    effects = runSimulations(first_protein, updatedProtein)
+    return jsonify([updatedProtein, updatedGenome, effects])
+
+
+
+
+
 #pypdb
 #flask_cors
 #https://www.tutorialspoint.com/biopython/biopython_overview_of_blast.htm
+#https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Nucleotides&PROGRAM=blastn&QUERY=NC_003076.8&DATABASE=nr&MEGABLAST=on&BLAST_PROGRAMS=megaBlast&LINK_LOC=nuccore&PAGE_TYPE=BlastSearch&QUERY_FROM=1060106&QUERY_TO=1063425    
 def fasta_dna_to_protein_file(filename):
     seq_record = next(SeqIO.parse(open(filename),'fasta')) 
     print('seq_record')
@@ -61,7 +335,7 @@ def fasta_dna_to_protein_file(filename):
         blast_results = result_handle.read() 
         save_file.write(blast_results)
 print('running fasta')
-
+fname = 'gene.fna'
 fasta_dna_to_protein_file(fname)
 print('exiting')
 exit()
