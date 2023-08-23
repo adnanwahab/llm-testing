@@ -2,17 +2,58 @@ import './style.css'
 import typescriptLogo from './typescript.svg'
 import viteLogo from '/vite.svg'
 import { setupCounter } from './counter.ts'
+import * as d3 from "d3"
+
+const get = (get) => document.querySelector(get)
 
 
 
-import * as d3 from "d3";
 
-import { SeqViz } from "seqviz";
 
+
+
+
+
+
+
+
+
+
+fetch('getInitialOrganismsAndPossibleGeneticMutations')
+
+
+
+
+
+let genes = {
+    'algae': [{property: 'glowing', name: 'asdfasdf'},
+			  {property: 'increased photosynthesis', name: 'aslkdfjaslkdfj'},
+			  {}
+			
+			],
+    'corn': [{property: 'purple', name: 'asdfasdf'}],
+    'trees': [{property: 'purple', name: 'asdfasdf'}],
+}
+
+
+get('.dropdown').innerHTML = Object.keys(genes).map((x) => '<option>' + x + '</option>')
+get('.gene-dropdown').innerHTML = genes['algae'].map((x) => '<option>' + x.property + '</option>')
+
+get('.gene-dropdown').addEventListener('change', function () {
+
+     fetch('/findCorrectPlaceToPutGeneInNucleus', {
+         ...genes['algae']['glowing']
+     }).then(reRenderDNA)
+
+
+	 fetch('/designSGRNA').then(renderDesignSGRNA)
+})
+
+function reRenderDNA() {}
+function renderDesignSGRNA() {}
 
 // https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fdevteam%2Fdgidb_annotator%2Fdgidb_annotator%2F0.1&version=latest
 //https://colab.research.google.com/github/deepmind/alphafold/blob/main/notebooks/AlphaFold.ipynb#scrollTo=XUo6foMQxwS2
-//https://github.com/pablo-arantes/Making-it-rain
 let kmers = d3.json('/kmers.json', {
   crossOrigin: "anonymous",
   headers : { 
@@ -25,69 +66,19 @@ let kmers = d3.json('/kmers.json', {
 	.classed('text-ellipsis overflow-hidden ...', true)
 
 	.on('click', function (data) {
-		console.log('123')
-		renderTree(data)
+		renderTree()
+
+		editGeneSeeHowItAffectsTheOrganism()
 	})
 }) 
-
-
-
-//what feature would complete the application
-//Typical User = Biologist that works in a lab -> sequencing genome
-//get genome information about organism
-//alignments
-//sequences -> alignmnets -> genome -> enzymes -> design crispr / (vaccine / whatever user wants)
-//Thats not what we want.
-//code
-//halo = more people watching than you think
-//Something kinda contrived and kinda funny about whats going on today
-//Had to be extrmeley different since July 8.
-//What if it didnt matter how much code you wrote today. 
-//What if you just clearly define the problem and redefine it 
-//read about and take notes on 
-//what if you actually wanted to "solve" the "problem"
-//problem is - tools for biologists are probably kinda who knows
-//Maybe they are great
-//try a couple and see what the workflows are, then come out with something that is different and possibly better for soem of them
-//
-
-
-
-
-
-
-
-
-
-
-
-
-
-//code something that matters - 10x more impressive than karaoke 
 async function getPossibleEdits() {
-	let req = await fetch('/getPossibleEdits')
-	let json = req.json()
-
-
+	let req = await fetch('/tree.json')
+	let json = await req.json()
+	return json
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function getInformationAboutGeneEditing(seq){
-	let data = {}
+async function getInformationAboutGeneEditing(seq){
+	let data = await getPossibleEdits()
   // Specify the charts’ dimensions. The height is variable, depending on the layout.
   const width = 928;
   const marginTop = 10;
@@ -127,8 +118,6 @@ function getInformationAboutGeneEditing(seq){
     const duration = event?.altKey ? 2500 : 250; // hold the alt key to slow down the transition
     const nodes = root.descendants().reverse();
     const links = root.links();
-
-    // Compute the new tree layout.
     tree(root);
 
     let left = root;
@@ -215,7 +204,6 @@ function getInformationAboutGeneEditing(seq){
       d.y0 = d.y;
     });
   }
-
   // Do the first update to the initial configuration of the tree — where a number of nodes
   // are open (arbitrarily selected as the root, plus nodes with 7 letters).
   root.x0 = dy / 2;
@@ -232,41 +220,33 @@ function getInformationAboutGeneEditing(seq){
 }
 
 
+
+
+
+
+
+async function editGeneSeeHowItAffectsTheOrganism(gene) {
+	//map out how to get glowing plant genes into a tree
+	//figure out other workflows
+	//figure out workflows in blue biotech - make green algae better for the environment
+	//figure out how to design better vaccines and medicines
+	//figure out how to present all information there is to know from all single-cell analysis 
+
+	//use 100s of different single-cell analysis studies to simulate different aspects of the cell
+	//using the simulation data, present a list of information that describes how the edit may change the entire organism 
+	let req = await fetch('http://localhost:5000/gene-editing')
+	let json = await req.json()
+
+	get('.possible-edits-to-gene').textContent = JSON.stringify(json, null, 2)
+}
 const svg = d3.select('svg')
-
 function renderTree() {
-	
-	// svg.append('circle')
-	// .attr('cx', Math.random() * 300)
-	// .attr('cy', Math.random() * 150)
-	// .attr('r', 10).attr('fill', 'blue')
-
-	// svg.append('line').attr('x1', 0)
-	// .attr('y1', 0).attr('y2', 0).attr('x2', 0)
 	getInformationAboutGeneEditing()
 }
-//visualize how editing one gene affects the cell
-//see how the changes in the cell affect the tisues
-//see how the changes in the tissue affects the organism
-//see how the changes in the organism changes the enviroment - woth a picture of a glowing tree or an algae that produces extra biofuel or other improvements
-// how many charts can you make for this progress that look cool and render instantly 
-//1. genomics - dna
-//2. transcriptomics - ribosome
-//3. proteinomics - protein
-//4. metalabolimcs - sugars and sodium 
-//5. RNA sg-guide ???
-//help run experiments so biologists in the lab dont have to - do it with simulation and verify in the lab 
-//will changing it like this cause unseen perturbations? (alert) -> if not, then it is a good idea.... .... .. .
-
-
 //6. ecosystem ? (out of scope)
-//design algorithm along with the output (wysiwyg)
-
-
 // fetch('http://localhost:5000/genomics').then(req => req.json).then(json =>renderGenomics(json))
 // fetch('http://localhost:5000/transcriptomics').then(req => req.json).then(json => renderTranscriptomics(json))
 // fetch('http://localhost:5000/proteomics').then(req => req.json).then(json => renderProteomics(json))
-
 // function renderGenomics(json) {
 // 	get('.genomics')
 // 	//render the sequences and possible edits to them
@@ -278,47 +258,23 @@ function renderTree() {
 // function renderProteomics(json) {
 // 	let container = get('.proteomics')
 // 	for (let i = 0; i < json.length; i++) {
-
 // 	}
 // 	//render a list of proteins 
 // 	//when you interact with the item, changes propagate across the sequence of views into the cell
 // 	//
 // }
-
-const get = (get) => document.querySelector(get)
-//https://www.shadertoy.com/view/tlGGz1
-//algae from scratch ??? https://algaeliving.com/2020/03/24/interesting-facts-about-algae/ 
-
-//dna assembly
-//alignment
-//develop artifical construct
-
-//transcriptome
-
-
-
-
-
 import * as THREE from 'three';
-
 import { TrackballControls } from 'three/addons/controls/TrackballControls.js';
 import { PDBLoader } from 'three/addons/loaders/PDBLoader.js';
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { GUI } from 'three/addons/libs/lil-gui.module.min.js';
-
 let camera, scene, renderer, labelRenderer;
 let controls;
-
 let root;
-
 const loader = new PDBLoader();
 const offset = new THREE.Vector3();
-
 init();
 animate();
-
 function init() {
-
 	scene = new THREE.Scene();
 	scene.background = new THREE.Color( 0x050505 );
 
@@ -337,11 +293,8 @@ function init() {
 	root = new THREE.Group();
 	scene.add( root );
 
-	//
-
 	renderer = new THREE.WebGLRenderer( { antialias: true, canvas: document.querySelector('canvas')} );
 	renderer.setPixelRatio( window.devicePixelRatio );
-	//renderer.setSize( window.innerWidth, window.innerHeight );
 	document.querySelector( 'body' ).appendChild( renderer.domElement );
 
 	labelRenderer = new CSS2DRenderer();
@@ -356,12 +309,9 @@ function init() {
 	window.addEventListener( 'resize', onWindowResize );
 }
 
-//
 
 function loadMolecule(  ) {
-
 	const url = '/1w5c.pdb';
-
 	while ( root.children.length > 0 ) {
 
 		const object = root.children[ 0 ];
