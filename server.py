@@ -315,20 +315,29 @@ def runSimulations(first, second):
 def alphaFold():
     return 123
 
-def applyGeneEdit(first_protein, edit):
-    return first_protein.replace(first_protein, edit)
+def applyEditToGenome(entireGenome, updatedGene):
+    return 
 
-def edit_Gene_Get_New_Protein_And_Diff_TheResults(organism, gene, edit):
-    entireGenome = readFasta(organism)
+def applyEditToGene(gene, before, edit):
+    idx = -1
+    for seq in gene:
+        idx+= 1
+        if before in seq:
+            break
+    return idx #gene.replace(before, edit)
+
+def edit_Gene_Get_New_Protein_And_Diff_TheResults(organism, gene, before, edit):
+    #dont need the proteins -> just use the genes ??
+    entireGenome = readFasta(organism) #200mb -> just a generator
     geneToEdit = readFasta(gene)
     protein_name = 'CpSRP54.fna'
-    first_protein = readFasta(protein_name)
+    first_protein = readFasta(protein_name) #read PDB or run AF
     #sql.query('select prot from protein where gene_name = (?)', gene)
     
-    updatedGene = applyGeneEdit(geneToEdit, edit)
-    updatedGenome = entireGenome.replace(geneToEdit, updatedGene) # display this
+    updatedGene = applyEditToGene(geneToEdit, before, edit)
+    updatedGenome = applyEditToGenome(entireGenome, geneToEdit, updatedGene) # display this
 
-    updatedProtein = alphaFold(updatedGene)
+    updatedProtein = runAF(updatedGene)
     effects = runSimulations(first_protein, updatedProtein)
 
     return jsonify([updatedProtein, updatedGenome, effects])
