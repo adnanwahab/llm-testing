@@ -34,17 +34,89 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-@app.route('/gene-editing')
-def lyrics():
-    data = {}
-    found_pdbs = pypdb.Query("algae").search()
+# @app.route('/gene-editing')
+# def lyrics():
+#     data = {}
+#     found_pdbs = pypdb.Query("algae").search()
 
-    data['genesToEdit'] = {
-        'name': 'go:123', 
-        'effects': 'this adds glowing to a tree',
-        'genesToEdit': found_pdbs
+#     data['genesToEdit'] = {
+#         'name': 'go:123', 
+#         'effects': 'this adds glowing to a tree',
+#         'genesToEdit': found_pdbs
+#         }
+#     return jsonify(data)
+
+from flask import Flask, Response
+import time
+import json
+
+
+
+from openmm.app import *
+from openmm import *
+from openmm.unit import *
+
+
+def helloWorld():
+    print('Loading...')
+    #create custom PDB from fasta edit 
+    pdb = PDBFile('./data_sets/AF-A0A2W7I3V2-F1-model_v4.pdb')
+    forcefield = ForceField('amber99sb.xml', 'tip3p.xml')
+    modeller = Modeller(pdb.topology, pdb.positions)
+    print('Adding hydrogens...')
+    modeller.addHydrogens(forcefield)
+    print('Adding solvent...')
+    modeller.addSolvent(forcefield, model='tip3p', padding=1*nanometer)
+    print('Minimizing...')
+    system = forcefield.createSystem(modeller.topology, nonbondedMethod=PME)
+    integrator = VerletIntegrator(0.001*picoseconds)
+    simulation = Simulation(modeller.topology, system, integrator)
+    simulation.context.setPositions(modeller.positions)
+    simulation.minimizeEnergy(maxIterations=1)
+    print('Saving...')
+    positions = simulation.context.getState(getPositions=True).getPositions()
+    PDBFile.writeFile(simulation.topology, positions, open('output.pdb', 'w'))
+    print('Done', simulation.topology)
+    return simulation.topology
+
+app = Flask(__name__)
+@app.route('/gene-editing')
+def gene_editing():
+    #workflow = req.params.workflow
+    def simulate_and_stream():
+        content_length = 1e6
+        for i in range(10):
+            # Simulate some gene-editing computation here
+            time.sleep(1)
+            helloWorld()
+            # Generate JSON payload (could be the current state of the simulation)
+            simulation_data = {
+                "iteration": i,
+                "status": "in_progress",
+                "data": [i, i + 1, i + 2]
+            }
+            
+            payload = json.dumps(simulation_data)
+            payload_length = len(payload)
+            content_length += payload_length
+            
+            yield payload
+
+        # Sending final state
+        simulation_data = {
+            "iteration": 10,
+            "status": "completed",
+            "data": []
         }
-    return jsonify(data)
+        yield json.dumps(simulation_data)
+        
+    # Set the headers, including 'Content-Length' and 'Content-Type'
+    headers = {
+        'Content-Type': 'application/octet-stream',
+        'Transfer-Encoding': 'chunked',
+    }
+
+    return Response(simulate_and_stream(), headers=headers)
 
 CORS(app)
 if __name__ == "__main__":
