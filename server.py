@@ -12,6 +12,42 @@ import pypdb
 
 knownInteractions = {}
 
+#given a protein on af
+#get gene
+#gene entire genome
+#perform sgrna substitution
+#simulate effects of gene on organism -> custom for each gene as of now 
+#simualate behavior of gene [done]
+
+
+#get pdb -> simulate behavior and interactions -> give readout of 
+#get pdb
+#get gene
+#replace gene in fasta using gene
+#get new protein ???
+#run alphafold on fasta to get new protein 
+#simulate new protein and previous protein and diff the behavior 
+#that gives you the results to tell user to see if it works
+
+
+
+
+
+#simulate as much shit as possible
+
+
+
+# http://plantcrispr.org/cgi-bin/crispr/index.cgi
+#find a fasta 
+#find selected gene - ideally list all genes that are possible to edit
+#find all possible ways to edit a genome using crispr
+
+#once gene is edited
+#get protein produced by gene
+
+
+
+# https://plants.ensembl.org/Zea_mays/Search/Results?species=Zea_mays;idx=;q=Zm00001eb404730;site=ensemblthis
 # i want to code and complete this demo today
 #computation chemsitry - database lookups and joins - 
 #ui + 
@@ -57,6 +93,23 @@ from openmm import *
 from openmm.unit import *
 
 
+
+
+
+
+
+#nnluz (luciferase), nnhisps (hispidin synthase), nnh3h (hispidin-3-hydroxylase), and nncph (caffeoyl pyruvate hydrolase)
+#https://www.pnas.org/doi/suppl/10.1073/pnas.1803615115
+#https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7610436/
+first_glowing_genes_attempt = [
+    'nnluz',
+    'nnhisps', 
+    'nnh3h',
+    'nncph'
+]
+#first 
+
+
 def helloWorld():
     print('Loading...')
     #create custom PDB from fasta edit 
@@ -82,7 +135,8 @@ def helloWorld():
 app = Flask(__name__)
 @app.route('/gene-editing')
 def gene_editing():
-    #workflow = req.params.workflow
+    workflow = req.params.seq
+
     def simulate_and_stream():
         content_length = 1e6
         for i in range(10):
