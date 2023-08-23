@@ -286,18 +286,31 @@ if pae_outputs:
   with open(pae_output_path, 'w') as f:
     f.write(pae_data)
 
-
 def difference(one, two):
     return [item for item in one if item in two]
 
 def readFasta(filename):
     return SeqIO.parse(open(filename),'fasta')
 
+def simulateMolecularDynamics():
+    system = forcefield.createSystem(pdb.topology, nonbondedMethod=CutoffNonPeriodic,
+    nonbondedCutoff=1*nanometer, constraints=None)
+    force = CustomExternalForce('100*max(0, r-2)^2; r=sqrt(x*x+y*y+z*z)')
+    system.addForce(force)
+    for i in range(system.getNumParticles()):
+        force.addParticle(i, [])
+    integrator = LangevinMiddleIntegrator(300*kelvin, 91/picosecond, 0.004*picoseconds)
+    import os
+    for file in os.listdir('structures'):
+        pdb = PDBFile(os.path.join('structures', file))
+        simulation.context.setPositions(pdb.positions)
+        state = simulation.context.getState(getEnergy=True)
+        print(file, state.getPotentialEnergy())
+
 def runSimulations(first, second):
     result1 = simulateMolecularDynamics(first)
     result2 = simulateMolecularDynamics(second)
     return difference(result1, result2)
-
 
 def alphaFold():
     return 123
@@ -306,24 +319,26 @@ def applyGeneEdit(first_protein, edit):
     return first_protein.replace(first_protein, edit)
 
 def edit_Gene_Get_New_Protein_And_Diff_TheResults(organism, gene, edit):
-    first = readFasta(organism)
+    entireGenome = readFasta(organism)
     geneToEdit = readFasta(gene)
-    protein_name = sql.query('select prot from protein where gene_name = (?)', gene)
+    protein_name = 'CpSRP54.fna'
     first_protein = readFasta(protein_name)
-    updatedGene = applyGeneEdit(first_protein, edit)
-    updatedGenome = first.replace(geneToEdit, updatedGene) # display this
+    #sql.query('select prot from protein where gene_name = (?)', gene)
+    
+    updatedGene = applyGeneEdit(geneToEdit, edit)
+    updatedGenome = entireGenome.replace(geneToEdit, updatedGene) # display this
+
     updatedProtein = alphaFold(updatedGene)
     effects = runSimulations(first_protein, updatedProtein)
+
     return jsonify([updatedProtein, updatedGenome, effects])
-
-
-
-
 
 #pypdb
 #flask_cors
 #https://www.tutorialspoint.com/biopython/biopython_overview_of_blast.htm
 #https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Nucleotides&PROGRAM=blastn&QUERY=NC_003076.8&DATABASE=nr&MEGABLAST=on&BLAST_PROGRAMS=megaBlast&LINK_LOC=nuccore&PAGE_TYPE=BlastSearch&QUERY_FROM=1060106&QUERY_TO=1063425    
+#https://www.ncbi.nlm.nih.gov/datasets/taxonomy/3702/
+#https://api.ncbi.nlm.nih.gov/datasets/v2alpha/genome/download?filename=ncbi_dataset.zip&ncbi_phid=939B3D945261CB95000055F0642CA36E.1.m_1.021
 def fasta_dna_to_protein_file(filename):
     seq_record = next(SeqIO.parse(open(filename),'fasta')) 
     print('seq_record')
@@ -646,17 +661,3 @@ class ForceReporter(object):
         for f in forces:
             self._out.write('%g %g %g\n' % (f[0], f[1], f[2]))
 
-def simulateMolecularDynamics():
-    system = forcefield.createSystem(pdb.topology, nonbondedMethod=CutoffNonPeriodic,
-    nonbondedCutoff=1*nanometer, constraints=None)
-    force = CustomExternalForce('100*max(0, r-2)^2; r=sqrt(x*x+y*y+z*z)')
-    system.addForce(force)
-    for i in range(system.getNumParticles()):
-        force.addParticle(i, [])
-    integrator = LangevinMiddleIntegrator(300*kelvin, 91/picosecond, 0.004*picoseconds)
-    import os
-    for file in os.listdir('structures'):
-        pdb = PDBFile(os.path.join('structures', file))
-        simulation.context.setPositions(pdb.positions)
-        state = simulation.context.getState(getEnergy=True)
-        print(file, state.getPotentialEnergy())
