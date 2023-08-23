@@ -326,6 +326,11 @@ def applyEditToGene(gene, before, edit):
             break
     return idx #gene.replace(before, edit)
 
+
+#how to propose a gene edit
+#use a prompt
+#use a menu
+#use a contentEditable textarea (nope)
 def edit_Gene_Get_New_Protein_And_Diff_TheResults(organism, gene, before, edit):
     #dont need the proteins -> just use the genes ??
     entireGenome = readFasta(organism) #200mb -> just a generator
