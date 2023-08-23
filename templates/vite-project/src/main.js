@@ -345,7 +345,7 @@ function loadMolecule(  ) {
 
 		const position = new THREE.Vector3();
 		const color = new THREE.Color();
-
+		positions.count /= 20
 		for ( let i = 0; i < positions.count; i ++ ) {
 
 			position.x = positions.getX( i );
