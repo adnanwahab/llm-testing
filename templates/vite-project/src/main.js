@@ -11,34 +11,53 @@ const get = (get) => document.querySelector(get)
 
 
 
-
-
-
-
-
-
-
+// 
+// https://alphafold.ebi.ac.uk/search/text/algae%20photosynthesis
+// https://www.uniprot.org/uniprotkb/A0A2W7I3V2/entry
+// https://www.ebi.ac.uk/ebisearch/search?query=PZW41561.1&requestFrom=ebi_index&db=allebi
+// https://www.rcsb.org/search?request=%7B%22query%22%3A%7B%22type%22%3A%22group%22%2C%22nodes%22%3A%5B%7B%22type%22%3A%22group%22%2C%22nodes%22%3A%5B%7B%22type%22%3A%22group%22%2C%22nodes%22%3A%5B%7B%22type%22%3A%22terminal%22%2C%22service%22%3A%22full_text%22%2C%22parameters%22%3A%7B%22value%22%3A%22LX95_01242%22%7D%7D%5D%2C%22logical_operator%22%3A%22and%22%7D%5D%2C%22logical_operator%22%3A%22and%22%2C%22label%22%3A%22full_text%22%7D%5D%2C%22logical_operator%22%3A%22and%22%7D%2C%22return_type%22%3A%22entry%22%2C%22request_options%22%3A%7B%22paginate%22%3A%7B%22start%22%3A0%2C%22rows%22%3A25%7D%2C%22results_content_type%22%3A%5B%22experimental%22%5D%2C%22sort%22%3A%5B%7B%22sort_by%22%3A%22score%22%2C%22direction%22%3A%22desc%22%7D%5D%2C%22scoring_strategy%22%3A%22combined%22%7D%2C%22request_info%22%3A%7B%22query_id%22%3A%22552b8ed481119224a51aeade1cf10ef8%22%7D%7D
+// https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9244459/
+// https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/algae
 
 fetch('getInitialOrganismsAndPossibleGeneticMutations')
 
 
+let content = `Photosynthesis is the biological process through which plants, algae, and some bacteria convert light energy into chemical energy in the form of glucose (a type of sugar) and oxygen. This process plays a crucial role in the Earth's ecosystems, as it is the primary way that energy from the sun is transformed into a usable form for living organisms.
+
+The general equation for photosynthesis can be represented as:
+
+6 CO2 + 6 H2O + light energy → C6H12O6 (glucose) + 6 O2
+
+Here's a breakdown of the process:
+
+Light Absorption: Photosynthesis begins when chlorophyll and other pigments in plant cells absorb light energy from the sun.
+
+Light-Dependent Reactions: These reactions occur in the thylakoid membranes of chloroplasts, the specialized organelles in plant cells responsible for photosynthesis. Light energy is used to split water molecules into oxygen and protons, releasing oxygen as a byproduct and generating ATP (adenosine triphosphate) and NADPH (nicotinamide adenine dinucleotide phosphate) as energy-rich molecules.
+
+Calvin Cycle (Light-Independent Reactions): Taking place in the stroma of chloroplasts, the Calvin cycle uses the ATP and NADPH generated in the light-dependent reactions to convert carbon dioxide into glucose. This process involves a series of enzyme-mediated reactions that lead to the formation of glucose molecules, which store the energy captured from the sun.
+
+The glucose produced during photosynthesis serves as an energy source for the plant's growth, development, and reproduction. It can also be stored as starch or used to produce other essential molecules for the plant's functioning. The oxygen released during photosynthesis is released into the atmosphere, where it supports the respiration of many organisms, including humans.
+
+Overall, photosynthesis is a fundamental process that sustains life on Earth by producing oxygen and providing the energy-rich molecules necessary for the survival of plants and the organisms that depend on them.`
 
 
+content = ['glowing means that photons are emitted from each leaf due to a molecule from jellyfish', content, 'increased yield comes from less methane and more shit like ethanol which can be used to drive cars fast']
 
+get('.gene-description').innerHTML = content
 let genes = {
     'algae': [{property: 'glowing', name: 'asdfasdf'},
 			  {property: 'increased photosynthesis', name: 'aslkdfjaslkdfj'},
-			  {}
+			  {property: 'increased biofuel yield', name: 'asdasdfs'}
 			
 			],
     'corn': [{property: 'purple', name: 'asdfasdf'}],
     'trees': [{property: 'purple', name: 'asdfasdf'}],
+
 }
 
 
 get('.dropdown').innerHTML = Object.keys(genes).map((x) => '<option>' + x + '</option>')
 get('.gene-dropdown').innerHTML = genes['algae'].map((x) => '<option>' + x.property + '</option>')
-
 get('.gene-dropdown').addEventListener('change', function () {
 
      fetch('/findCorrectPlaceToPutGeneInNucleus', {
@@ -98,6 +117,8 @@ async function getInformationAboutGeneEditing(seq){
   const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
 
   // Create the SVG container, a layer for the links and a layer for the nodes.
+	d3.select('svg').append('image')
+.attr('src', 'public/rna.png')
   const svg = d3.select("svg")
       .attr("width", width)
       .attr("height", dx)

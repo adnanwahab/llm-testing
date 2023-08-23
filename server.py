@@ -12,11 +12,13 @@ import pypdb
 
 knownInteractions = {}
 
-# i want to code
-
-
-
-
+# i want to code and complete this demo today
+#computation chemsitry - database lookups and joins - 
+#ui + 
+#invent something so cool that people actually want to tell their friends about
+#hey youj can buy purple popcorn and grow it in your yard - present for your family 
+#3 click crispr popcorn + gift set (wrapped in paper + comes with readouts of cool information about how crispr works ) - nope
+#super easy to use and automated workflows and simulated experiments for algae people - correct
 def getAllChemicalInteractions(fasta):
     chemicalInteractions = []
     for seq in fasta:
