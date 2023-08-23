@@ -8,54 +8,91 @@ from flask_cors import CORS
 import sqlite3
 
 import pypdb
+from Bio.Blast import NCBIWWW
 
+import urllib
+import urllib.parse
+import urllib.request
+from bs4 import BeautifulSoup
+
+#perfect programming
+#human has 50 trillion cells
+#human has 50 protein million molecules per cell
+#proteins have average of 1500 atoms 
+#20,000 proteins types in a human
+
+#corn is solved https://www.maizegdb.org/
+
+fname=  'F1maize.FINAL.fasta'
+def get_uniprot (query='',query_type='PDB_ID'):
+    #code found at <a href="https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/">https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/</a>
+    #query_type must be: "PDB_ID" or "ACC"
+    url = 'https://www.uniprot.org/uploadlists/' #This is the webser to retrieve the Uniprot data
+    params = {
+    'from':query_type,
+    'to':'ACC',
+    'format':'txt',
+    'query':query
+    }
+    data = urllib.parse.urlencode(params)
+    data = data.encode('ascii')
+    request = urllib.request.Request(url, data)
+    with urllib.request.urlopen(request) as response:
+        res = response.read()
+        page=BeautifulSoup(res).get_text()
+        page=page.splitlines()
+    return page
+    pdb_code = '4FXF'
+    query_output=get_uniprot(query=pdb_code,query_type='PDB_ID')
+    accession_number = query_output[1].strip().split(' ')[-1].strip(';')
+
+from Bio import SeqIO
+#pypdb
+#flask_cors
+#https://www.tutorialspoint.com/biopython/biopython_overview_of_blast.htm
+def fasta_dna_to_protein_file(filename):
+    seq_record = next(SeqIO.parse(open(filename),'fasta')) 
+    print('seq_record')
+
+    result_handle = NCBIWWW.qblast("blastn", "nt", seq_record.seq) 
+    print(result_handle) 
+
+    with open('results.xml', 'w') as save_file: 
+        blast_results = result_handle.read() 
+        save_file.write(blast_results)
+print('running fasta')
+
+fasta_dna_to_protein_file(fname)
+print('exiting')
+exit()
+print('exitin 2g')
 
 knownInteractions = {}
-
+#go to the lab
 #given a protein on af
 #get gene
 #gene entire genome
 #perform sgrna substitution
 #simulate effects of gene on organism -> custom for each gene as of now 
 #simualate behavior of gene [done]
-
-
-#get pdb -> simulate behavior and interactions -> give readout of 
-#get pdb
-#get gene
-#replace gene in fasta using gene
-#get new protein ???
-#run alphafold on fasta to get new protein 
-#simulate new protein and previous protein and diff the behavior 
-#that gives you the results to tell user to see if it works
-
-
-
-
-
-#simulate as much shit as possible
-
-
-
+# get pdb -> simulate behavior and interactions -> give readout of 
+# get pdb
+# get gene
+# replace gene in fasta using gene
+# get new protein ???
+# run alphafold on fasta to get new protein 
+# simulate new protein and previous protein and diff the behavior 
+# that gives you the results to tell user to see if it works
+# simulate as much shit as possible
 # http://plantcrispr.org/cgi-bin/crispr/index.cgi
-#find a fasta 
-#find selected gene - ideally list all genes that are possible to edit
-#find all possible ways to edit a genome using crispr
+# find a fasta 
+# find selected gene - ideally list all genes that are possible to edit
+# find all possible ways to edit a genome using crispr
+# once gene is edited
+# get protein produced by gene
 
-#once gene is edited
-#get protein produced by gene
-
-
-
-# https://plants.ensembl.org/Zea_mays/Search/Results?species=Zea_mays;idx=;q=Zm00001eb404730;site=ensemblthis
-# i want to code and complete this demo today
-#computation chemsitry - database lookups and joins - 
-#ui + 
-#invent something so cool that people actually want to tell their friends about
-#hey youj can buy purple popcorn and grow it in your yard - present for your family 
-#3 click crispr popcorn + gift set (wrapped in paper + comes with readouts of cool information about how crispr works ) - nope
 #super easy to use and automated workflows and simulated experiments for algae people - correct
-#expediency = best impressiveness
+#expediency = best 
 #compelte application today
 def getAllChemicalInteractions(fasta):
     chemicalInteractions = []
@@ -85,19 +122,9 @@ def get_db_connection():
 from flask import Flask, Response
 import time
 import json
-
-
-
 from openmm.app import *
 from openmm import *
 from openmm.unit import *
-
-
-
-
-
-
-
 #nnluz (luciferase), nnhisps (hispidin synthase), nnh3h (hispidin-3-hydroxylase), and nncph (caffeoyl pyruvate hydrolase)
 #https://www.pnas.org/doi/suppl/10.1073/pnas.1803615115
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7610436/
@@ -107,9 +134,7 @@ first_glowing_genes_attempt = [
     'nnh3h',
     'nncph'
 ]
-#first 
-
-
+#first
 def helloWorld():
     print('Loading...')
     #create custom PDB from fasta edit 
