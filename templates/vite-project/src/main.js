@@ -5,13 +5,6 @@ import { setupCounter } from './counter.ts'
 import * as d3 from "d3"
 
 const get = (get) => document.querySelector(get)
-
-
-
-
-
-
-// 
 // https://alphafold.ebi.ac.uk/search/text/algae%20photosynthesis
 // https://www.uniprot.org/uniprotkb/A0A2W7I3V2/entry
 // https://www.ebi.ac.uk/ebisearch/search?query=PZW41561.1&requestFrom=ebi_index&db=allebi
@@ -20,8 +13,6 @@ const get = (get) => document.querySelector(get)
 // https://www.ncbi.nlm.nih.gov/genome/browse#!/overview/algae
 
 fetch('getInitialOrganismsAndPossibleGeneticMutations')
-
-
 let content = `Photosynthesis is the biological process through which plants, algae, and some bacteria convert light energy into chemical energy in the form of glucose (a type of sugar) and oxygen. This process plays a crucial role in the Earth's ecosystems, as it is the primary way that energy from the sun is transformed into a usable form for living organisms.
 
 The general equation for photosynthesis can be represented as:
@@ -52,25 +43,19 @@ let genes = {
 			],
     'corn': [{property: 'purple', name: 'asdfasdf'}],
     'trees': [{property: 'purple', name: 'asdfasdf'}],
-
 }
-
 
 get('.dropdown').innerHTML = Object.keys(genes).map((x) => '<option>' + x + '</option>')
 get('.gene-dropdown').innerHTML = genes['algae'].map((x) => '<option>' + x.property + '</option>')
 get('.gene-dropdown').addEventListener('change', function () {
-
      fetch('/findCorrectPlaceToPutGeneInNucleus', {
          ...genes['algae']['glowing']
      }).then(reRenderDNA)
-
-
 	 fetch('/designSGRNA').then(renderDesignSGRNA)
 })
 
 function reRenderDNA() {}
 function renderDesignSGRNA() {}
-
 // https://usegalaxy.eu/?tool_id=toolshed.g2.bx.psu.edu%2Frepos%2Fdevteam%2Fdgidb_annotator%2Fdgidb_annotator%2F0.1&version=latest
 //https://colab.research.google.com/github/deepmind/alphafold/blob/main/notebooks/AlphaFold.ipynb#scrollTo=XUo6foMQxwS2
 let kmers = d3.json('/kmers.json', {
@@ -83,10 +68,8 @@ let kmers = d3.json('/kmers.json', {
 	d3.select('ul.kmers').selectAll('li')
 	.data(kmers).join('li').text(data => data)
 	.classed('text-ellipsis overflow-hidden ...', true)
-
 	.on('click', function (data) {
 		renderTree()
-
 		editGeneSeeHowItAffectsTheOrganism()
 	})
 }) 
@@ -95,7 +78,7 @@ async function getPossibleEdits() {
 	let json = await req.json()
 	return json
 }
-
+//jets that run on algae fuel -> in case electric jets are impractical
 async function getInformationAboutGeneEditing(seq){
 	let data = await getPossibleEdits()
   // Specify the charts’ dimensions. The height is variable, depending on the layout.
@@ -117,8 +100,11 @@ async function getInformationAboutGeneEditing(seq){
   const diagonal = d3.linkHorizontal().x(d => d.y).y(d => d.x);
 
   // Create the SVG container, a layer for the links and a layer for the nodes.
-	d3.select('svg').append('image')
-.attr('src', 'public/rna.png')
+	d3.select('svg')
+	.attr('height', 350)
+	.append('image')
+.attr("xlink:href", 'public/rna.png')
+return;
   const svg = d3.select("svg")
       .attr("width", width)
       .attr("height", dx)
@@ -316,7 +302,6 @@ function init() {
 
 	renderer = new THREE.WebGLRenderer( { antialias: true, canvas: document.querySelector('canvas')} );
 	renderer.setPixelRatio( window.devicePixelRatio );
-	document.querySelector( 'body' ).appendChild( renderer.domElement );
 
 	labelRenderer = new CSS2DRenderer();
 	labelRenderer.setSize( window.innerWidth, window.innerHeight );

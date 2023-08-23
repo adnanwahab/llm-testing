@@ -19,6 +19,8 @@ knownInteractions = {}
 #hey youj can buy purple popcorn and grow it in your yard - present for your family 
 #3 click crispr popcorn + gift set (wrapped in paper + comes with readouts of cool information about how crispr works ) - nope
 #super easy to use and automated workflows and simulated experiments for algae people - correct
+#expediency = best impressiveness
+#compelte application today
 def getAllChemicalInteractions(fasta):
     chemicalInteractions = []
     for seq in fasta:
@@ -93,8 +95,6 @@ def runGenomeSequencingAlgorithm(data):
             seq[i] = seq[j]
     return data
 #edit genome -> see how the updated 3d structure affects how it changes how it runs within the cell
-
-
 #what other types of agents are there in a cell
 #mitochrondria, ribosomes, sgRNA 
 #hardcode nucleus
