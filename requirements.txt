@@ -10,3 +10,4 @@ Cython==3.0.0
 librosa==0.5.1
 madmom==0.15.1
 huggingface-hub==0.16.4
+lightdock==0.9.4.

@@ -2,8 +2,17 @@ DcoerkFROM scratch
 
 
 sudo apt-get install -y libboost-python-dev
-
+sudo apt-get install libglpk-dev glpk-utils glpk-doc  libgmp10 libgmpxx4ldbl
 # https://docs.docker.com/engine/reference/builder/
+cmake -DGMX_BUILD_OWN_FFTW=ON
+cd gromacs-2023.2
+mkdir build
+cd build
+cmake .. -DGMX_BUILD_OWN_FFTW=ON -DREGRESSIONTEST_DOWNLOAD=ON
+make
+make check
+sudo make install
+source /usr/local/gromacs/bin/GMXRC
 # The MAINTAINER instruction allows you to set the Author field of the
 # generated images.
 #
