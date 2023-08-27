@@ -75,3 +75,119 @@ text =      text.replace('>XM_005758335.1 16PFK1 [organism=Emiliania huxleyi CCM
      return intervals;
  }
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 
+
+
+
+
+
+
+
+
+
+     <!DOCTYPE html>
+     <html>
+     <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Blue BioTech Support Tool - make algae bio-fuel cheaper </title>
+     <script src="https://cdn.tailwindcss.com"></script> 
+
+     <style>
+
+     li {
+
+     color:#0099ff;
+     padding: 10px;
+     cursor:pointer;
+     }
+     li:hover {
+     text-decoration: underline;
+     }
+
+     ul {
+     list-style-type: decimal;
+
+     }
+
+
+     /* 
+     https://www.ncbi.nlm.nih.gov/Structure/icn3d/full.html
+
+     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9780023/
+     https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7698662/
+     https://bioinformatics.psb.ugent.be/plaza/versions/pico-plaza/
+     https://academic.oup.com/database/article/doi/10.1093/database/bay072/5055577
+     https://github.com/charlesrocabert/MetEvolSim
+     https://en.wikipedia.org/wiki/List_of_sequenced_algae_genomes
+     https://observablehq.com/@pallada-92/3d-engine-in-dna-code
+     */
+     canvas {
+     border: 1px dotted blue;
+     }
+     head, body {
+     margin: 0;
+     border: 0;
+     padding: 0;
+     max-height: 100vh
+     }
+
+
+     ul {
+     width: 400px;
+     overflow: scroll;
+     height: 250px;
+     }
+     
+     </style>
+     </head>
+     <body class="bg-blue-100">
+     <div class="h-10 w-full bg-neutral-200 dark:bg-neutral-600 absolute top-0">
+     <div class="h-10 bg-primary loading bg-purple-500" style="width: 0%"></div>
+     </div>
+     <script src="https://unpkg.com/seqviz"></script>
+
+     <pre class="absolute top-32 border border-purple-500 gene-description h-48 overflow-scroll w-96 left-96"></pre>
+     <div id="viewer"></div>
+     <h1 class="absolute top-0">Blue BioTech Support Application</h1>
+     <h3 class="absolute top-8">Make biofuel cheaper by simulation experiment workflows for edited genes - customized experiment modeling using parameters</h3>
+
+
+     <select  class="dropdown absolute top-48 m-2">
+     <option>tree</option>
+     <option selected="true">algae</option>
+     </select>
+
+     <select  class="gene-dropdown absolute top-48 left-24 m-2">
+     <option>tree</option>
+     <option selected="true">algae</option>
+     </select>
+
+     <div class=" m-6 grid grid-cols-3 gap-4 w-full">
+     <ul class="kmers "></ul>
+     <svg></svg>
+     <canvas></canvas>
+     </div> 
+     <button class="">Add To Cart + Send To Lab</button>
+     <div class="possible-edits-to-gene mt-6 absolute bottom-0"></div>
+     <script type="module" src="/src/main.js"></script>
+     </body>
+     </html> 
+
+!-->
