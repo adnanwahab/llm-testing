@@ -56,6 +56,24 @@ from bs4 import BeautifulSoup
 #get protein of expressed gene
 #finale: so that this gene can be edited and the expressed protein changes
 fname=  'F1maize.FINAL.fasta'
+
+@app('getActiveGenes')
+def organismGetGenes():
+    return listOfGenesThatAreActive
+
+
+@app('getListoFgenesThatCanBeSpliced')
+def getListOfGenesThatCanBeSpliced():
+    return 123
+
+@app('spliceGeneByPrototypingSGRNA')
+def spliceGenesByPrototypingSGRNA():
+    return [{nodes: [], edge: []}]
+
+@app('testProtein/')
+def proteinSimulation():
+    return 12312312
+
 def get_uniprot (query='',query_type='PDB_ID'):
     #code found at <a href="https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/">https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/</a>
     #query_type must be: "PDB_ID" or "ACC"
