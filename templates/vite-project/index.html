@@ -129,23 +129,42 @@
 
 
 <script>
- console.log(123)
 
+  let get = (q) => document.querySelector(q)
 
+  function getSGRNADesign () {
+      //make this editable and show 6-7 different designs along with pros and cons for each one
+      return 'ba;lsdgalskjfals;kfjasldkfja'
+  }
+  
+  async function possibleGeneEdits() {
+      //mark up to 20 possibleGeneEdits as active for Crispr
+      let data= await fetch('/possibleGeneEdits')
+      return data
+  }
+  
+  async function currentlyActiveGenes() {
+      let data = await fetch('/currentlyActiveGenes')
+      return data
+  }
+  
+  function proposedGeneEdits() {
+      return []
+  }
+
+  function renderPage () {  
+      get('.possible-gene-edits').innerHTML = (await possibleGeneEdits()).map(d => `<li>${d}</li>`)
+      get('.currently-active-genes').innerHTML = (await currentlyActiveGenes()).map(d => `<li>${d}</li>`)
+  }
+
+ //get('.proposed-gene-edits').innerHTML = proposedGeneEdits().map(d => `<li>${d}</li>`)
  fetch('./rna.fna').then(req => req.text())
         .then(text => processText(text))
-
-
  function processText(text) {
-text =text.replace(/\n/g, '')
-text =      text.replace('>XM_005758335.1 16PFK1 [organism=Emiliania huxleyi CCMP1516] [GeneID=17252077]', '')
+     text = text.replace(/\n/g, '')
+     text = text.replace('>XM_005758335.1 16PFK1 [organism=Emiliania huxleyi CCMP1516] [GeneID=17252077]', '')
          .split('>XM_005772135.1 26PFK2 [organism=Emiliania huxleyi CCMP1516] [GeneID=17265309]')
-
-     console.log(text)
-
-     return
-     text.forEach(renderCanvas)
-     
+     return text.forEach(renderCanvas)
  }
 
 
