@@ -137,27 +137,35 @@
       return 'ba;lsdgalskjfals;kfjasldkfja'
   }
   
-  async function possibleGeneEdits() {
+  async function getPossibleGeneEdits() {
       //mark up to 20 possibleGeneEdits as active for Crispr
       let data= await fetch('/possibleGeneEdits')
-      return data
+      let json = await data.json()
+      return json
   }
   
-  async function currentlyActiveGenes() {
+  async function getCurrentlyActiveGenes() {
       let data = await fetch('/currentlyActiveGenes')
-      return data
+      let json = await data.json()
+      return json
   }
   
   function proposedGeneEdits() {
       return []
   }
 
-  function renderPage () {  
-      get('.possible-gene-edits').innerHTML = (await possibleGeneEdits()).map(d => `<li>${d}</li>`)
-      get('.currently-active-genes').innerHTML = (await currentlyActiveGenes()).map(d => `<li>${d}</li>`)
+  async function renderPage () {
+      let possibleGeneEdits = await getPossibleGeneEdits()
+      let currentlyActiveGenes = await getCurrentlyActiveGenes()
+      console.log('edits', possibleGeneEdits, currentlyActiveGenes)
+      
+      get('.possible-gene-edits').innerHTML = (possibleGeneEdits).map(d => `<li>${d}</li>`)
+      get('.currently-active-genes').innerHTML = (currentlyActiveGenes).map(d => `<li>${d}</li>`)
   }
+  renderPage()
 
  //get('.proposed-gene-edits').innerHTML = proposedGeneEdits().map(d => `<li>${d}</li>`)
+
  fetch('./rna.fna').then(req => req.text())
         .then(text => processText(text))
  function processText(text) {
@@ -186,11 +194,11 @@
 
      let kmers = parseText(text)
 
-     console.log(kmers)
+//     console.log(kmers)
      kmers.forEach(function (coords, i) {
          //ctx.fillStyle = 'blue'
          let [start, end ] = coords;
-         console.log(start, end)
+         //console.log(start, end)
          ctx.fillRect(end, 0, 3, 20 )
      })
      //let n = kmers.next()

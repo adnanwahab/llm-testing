@@ -56,20 +56,67 @@ from bs4 import BeautifulSoup
 #get protein of expressed gene
 #finale: so that this gene can be edited and the expressed protein changes
 fname=  'F1maize.FINAL.fasta'
+from Bio import SeqIO
+from BCBio.GFF import GFFExaminer
+import re
+from collections import defaultdict
+open_ai_key = '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'
+
+import glob
+from Bio import SeqIO
+
+def listOfGenesThatAreActive():
+    intron = 'T'
+    exon = 'A'
+    gff = 'Astgub1_GeneCatalog_genes_20230516.gff'
+    f = '/home/awahab/llm-testing/data_sets/Astgub1/'
+    fasta = 'Astgub1_AssemblyScaffolds_Repeatmasked.fasta'
+    #records = list(SeqIO.parse(f+gff, "gff"))
+    in_file = f + gff
+    examiner = GFFExaminer()
+    in_handle = open(in_file)
+    print(examiner.parent_child_map(in_handle))
+    #in_handle.close()
+    lines = []
+    with open(f + gff) as file:
+        lines += file.read().split('\n')
+        tabsOut = [line.split('\t') for line in lines]
+    exons = [row for i, row in enumerate(tabsOut) if len(row) > 1 and row[2] == 'exon']
+    
+    geneIds = defaultdict(list)
+    exon_start_ends = {}
+
+    for i in exons: 
+        start = int(i[3])
+        end = int(i[4])
+        geneId = i[8]
+        geneId = re.search(r'name "([^"]+)"', geneId)[1]
+        geneIds[geneId].append([start, end])
+        exon_start_ends[start] = end
+    return geneIds
+
+def findGenesFromDisk(f):
+    #f = all_fna[0]
+    descp = next(SeqIO.parse(f, 'fasta')).description
+    return descp
+    #return re.search(r'name "([^"]+)"', descp)[1]
+
+def listOF300Genes():
+    fna = all_fna = glob.glob('./archive/*/ncbi_dataset/data/rna.fna')
+    return [findGenesFromDisk(f) for gene in all_fna]
 
 @app('currentlyActiveGenes')
 def organismGetGenes():
-    return listOfGenesThatAreActive
-
+    return jsonify(listOfGenesThatAreActive())
 
 @app('possibleGeneEdits')
 def getListOfGenesThatCanBeSpliced():
-    
-    return listOf300Things
+    return jsonify(listOf300Genes())
 
 @app('spliceGeneByPrototypingSGRNA')
 def spliceGenesByPrototypingSGRNA():
     return 123
+
 def get_uniprot (query='',query_type='PDB_ID'):
     #code found at <a href="https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/">https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/</a>
     #query_type must be: "PDB_ID" or "ACC"
