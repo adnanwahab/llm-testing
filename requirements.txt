@@ -5,9 +5,4 @@ openai==0.27.4
 python-dotenv==1.0.0
 sentence-transformers==2.2.2
 transformers==4.31
-audioowl==0.0.14
-Cython==3.0.0
-librosa==0.5.1
-madmom==0.15.1
-huggingface-hub==0.16.4
 lightdock==0.9.4.
