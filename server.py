@@ -1,23 +1,5 @@
 #./build_sgrna_library.py --input_genbank_genome_name testdata/U00096.3_full_sequence.gb
 #https://github.com/traeki/sgrna_design
-
-from __future__ import unicode_literals
-
-import os
-
-from flask import Flask, render_template, jsonify, redirect, url_for, request, send_from_directory
-app = Flask(__name__)
-from flask_cors import CORS
-import sqlite3
-
-import pypdb
-from Bio.Blast import NCBIWWW
-
-import urllib
-import urllib.parse
-import urllib.request
-from bs4 import BeautifulSoup
-
 #Do Trait Modeling - do this one
 #Do crispr design + verification 
 
@@ -58,14 +40,93 @@ from bs4 import BeautifulSoup
 #get gene file
 #get protein of expressed gene
 #finale: so that this gene can be edited and the expressed protein changes
+
+#protein interaction network
+#metabolome network
+#cell interaction network
+#transcriptome =
+# to finish this app - first step = talk to 10-100 domain experts - 5 per day - get lists of requiremnets
+#eta till v1 = 1 week
+
+
+#desired traits to add / emphasize = diseease resistnace, immunity to cold/heat, and increased yield of biofuels and reduced methane
+#current genes, possible genes, and proposed gene edits
+#that becomes a target genome which you use to generate SGRNA
+#selected possible genes = 20 => generates l;ist of proposed gene edits => SGRNA 
+#sent to lab, add to cart, send to home, and generate lab instruction procedure
+
+
+#difference between previous proteins, cell-behavior and tissue behavior, organism behavior -> effect on ecosystem/enviornment
+#
+
+
+
+#given a number of proposed gene edits
+#addition = substitue for unused genes
+#subtraction = substitute used genes for fillers
+#edit = subsittue used gene for another used gene
+
+
+from __future__ import unicode_literals
+
+import os
+
+from flask import Flask, render_template, jsonify, redirect, url_for, request, send_from_directory
+app = Flask(__name__)
+from flask_cors import CORS
+import sqlite3
+
+import pypdb
+from Bio.Blast import NCBIWWW
+
+import urllib
+import urllib.parse
+import urllib.request
+from bs4 import BeautifulSoup
+
 fname = 'F1maize.FINAL.fasta'
 from Bio import SeqIO
 from BCBio.GFF import GFFExaminer
 import re
 from collections import defaultdict
-open_ai_key = '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'
+open_ai_key = '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'
 import glob
 from Bio import SeqIO
+import requests
+
+#glowing is 6 genes
+#add the glowing phenotype to algae
+#all glowing to popcorn
+from PyPDF2 import PdfReader
+import openai
+
+def generate_text(prompt):
+    openai.api_key = open_ai_key
+
+    # list models
+    models = openai.Model.list()
+
+    # print the first model's id
+    print(models.data[0].id)
+
+    # create a chat completion
+    chat_completion = openai.ChatCompletion.create(model="gpt-3.5-turbo",
+                                                   messages=[{"role": "user", "content": prompt}])
+
+    #use fineTuning to read all papers in computational biolgoy + algae + create datasets like 
+    # print the chat completion
+    print(chat_completion.choices[0].message.content)
+
+def processPrompt():
+    paper = './data_sets/s41588-022-01052-9.pdf'
+    reader = PdfReader(paper)
+    number_of_pages = len(reader.pages)
+    page = reader.pages[0]
+    text = page.extract_text()
+    #print(text)
+    prompt = f"given all this text {text}, list all genes that are mentioned"
+    generated_text = generate_text(prompt)
+    print(generated_text)
 
 def listOfGenesThatAreActive():
     intron = 'T'
@@ -250,36 +311,6 @@ def extractPhenoTypeAndGeneticDependenciesFromPaper():
         results = gpt.request('get me all the phenotype/trait->genes in the format phenotype:[genes], ')
         phenotypes.append(results)
     return phenotypes
-#protein interaction network
-#metabolome network
-#cell interaction network
-#transcriptome =
-# to finish this app - first step = talk to 10-100 domain experts - 5 per day - get lists of requiremnets
-#eta till v1 = 1 week
-
-
-#desired traits to add / emphasize = diseease resistnace, immunity to cold/heat, and increased yield of biofuels and reduced methane
-#current genes, possible genes, and proposed gene edits
-#that becomes a target genome which you use to generate SGRNA
-#selected possible genes = 20 => generates l;ist of proposed gene edits => SGRNA 
-#sent to lab, add to cart, send to home, and generate lab instruction procedure
-
-
-#difference between previous proteins, cell-behavior and tissue behavior, organism behavior -> effect on ecosystem/enviornment
-#
-
-
-
-
-
-
-
-
-
-#given a number of proposed gene edits
-#addition = substitue for unused genes
-#subtraction = substitute used genes for fillers
-#edit = subsittue used gene for another used gene
 def proposeSgrnaFromGeneEdits(edits):
     #list of edits
     edits = [
