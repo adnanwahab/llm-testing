@@ -97,17 +97,54 @@ def listOf300Genes():
     all_fna = glob.glob('./archive/*/ncbi_dataset/data/rna.fna')
     return [findGenesFromDisk(f) for f in all_fna]
 
-@app.route('/'):
+@app.route('/simulateStepsOfCrispr'):
 def simulateStepsOfCrispr():
     #simulate what happens when crispr molecule interacts with DNA molecule
     #how does it cut the dna in the chromatin
     #how many cells does it affect
     s = SeqIO.parse('./maize.fasta')
     seq = next(s).seq
+    
+    #run basic local alignment search tool
+    #get list of gene coordinates
+    #return list of gene coordinates to browser -> assign each coordiante to a gene to splice
+
+    #98% of genome is not expressed -> use this to splice genes
+    start_codon = 'ATG'
+    end_codons = ['TTG', 'CTC', 'GGA']
     for seq in s:
         applyEditedRNAToDNA(seq)
+        s = seq.seq
+        openReferenceFrames = []
+        for idx, char in enumerate(s):
+            window = s[idx:idx+3]
+            if window == start_codon:
+                for idx2, char2 in enumerate(s[idx:]):
+                    window2 = s[idx2:idx+3]
+                    if window2 in end_codons:
+                        start = idx
+                        end = idx2
+                        openReferenceFrames.append((start, end ))
+    print(openReferenceFrames)
     SeqIO.write(f'maize{CRISPR_COPY}.fasta')
-    return 123
+
+    #approximately 8 introns and exons
+    #len = end - start
+    #exonLength = math.floor(len / 16)
+
+    intronsAndExons = [seq[exonLength*i:exonLength*i+1] for i in range(exonLength - 1)]
+    introns = [intron for i, intron in enumerate(intronsAndExons) if i % 2 == 0]
+    exons = [exon for i, exon in enumerate(intronsAndExons) if i % 2 == 1]
+    introns = intronsAndExons[1::2]
+    exons = intronsAndExons[0::2]
+    
+    
+
+    #splice
+    #new genes - replace with previous ones => simulate effects - substitue
+    #splice new genes by replacing unused data with new gene - adddition
+    #can crispr delete genes ???? 
+    return openReferenceFrames
 
 @app.route('/currentlyActiveGenes')
 def organismGetGenes():
