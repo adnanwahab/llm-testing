@@ -139,13 +139,13 @@
   
   async function getPossibleGeneEdits() {
       //mark up to 20 possibleGeneEdits as active for Crispr
-      let data= await fetch('/possibleGeneEdits')
+      let data= await fetch('http://localhost:5000/possibleGeneEdits')
       let json = await data.json()
       return json
   }
   
   async function getCurrentlyActiveGenes() {
-      let data = await fetch('/currentlyActiveGenes')
+      let data = await fetch('http://localhost:5000/currentlyActiveGenes')
       let json = await data.json()
       return json
   }
