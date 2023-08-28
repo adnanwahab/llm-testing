@@ -3,7 +3,7 @@
      <head>
      <meta charset="UTF-8">
      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Blue BioTech Support Tool - make algae bio-fuel cheaper </title>
+     <title>Blue BioTech Support App - make algae bio-fuel cheaper </title>
      <script src="https://cdn.tailwindcss.com"></script> 
 
      <style>
@@ -77,25 +77,54 @@
      </select>
 
      <div class=" m-6 grid grid-cols-4 gap-4 w-full">
+       <div>
+	 <label>Current Genome</label>
      <ul class="kmers "></ul>
-     <svg></svg>
+       </div>
 
-     <label class="inline">Currently Active Genes</label>
-     <ul class="currently-active-genes"></ul>
-     
-     <label class="inline">Proposed Gene Edits </label>
-     <ul class="available-gene-edits"></ul>
-
-     <label class="inline">All Possible Gene Edits</label>
-     <ul class="possible-gene-edits"></ul>
-     
-     <label class="inline">Protein Visualization</label>
-     <canvas></canvas>
-     
+     <div>
+       <label class="inline">Currently Active Genes</label>
+       <ul class="currently-active-genes"></ul>
      </div>
+
+     <!-- <div> -->
+     <!--   <label class="inline">Proposed Gene Edits </label> -->
+     <!--   <ul class="available-gene-edits"></ul> -->
+     <!-- </div> -->
+
+     <div>
+       <label class="inline">All Possible Gene Edits</label>
+       <ul class="possible-gene-edits"></ul>
+     </div>
+
+     <div>
+       <label class="inline">Protein Visualization</label>
+       <canvas></canvas>
+     </div>
+
+     <div>
+       <label class="inline">Trait Selection</label>
+       <ul class="traits"></ul>
+     </div>
+
+     <div>
+       <label class="inline">Gene Ontology Newtwork</label>
+       <svg>
+	 	 <line x1='50' x2='100' y1='50' y2='100' stroke-width="5" stroke="green"></line>
+	 <circle cx='50' cy='50' r='5' fill='blue'></circle>
+	 <circle cx='100' cy='100' r='5' fill='blue'></circle>
+
+       </svg>
+     </div>
+
+     <div>
+       <label class="inline">Transcriptome / Genome / Metabolomics / Proteinomics</label>
+       <svg>
+         <circle cx='50' cy='50' r='5' fill='blue'></circle>
+       </svg>
+     </div>
+     <button class="absolute top-28 right-0 ">Add To Cart + Send To Lab</button>
      
-     <button class="absolute bottom-0 ">Add To Cart + Send To Lab</button>
-     <div class="possible-edits-to-gene mt-6 absolute bottom-0"></div>
      <script type="module" src="/src/main.js"></script>
      </body>
      </html> 
@@ -123,6 +152,12 @@
       let json = await data.json()
       return json
   }
+
+    async function getCurrentlyActiveGenes() {
+      let data = await fetch('http://localhost:5000/getPhenotypeNetwork')
+      let json = await data.json()
+      return json
+  }
   
   function proposedGeneEdits() {
       return []
@@ -131,20 +166,32 @@
   async function renderPage () {
       let possibleGeneEdits = await getPossibleGeneEdits()
       let currentlyActiveGenes = Object.entries(await getCurrentlyActiveGenes())
-      console.log('edits', possibleGeneEdits, currentlyActiveGenes)
+      let traits = (await getCurrentlyActiveGenes())
       
       get('.possible-gene-edits').innerHTML = (possibleGeneEdits).map(d => `<li>${d}</li>`)
       get('.currently-active-genes').innerHTML = (currentlyActiveGenes).map(d => `<li>${d}</li>`)
+      //get('.traits').innerHTML = (traits).map(d => `<li>${d}</li>`)
+      //get('.traits').innerHTML = Object.keys(traits).map(d => `<li>${d}</li>`)
 
+      renderListView('.traits', Object.keys(traits))
       get('.currently-active-genes').addEventListener('click', function (e) {
 	  let index = Array.from(get('.currently-active-genes').children).indexOf(e.target)
-	  
-	  console.log(index)
       })
+
+      get('.traits').addEventListener('click', function (e) {
+	  let index = e.target.textContent
+	      //Array.from(get('.traits').children).indexOf(e.target)
+	  console.log(traits[index])
+      })
+
+  }
+
+  function renderListView(selector, data) {
+      get(selector).innerHTML = (data).map(d => `<li>${d}</li>`).join('\n')
   }
   renderPage()
 
- //get('.proposed-gene-edits').innerHTML = proposedGeneEdits().map(d => `<li>${d}</li>`)
+ //get('.proposed-gene-edits').innerHTML = proposdGeneEdits().map(d => `<li>${d}</li>`)
 
  fetch('./rna.fna').then(req => req.text())
         .then(text => processText(text))

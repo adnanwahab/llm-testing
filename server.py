@@ -1,3 +1,6 @@
+#./build_sgrna_library.py --input_genbank_genome_name testdata/U00096.3_full_sequence.gb
+#https://github.com/traeki/sgrna_design
+
 from __future__ import unicode_literals
 
 import os
@@ -14,6 +17,10 @@ import urllib
 import urllib.parse
 import urllib.request
 from bs4 import BeautifulSoup
+
+#Do Trait Modeling - do this one
+#Do crispr design + verification 
+
 #https://www.ncbi.nlm.nih.gov/genbank/fastaformat/
 #perfect programming - 25 - august 
 # "send me a tree that has purple branches and so on"
@@ -97,12 +104,28 @@ def listOf300Genes():
     all_fna = glob.glob('./archive/*/ncbi_dataset/data/rna.fna')
     return [findGenesFromDisk(f) for f in all_fna]
 
-@app.route('/simulateStepsOfCrispr'):
+@app.route('/getPhenotypeNetwork')
+def phenotypeNetwork():
+    #determine which phenotypes belong to which species
+    phenotypes = {
+        #determine which traits complement each other
+        #rules = if more than 20 genes activated - no can do
+        #if over lapping genes, place genes twice
+	  'Increased PhotoSynthesis': ['GFR39584.1', 'GFR39584.2', 'GFR39584.3'],
+	  'Immunity to Frost': ['GFR32184.1', 'GFR341584.2', 'GFR49584.3'],
+	  'Immunity to Disease': ['GFR32131.1', 'GFR341521.2', 'GFR49584.3'],
+	  'Increased BioFuel Yield': ['GFR32134.1', 'GFR341521.2', 'GFR49521.3'],
+    }
+    print('phenotypeNetwork')
+    return jsonify(phenotypes)
+
+#piano player who wants to be mute
+@app.route('/simulateStepsOfCrispr')
 def simulateStepsOfCrispr():
     #simulate what happens when crispr molecule interacts with DNA molecule
     #how does it cut the dna in the chromatin
     #how many cells does it affect
-    s = SeqIO.parse('./maize.fasta')
+    s = SeqIO.parse('./maize.fasta', 'fasta')
     seq = next(s).seq
     
     #run basic local alignment search tool
@@ -115,6 +138,7 @@ def simulateStepsOfCrispr():
     for seq in s:
         applyEditedRNAToDNA(seq)
         s = seq.seq
+        print(len(s))
         openReferenceFrames = []
         for idx, char in enumerate(s):
             window = s[idx:idx+3]
@@ -126,6 +150,8 @@ def simulateStepsOfCrispr():
                         end = idx2
                         openReferenceFrames.append((start, end ))
     print(openReferenceFrames)
+    CRISPR_COPY = 123
+    a = f'asdf {asdfasdasdfi}'
     SeqIO.write(f'maize{CRISPR_COPY}.fasta')
 
     #approximately 8 introns and exons
@@ -138,13 +164,13 @@ def simulateStepsOfCrispr():
     introns = intronsAndExons[1::2]
     exons = intronsAndExons[0::2]
     
-    
-
     #splice
     #new genes - replace with previous ones => simulate effects - substitue
     #splice new genes by replacing unused data with new gene - adddition
     #can crispr delete genes ???? 
     return openReferenceFrames
+
+#simulateStepsOfCrispr()
 
 @app.route('/currentlyActiveGenes')
 def organismGetGenes():
@@ -170,7 +196,7 @@ def get_uniprot (query='',query_type='PDB_ID'):
     'query':query
     }
     data = urllib.parse.urlencode(params)
-9    data = data.encode('ascii')
+    data = data.encode('ascii')
     request = urllib.request.Request(url, data)
     with urllib.request.urlopen(request) as response:
         res = response.read()
@@ -181,9 +207,125 @@ def get_uniprot (query='',query_type='PDB_ID'):
     query_output=get_uniprot(query=pdb_code,query_type='PDB_ID')
     accession_number = query_output[1].strip().split(' ')[-1].strip(';')
 
+
+def proteinomics():
+    #for gene in changedGene:
+    lines =
+    'ATOM      1  N   MET A   1      -8.016  15.868  15.250  1.00 62.44           N  '
+    with open('./data_sets/_.pdb') as pdb:
+        for line in pdb:
+            line = line.split(' ')
+    #simulate chemical reactions within cell
+    #diff output of simulation before and after gene edits
+            #type = atom, index = n, Met=, xyz element = z
+            
+def getPhenoTypesComputationally():
+    #probably n genes
+    #may not be a problem that can be yet solved in this way, requires direct observation and experiment?
+    #look up more papers and find out if there is a way to do this with code
+    if gene.expression = 'increased melanin in iris':
+        return ['brown color in eyes']
+    #TODO talk to biologists and find out what exactly they do to determine which genes to tweak and then get the desired result to publih a paper on
+
+def extractPhenoTypeAndGeneticDependenciesFromPaper():
+    phenotypes = []
+    for paper in os.listdir('./papers'):
+        text = getText(paper)
+        results = gpt.request('get me all the phenotype/trait->genes in the format phenotype:[genes], ')
+        phenotypes.append(results)
+    return phenotypes
+#protein interaction network
+#metabolome network
+#cell interaction network
+#transcriptome =
+# to finish this app - first step = talk to 10-100 domain experts - 5 per day - get lists of requiremnets
+#eta till v1 = 1 week
+
+
+#desired traits to add / emphasize = diseease resistnace, immunity to cold/heat, and increased yield of biofuels and reduced methane
+#current genes, possible genes, and proposed gene edits
+#that becomes a target genome which you use to generate SGRNA
+#selected possible genes = 20 => generates l;ist of proposed gene edits => SGRNA 
+#sent to lab, add to cart, send to home, and generate lab instruction procedure
+
+
+#difference between previous proteins, cell-behavior and tissue behavior, organism behavior -> effect on ecosystem/enviornment
+#
+
+
+
+
+
+
+
+
+
+#given a number of proposed gene edits
+#addition = substitue for unused genes
+#subtraction = substitute used genes for fillers
+#edit = subsittue used gene for another used gene
+def proposeSgrnaFromGeneEdits(edits):
+    #list of edits
+    edits = [
+        {'type': 'addition', 'seqData': 'asdfas',
+         },
+        {'type': 'subtraction', 'targetSeqData': 'asdf',
+         'targetSeqIndex': 1
+         },
+        {'type': 'substitution', 'targetSeqIndex': '1',
+         'originalSeqData': 'cat',
+         'targetSeqData': 'ccc',
+         'geneName': 'atpA'
+         }
+    ]
+    mrna = 'gatactactata'[::-1]
+    for edit in edits: 
+      if type == 'substituion':
+        gatacaa[edit['targetSeqIndex']] = edit['targetSeqData']
+      if type == 'addition':
+        idx = findFirstIndex(mrna, len(edit['seqData']))
+        mrna[idx] = edit['seqData']
+      if type == 'subtract':
+        mrna[edit['targetSeqIndex']] = 'T' * len(edit['targetSeqData'])
+    #consider introns + exonsfff
+    #consider how different gene placements affect the expression of said gene
+    return mrna
+
+def runTests():
+    print(proposeSgrnaFromGeneEdits([]))
+    assert proposeSgrnaFromGeneEdits([]) == 'gatactactata'
+    assert proposeSgrnaFromGeneEdits([])[3:6] == 'cat'
+
+    
+def predictEffectsOnMetabolimics():
+    #given a change to genes
+    #predict the change in the metabololome
+    #https://en.wikipedia.org/wiki/METLIN
+    #220,000 metabolite entries
+    #50 million molecules per cell
+    #70% cytoplasm
+    #network of metabolic reactions
+    #25% of weight in a cell = ribosome, 20,000
+
+    #45 trillion cells per human
+    #how many cells in an algae
+    #50 million protein molecules in a cell
+    #160,000 genes in algae
+    #300,000 genes
+    #simulate all combinations
+    #see which give best biofuel
+    return 10
+
+def predictEffectsOnTranscriptome():
+    #collection and properties of each ribosome+mrna
+    return 'prediction.h5'
+    
+def predictProteinStructure(): #predicts effects of cell change on tissue
+    return 'prediction.pdb'
+    
 CORS(app)
 if __name__ == "__main__":
-    print('hello')
+
     app.run(debug=True)
 
 from Bio import SeqIO
@@ -705,6 +847,10 @@ from Bio import SeqIO
 # #edit the PDB directly according to what the fasta file says 
 # #me = {} -> send request to nameServer which dispatches a route from cvs to postoffice
 
+def checkoutCart(params):
+    stripe_modal()
+    sendToLab()
+    return emails
 
 
 
