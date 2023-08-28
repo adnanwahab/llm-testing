@@ -15,28 +15,24 @@ import urllib.parse
 import urllib.request
 from bs4 import BeautifulSoup
 #https://www.ncbi.nlm.nih.gov/genbank/fastaformat/
-#perfect programming
+#perfect programming - 25 - august 
+# "send me a tree that has purple branches and so on"
 #human has 50 trillion cells
 #human has 50 protein million molecules per cell
 #proteins have average of 1500 atoms 
 #20,000 proteins types in a human
 #what is the overlap between the reference sequence and the existing sequences of the target nucleus
-
 #corn is solved https://www.maizegdb.org/
 #https://algae.biocyc.org/gene-search.shtm
 #https://mycocosm.jgi.doe.gov/cgi-bin/ToGo?accession=GO:0008150&species=Astpho2
 #https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2863401/
 #https://www.sciencedirect.com/science/article/abs/pii/S2211926423001017
 #https://www.nature.com/articles/srep24951
-
 #Phaeodactylum tricornutum
 #https://www.cell.com/molecular-plant/pdf/S1674-2052(18)30250-8.pdf
 #CpSRP54 is both a gene and a prtein? 
 #https://escholarship.org/uc/item/3xz420hv
-
-
 #add this gene to another algae so it has more photosynthesis ?
-
 # >sp|P37107|SR54C_ARATH Signal recognition particle subunit SRP54, chloroplastic OS=Arabidopsis thaliana OX=3702 GN=FFC PE=1 SV=1
 # MEALQFSSVNRVPCTLSCTGNRRIKAAFSSAFTGGTINSASLSSSRNLSTREIWSWVKSK
 # TVVGHGRYRRSQVRAEMFGQLTGGLEAAWSKLKGEEVLTKDNIAEPMRDIRRALLEADVS
@@ -55,13 +51,12 @@ from bs4 import BeautifulSoup
 #get gene file
 #get protein of expressed gene
 #finale: so that this gene can be edited and the expressed protein changes
-fname=  'F1maize.FINAL.fasta'
+fname = 'F1maize.FINAL.fasta'
 from Bio import SeqIO
 from BCBio.GFF import GFFExaminer
 import re
 from collections import defaultdict
 open_ai_key = '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'
-
 import glob
 from Bio import SeqIO
 
@@ -71,12 +66,9 @@ def listOfGenesThatAreActive():
     gff = 'Astgub1_GeneCatalog_genes_20230516.gff'
     f = '/home/awahab/llm-testing/data_sets/Astgub1/'
     fasta = 'Astgub1_AssemblyScaffolds_Repeatmasked.fasta'
-    #records = list(SeqIO.parse(f+gff, "gff"))
     in_file = f + gff
     examiner = GFFExaminer()
     in_handle = open(in_file)
-    print(examiner.parent_child_map(in_handle))
-    #in_handle.close()
     lines = []
     with open(f + gff) as file:
         lines += file.read().split('\n')
@@ -105,19 +97,30 @@ def listOf300Genes():
     all_fna = glob.glob('./archive/*/ncbi_dataset/data/rna.fna')
     return [findGenesFromDisk(f) for f in all_fna]
 
+@app.route('/'):
+def simulateStepsOfCrispr():
+    #simulate what happens when crispr molecule interacts with DNA molecule
+    #how does it cut the dna in the chromatin
+    #how many cells does it affect
+    s = SeqIO.parse('./maize.fasta')
+    seq = next(s).seq
+    for seq in s:
+        applyEditedRNAToDNA(seq)
+    SeqIO.write(f'maize{CRISPR_COPY}.fasta')
+    return 123
+
 @app.route('/currentlyActiveGenes')
 def organismGetGenes():
-    print('1231231231')
     return jsonify(listOfGenesThatAreActive())
 
 @app.route('/possibleGeneEdits')
 def getListOfGenesThatCanBeSpliced():
-    print('1231231231')
     return jsonify(listOf300Genes())
 
 @app.route('/spliceGeneByPrototypingSGRNA')
-def spliceGenesByPrototypingSGRNA():
-    return 123
+def spliceGeneWithSGRNA():
+    sgrna = ''
+    return sgrna
 
 def get_uniprot (query='',query_type='PDB_ID'):
     #code found at <a href="https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/">https://chem-workflows.com/articles/2019/10/29/retrieve-uniprot-data-using-python/</a>
@@ -130,7 +133,7 @@ def get_uniprot (query='',query_type='PDB_ID'):
     'query':query
     }
     data = urllib.parse.urlencode(params)
-    data = data.encode('ascii')
+9    data = data.encode('ascii')
     request = urllib.request.Request(url, data)
     with urllib.request.urlopen(request) as response:
         res = response.read()
@@ -148,30 +151,18 @@ if __name__ == "__main__":
 
 from Bio import SeqIO
 #protein updates involve which things in a cell - enzymes - especially for glowing and most of the things ?
-#glowing plant = 
-
-#just use a csv
-#@route
-
-
-# os.shell
-
+#glowing plant = #just use a csv
 # execAF = '''python3 docker/run_docker.py \
 #   --fasta_paths=monomer.fasta \
 #   --max_template_date=2021-11-01 \
 #   --model_preset=monomer \
 #   --data_dir=$DOWNLOAD_DIR \
 #   --output_dir=/home/user/absolute_path_to_the_output_dir'''
-
-
 # # Importing required module
 # import subprocess
- 
 # # Using system() method to
 # # execute shell commands
 # subprocess.Popen(execAF, shell=True)
-
-
 # def runAF():
 #     run_relax = True  #@param {type:"boolean"}
 #     relax_use_gpu = False  #@param {type:"boolean"}
@@ -181,15 +172,12 @@ from Bio import SeqIO
 #     model_names = config.MODEL_PRESETS['monomer'] + ('model_2_ptm',)
 #     elif model_type_to_use == ModelType.MULTIMER:
 #     model_names = config.MODEL_PRESETS['multimer']
-
 #     output_dir = 'prediction'
 #     os.makedirs(output_dir, exist_ok=True)
-
 #     plddts = {}
 #     ranking_confidences = {}
 #     pae_outputs = {}
 #     unrelaxed_proteins = {}
-
 #     for model_name in model_names:
 #         cfg = config.model_config(model_name)
 #         if model_type_to_use == ModelType.MONOMER: cfg.data.eval.num_ensemble = 1
@@ -565,38 +553,27 @@ from Bio import SeqIO
 #         'Content-Type': 'application/octet-stream',
 #         'Transfer-Encoding': 'chunked',
 #     }
-
 #     return Response(simulate_and_stream(), headers=headers)
-
-
 # #get list of viable edits online 
 # def get_genome():
 #     return ''
-
 # def modelMolecularChanges(fasta, seq, index):
 #     fasta[seq][index] = get_genome()
-
 # def pdb_to_fasta(pdb):
 #     assert 4 == 4
 #     pass
-
 # def fasta_to_pdb(fasta):
 #     pass
 
 # def editGenome(pdb, seq, index):
 #     fasta = pdb_to_fasta(pdb)
-
 #     fasta = modelMolecularChanges(fasta, seq, index)
-
 #     pdb = fasta_to_pdb(fasta)
-
 #     return pdb
-
 # @app.route('/alignment-editing')
 # def seeHowDNAEditsChangeThealignmentsOfTheGenome():
 #     seq = req.params.seq
 #     index = req.params.index
-    
 #     data = {
 #         'alignment': 'gataccat',
 #         'index': index,
@@ -604,7 +581,6 @@ from Bio import SeqIO
 #     }
 #     runGenomeSequencingAlgorithm(data)
 #     return data
-
 # def runGenomeSequencingAlgorithm(data):
 #     seq = data['seq']
 #     l = len(seq)
@@ -621,7 +597,6 @@ from Bio import SeqIO
 # ]
 # #use an octree for spatial acceleration lookups
 # #use numpy for faster vector math
-
 # #simulate 5 different systems in cell
 # #using machine learning to initialize the state of a cell so that it matches various states captured in single cell analysis 
 # #about 100 studies -> 5000-100,000 cell states in each one
@@ -638,17 +613,13 @@ from Bio import SeqIO
 #         self.dir = [0,0,0]
 #         self.type = 0
 #         #what states are there in an organelle 
-
 #     def step():
 #         self.coords[0] = self.coords[0] + self.dir[0]
 #         self.coords[1] = self.coords[1] + self.dir[1]
 #         self.coords[2] = self.coords[2] + self.dir[2]
-
 #     def interaction ():
 #         if collison(self.pos, self.neighbors):
 #             self.dir[0]
-
-
 # import random
 # def simulateCellChanges():
 #     agents = []
@@ -657,36 +628,27 @@ from Bio import SeqIO
 #         type = i % 5
 #         agents.append(Organelle(type, [i % 2, i % 3, i% 4], [i % 2, i% 2, i% 3])
 #         )
-
 #     iterations = 0
 #     while (iterations < 5000):
 #         iterations += 1
 #         for agent in agents: agent.step() 
-
-
 # class ExperimentModel:
 #     def __init__(self):
 #         self.steps = []
 #         self.parameters = None
 #     def step(self):
 #         return 1
-
 # def simulateExperiments(parameters):
 #     model = ExperimentModel()
 #     model.parameters = parameters
 #     model.step()
-
 # #https://www.frontiersin.org/articles/10.3389/fchem.2023.1106495/full
-
 # @route('/proteinomics')
 # def solveProblem():
 #     fasta = req.params.fasta
 #     import alphaFold
 #     alphaFold.run('./fasta')
 #     return 
-
-
-
 # def solveTheProblem():
 #     #go in person to every lab in the nation and talk to every biologist and find out software they use and come up with new workflows that they couldnt do before with new tools that they didnt have before 
 #     #   for each biologist(blueBiotech/greenBiotech) in the nation:
@@ -700,16 +662,12 @@ from Bio import SeqIO
 #             #return working product
 #             #return to step 1
 #     return 1
-
 # def findWalgreens():
 #     data = request('http://api.yelp.com/?&longitude=${longtiude}&latitude=${latitude}')
 #     print(data)     
-
 # #edit the PDB directly according to what the fasta file says 
-
-# "send me a tree that has purple branches and so on"
-
 # #me = {} -> send request to nameServer which dispatches a route from cvs to postoffice
+
 
 
 

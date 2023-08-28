@@ -1,31 +1,4 @@
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
      <html>
      <head>
      <meta charset="UTF-8">
@@ -90,7 +63,7 @@
      <pre class="absolute top-32 border border-purple-500 gene-description h-48 overflow-scroll w-96 left-96"></pre>
      <div id="viewer"></div>
      <h1 class="absolute top-0">Blue BioTech Support Application</h1>
-     <h3 class="absolute top-8">Make biofuel cheaper by simulation experiment workflows for edited genes - customized experiment modeling using parameters</h3>
+     <h3 class="absolute top-16">Make biofuel cheaper by simulation experiment workflows for edited genes - customized experiment modeling using parameters</h3>
 
 
      <select  class="dropdown absolute top-48 m-2">
@@ -103,7 +76,7 @@
      <option selected="true">algae</option>
      </select>
 
-     <div class=" m-6 grid grid-cols-3 gap-4 w-full">
+     <div class=" m-6 grid grid-cols-4 gap-4 w-full">
      <ul class="kmers "></ul>
      <svg></svg>
 
@@ -121,7 +94,7 @@
      
      </div>
      
-     <button class="">Add To Cart + Send To Lab</button>
+     <button class="absolute bottom-0 ">Add To Cart + Send To Lab</button>
      <div class="possible-edits-to-gene mt-6 absolute bottom-0"></div>
      <script type="module" src="/src/main.js"></script>
      </body>
@@ -134,7 +107,8 @@
 
   function getSGRNADesign () {
       //make this editable and show 6-7 different designs along with pros and cons for each one
-      return 'ba;lsdgalskjfals;kfjasldkfja'
+      let allPossibleEdits = []
+      return allPossibleEdits
   }
   
   async function getPossibleGeneEdits() {
@@ -161,6 +135,12 @@
       
       get('.possible-gene-edits').innerHTML = (possibleGeneEdits).map(d => `<li>${d}</li>`)
       get('.currently-active-genes').innerHTML = (currentlyActiveGenes).map(d => `<li>${d}</li>`)
+
+      get('.currently-active-genes').addEventListener('click', function (e) {
+	  let index = Array.from(get('.currently-active-genes').children).indexOf(e.target)
+	  
+	  console.log(index)
+      })
   }
   renderPage()
 
@@ -178,7 +158,7 @@
 
 
  function renderCanvas(text) {
-
+     return;
      var canvas = document.createElement('canvas')
 
      document.body.append(canvas)
