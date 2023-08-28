@@ -210,7 +210,7 @@ def get_uniprot (query='',query_type='PDB_ID'):
 
 def proteinomics():
     #for gene in changedGene:
-    lines =
+    lines =[]
     'ATOM      1  N   MET A   1      -8.016  15.868  15.250  1.00 62.44           N  '
     with open('./data_sets/_.pdb') as pdb:
         for line in pdb:
@@ -223,9 +223,25 @@ def getPhenoTypesComputationally():
     #probably n genes
     #may not be a problem that can be yet solved in this way, requires direct observation and experiment?
     #look up more papers and find out if there is a way to do this with code
-    if gene.expression = 'increased melanin in iris':
+    geneExpression = 123
+    if geneExpression == 'increased melanin in iris':
         return ['brown color in eyes']
     #TODO talk to biologists and find out what exactly they do to determine which genes to tweak and then get the desired result to publih a paper on
+
+
+def geneInteractionSimulation():
+    return 123
+def userFriendlyINterfaceThatGuidesUsersThroughCrisprcas9experiments():
+    #suggest target dequences, design pimers and predict potential off target effects
+    return 123
+
+def virtualLabEnvironment():
+    return 123 #virtual cells, reagents, equipment -> allow users
+
+#integrate databases of gene annotations such as functional information, pathways and related disesase
+
+#add persistence so all users can edit genomes on one canvas
+#use a discussionboard to have users collaboratively propose gene editing features
 
 def extractPhenoTypeAndGeneticDependenciesFromPaper():
     phenotypes = []
