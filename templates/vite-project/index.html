@@ -108,7 +108,7 @@
      <svg></svg>
 
      <label class="inline">Currently Active Genes</label>
-     <ul class="currently-gene-edits"></ul>
+     <ul class="currently-active-genes"></ul>
      
      <label class="inline">Proposed Gene Edits </label>
      <ul class="available-gene-edits"></ul>
@@ -156,7 +156,7 @@
 
   async function renderPage () {
       let possibleGeneEdits = await getPossibleGeneEdits()
-      let currentlyActiveGenes = await getCurrentlyActiveGenes()
+      let currentlyActiveGenes = Object.entries(await getCurrentlyActiveGenes())
       console.log('edits', possibleGeneEdits, currentlyActiveGenes)
       
       get('.possible-gene-edits').innerHTML = (possibleGeneEdits).map(d => `<li>${d}</li>`)
