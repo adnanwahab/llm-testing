@@ -151,32 +151,6 @@ import random
 #simulate tissues + communication between cells
 
 #simulate ecosystem -> https://tristansalles.github.io/EnviReef/welcome.html
-@jit(nopython=True)
-def spherical_to_cartesian(r, theta, phi):
-    '''Convert spherical coordinates (physics convention) to cartesian coordinates'''
-    sin_theta = np.sin(theta)
-    x = r * sin_theta * np.cos(phi)
-    y = r * sin_theta * np.sin(phi)
-    z = r * np.cos(theta)
-    
-    return x, y, z # return a tuple
-    
-@jit(nopython=True)
-def random_directions(n, r):
-    '''Return ``n`` 3-vectors in random directions with radius ``r``'''
-    out = np.empty(shape=(n,3), dtype=np.float64)
-    
-    for i in range(n):
-        # Pick directions randomly in solid angle
-        phi = random.uniform(0, 2*np.pi)
-        theta = np.arccos(random.uniform(-1, 1))
-        # unpack a tuple
-        x, y, z = spherical_to_cartesian(r, theta, phi)
-        out[i] = x, y, z
-    
-    return out
-
-
 
 def get_uniprot_info(uniprot_id):
     url = f"https://www.uniprot.org/uniprot/{uniprot_id}.xml"
