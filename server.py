@@ -3,6 +3,42 @@
 #Do Trait Modeling - do this one
 #Do crispr design + verification 
 
+
+
+
+
+#simulate every atom and every chemical process in a cell
+#use SCA to inform simulation -> 
+#query simulation by SCA -> outputs h5+h5ad
+
+# figure it out w/o molecules
+#gene ontology - tomorrow = get approximate "trait" or phentoype or what gene does 
+# https://nyu-cds.github.io/python-numba/05-cuda/
+# https://analyticsindiamag.com/scientists-use-nvidia-gpu-to-mimic-living-cell/#:~:text=NVIDIA%20GPUs%20were%20replicating%20around,them%20easier%20to%20recreate%20digitally.
+
+
+#use cell simulations to predict edits to genes result in better photosynthesis
+#cant do it randomly
+#a gene has 3000 base pairs - 3 million
+#create gene combinations that nature never would have and simulate them
+#render results of the simulation in webgpu
+
+#make it so the server ships in a docker container and you can run from steam or git clone 
+
+
+#simulate photosythesis to determine which genes to edit
+#dont use prebaked genes from other organisms ->
+#create new genes from scratch to create new chemical reaction cycles like calvin cycle that nature would
+#not have thought of
+
+
+#look at all crispr studies -> run
+
+
+
+
+#https://newatlas.com/crispr-flower-change-color/51276/#:~:text=Hitching%20a%20ride%20on%20a,usual%20violet%20flowers%20and%20stems.
+
 #https://www.ncbi.nlm.nih.gov/genbank/fastaformat/
 #perfect programming - 25 - august 
 # "send me a tree that has purple branches and so on"
@@ -66,9 +102,7 @@
 #subtraction = substitute used genes for fillers
 #edit = subsittue used gene for another used gene
 
-
 from __future__ import unicode_literals
-
 import os
 
 from flask import Flask, render_template, jsonify, redirect, url_for, request, send_from_directory
@@ -99,6 +133,95 @@ import requests
 #all glowing to popcorn
 from PyPDF2 import PdfReader
 import openai
+
+
+import requests
+from bs4 import BeautifulSoup
+
+
+import random
+#https://genomebiology.biomedcentral.com/articles/10.1186/s13059-020-02204-y
+#once you simulate the calvin cycle
+#can simulate or create new photosynthesis reactions from "scratch" -> may have different outputs
+#todo holographics -> design molecules in
+
+
+
+#https://github.com/GollyGang/ready/blob/gh-pages/Scripts/Python/convolve.py
+#simulate atoms in cell
+
+#simulate tissues + communication between cells
+
+#simulate ecosystem -> https://tristansalles.github.io/EnviReef/welcome.html
+@jit(nopython=True)
+def spherical_to_cartesian(r, theta, phi):
+    '''Convert spherical coordinates (physics convention) to cartesian coordinates'''
+    sin_theta = np.sin(theta)
+    x = r * sin_theta * np.cos(phi)
+    y = r * sin_theta * np.sin(phi)
+    z = r * np.cos(theta)
+    
+    return x, y, z # return a tuple
+    
+@jit(nopython=True)
+def random_directions(n, r):
+    '''Return ``n`` 3-vectors in random directions with radius ``r``'''
+    out = np.empty(shape=(n,3), dtype=np.float64)
+    
+    for i in range(n):
+        # Pick directions randomly in solid angle
+        phi = random.uniform(0, 2*np.pi)
+        theta = np.arccos(random.uniform(-1, 1))
+        # unpack a tuple
+        x, y, z = spherical_to_cartesian(r, theta, phi)
+        out[i] = x, y, z
+    
+    return out
+
+
+
+def get_uniprot_info(uniprot_id):
+    url = f"https://www.uniprot.org/uniprot/{uniprot_id}.xml"
+    response = requests.get(url)
+    if response.status_code != 200:
+        print(f"Failed to retrieve data for {uniprot_id}")
+        return
+
+    soup = BeautifulSoup(response.content, 'xml')
+    molecular_functions = []
+    gene_ontology = []
+
+    for entry in soup.find_all('entry'):
+        for dbReference in entry.find_all('dbReference', {'type': 'GO'}):
+            go_info = dbReference.find('property', {'type': 'term'}).get('value')
+            go_id = dbReference.get('id')
+            if go_info.startswith('F:'):
+                molecular_functions.append((go_id, go_info[2:]))
+            elif go_info.startswith('P:') or go_info.startswith('C:'):
+                gene_ontology.append((go_id, go_info[2:]))
+
+    return molecular_functions, gene_ontology
+
+
+def getTraits():
+    #given a genome -> genes
+    #look up every gene in ncbii -> uniprot -> find ones with GO + molecular function
+    #get list of all genes downloaded to archive
+    #look them up in uniprot
+    #build a graph out of the GO
+    #list of molecular functiosn = traits
+    uniprot_id = "IPR005969"  # Replace with your UniProt ID of interest
+    molecular_functions, gene_ontology = get_uniprot_info(uniprot_id)
+    
+    print("Molecular Functions:")
+    for go_id, function in molecular_functions:
+        print(f"{go_id}: {function}")
+
+    print("\nGene Ontology:")
+    for go_id, go_term in gene_ontology:
+         print(f"{go_id}: {go_term}")
+    return print(molecular_functions)
+#getTraits()
 
 def generate_text(prompt):
     openai.api_key = open_ai_key
@@ -866,7 +989,7 @@ from Bio import SeqIO
 #         return 1
 # def simulateExperiments(parameters):
 #     model = ExperimentModel()
-#     model.parameters = parameters
+#     model.parameters = parameters 
 #     model.step()
 # #https://www.frontiersin.org/articles/10.3389/fchem.2023.1106495/full
 # @route('/proteinomics')
@@ -899,7 +1022,6 @@ def checkoutCart(params):
     sendToLab()
     return emails
 
-
-
-
-
+#to do great work you have to not be distracted
+#they dont care they want you to do it anyway
+#hold 20 items in working memory and write perfect code w/o any mistakes 
