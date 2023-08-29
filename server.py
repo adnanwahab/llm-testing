@@ -145,8 +145,6 @@ import random
 #can simulate or create new photosynthesis reactions from "scratch" -> may have different outputs
 #todo holographics -> design molecules in
 
-
-
 #https://github.com/GollyGang/ready/blob/gh-pages/Scripts/Python/convolve.py
 #simulate atoms in cell
 
